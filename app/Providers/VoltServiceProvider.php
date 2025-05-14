@@ -8,7 +8,7 @@ use Livewire\Volt\Volt;
 class VoltServiceProvider extends ServiceProvider
 {
     /**
-     * Register services.
+     * Register any application services.
      */
     public function register(): void
     {
@@ -16,13 +16,12 @@ class VoltServiceProvider extends ServiceProvider
     }
 
     /**
-     * Bootstrap services.
+     * Bootstrap any application services.
      */
     public function boot(): void
     {
         Volt::mount([
-            config('livewire.view_path', resource_path('views/livewire')),
-            resource_path('views/pages'),
+            resource_path('views/livewire'),
         ]);
     }
 }

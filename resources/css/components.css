@@ -1,0 +1,94 @@
+/* Base colors for light/dark mode */
+@layer base {
+    :root {
+        /* Light mode variables */
+        --primary-color: #2563eb;
+        --background-light: #ffffff;
+        --text-light: #1f2937;
+        --border-light: #e5e7eb;
+        --card-light: #f9fafb;
+    }
+
+    .dark {
+        /* Dark mode variables */
+        --primary-color: #3b82f6;
+        --background-dark: #1f2937;
+        --text-dark: #f3f4f6;
+        --border-dark: #374151;
+        --card-dark: #111827;
+    }
+}
+
+/* Common component styles */
+.pelek-card {
+    @apply bg-white dark:bg-gray-800 
+           border border-gray-200 dark:border-gray-700 
+           rounded-lg shadow-sm 
+           transition-colors duration-200;
+}
+
+.pelek-text-primary {
+    @apply text-gray-900 dark:text-white;
+}
+
+.pelek-text-secondary {
+    @apply text-gray-600 dark:text-gray-300;
+}
+
+.pelek-button-primary {
+    @apply bg-primary-600 hover:bg-primary-700 
+           dark:bg-primary-500 dark:hover:bg-primary-600
+           text-white font-semibold 
+           rounded-lg px-4 py-2 
+           transition-colors duration-200;
+}
+
+.pelek-input {
+    @apply bg-white dark:bg-gray-800 
+           text-gray-900 dark:text-white 
+           border border-gray-300 dark:border-gray-600 
+           rounded-lg 
+           focus:ring-primary-500 focus:border-primary-500 
+           dark:focus:ring-primary-400 dark:focus:border-primary-400;
+}
+
+/* Property card specific styles */
+.property-card {
+    @apply pelek-card hover:shadow-md;
+}
+
+.property-card-title {
+    @apply text-xl font-semibold pelek-text-primary;
+}
+
+.property-card-price {
+    @apply text-lg font-bold text-primary-600 dark:text-primary-400;
+}
+
+.property-card-location {
+    @apply pelek-text-secondary text-sm;
+}
+
+/* Search filter styles */
+.filter-section {
+    @apply bg-gray-50 dark:bg-gray-900 
+           border border-gray-200 dark:border-gray-700 
+           rounded-lg p-4;
+}
+
+.filter-label {
+    @apply block pelek-text-primary text-sm font-medium mb-2;
+}
+
+/* Form styles */
+.form-group {
+    @apply space-y-2 mb-4;
+}
+
+.form-label {
+    @apply block pelek-text-primary text-sm font-medium;
+}
+
+.form-input {
+    @apply pelek-input w-full;
+}
