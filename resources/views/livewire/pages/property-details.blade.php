@@ -5,7 +5,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 use function Livewire\Volt\{state, computed};
 
-new #[Layout('layouts.app')] class extends Component {
+new #[Layout('component.layouts.app')] class extends Component {
     public Property $property;
 
     public function mount(Property $property)
