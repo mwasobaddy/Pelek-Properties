@@ -3,9 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+// Home page route using Volt component
+Volt::route('/', 'pages.home')->name('home');
 
 // Property routes
 Route::prefix('properties')->group(function () {
