@@ -1,6 +1,10 @@
 # Pelek Properties Implementation Tracking
 
-## Core Infrastructure Setup
+##- [x] Services Layer Implementation
+  - [x] PropertyService for CRUD operations
+  - [x] PropertySearchService with caching
+  - [x] PropertyImageService for image handling
+  - [x] BookingService for WhatsApp integrationCore Infrastructure Setup
 - [x] Laravel 12.x Installation
 - [x] Livewire/Volt Setup
 - [x] TailwindCSS Integration
