@@ -27,12 +27,13 @@
   - [x] System Management (4 permissions)
 
 ## Property Management
-- [ ] Database Migrations
-  - [ ] Properties Table
-  - [ ] Property Types
-  - [ ] Amenities
-  - [ ] Property Images
-- [ ] Models & Relationships
+- [x] Database Migrations
+  - [x] Properties Table (with listing types: sale, rent, airbnb)
+  - [x] Property Types Table
+  - [x] Amenities Table
+  - [x] Property Images Table
+  - [x] Property-Amenity Pivot Table
+- [-] Models & Relationships
 - [ ] Services Layer Implementation
 - [ ] Property CRUD Operations
 - [ ] Property Search & Filters
