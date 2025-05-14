@@ -11,12 +11,7 @@
 - [x] Environment Setup
 
 ## Livewire/Volt Components
-- [ ] Layouts
-  - [ ] Guest Layout (app.blade.php)
-  - [ ] Admin Layout (admin.blade.php)
-  - [ ] Navigation Component (Volt)
-  - [ ] Footer Component (Volt)
-
+- NB All blade must support both light and dark mode
 - [ ] Page Components
   - [ ] Home Page
     - [ ] FeaturedProperties.php (Livewire)
@@ -25,17 +20,20 @@
     - [ ] CallToAction.php (Volt)
   
   - [ ] Property Pages
-    - [ ] PropertyList.php (Livewire)
-      - [ ] Advanced Filtering
-      - [ ] Sorting Options
-      - [ ] Pagination with @persist
-    - [ ] PropertyDetails.php (Livewire)
-      - [ ] Image Gallery
-      - [ ] Property Info
-      - [ ] Similar Properties
-    - [ ] PropertySearch.php (Livewire)
-      - [ ] Real-time Search with wire:model.live
-      - [ ] Filter Panel
+    - [x] PropertyList.php (Volt)
+      - [x] Advanced Filtering
+      - [x] Sorting Options
+      - [x] Pagination with @persist
+    - [x] PropertyDetails.php (Volt)
+      - [x] Image Gallery
+      - [x] Property Info
+      - [x] Similar Properties
+    - [x] PropertySearch.php (Volt)
+      - [x] Real-time Search with wire:model.live
+      - [x] Filter Panel
+      - [x] URL-persisted filters
+      - [x] Price range filtering
+      - [x] Property type filtering
   
   - [ ] Admin Dashboard
     - [ ] PropertyManager.php (Livewire)
@@ -45,7 +43,7 @@
 
 - [ ] Reusable Components (Volt)
   - [ ] UI Components
-    - [ ] PropertyCard.php
+    - [x] PropertyCard.php (with dark mode support)
     - [ ] SearchFilters.php
     - [ ] ImageGallery.php
     - [ ] PriceDisplay.php
@@ -159,12 +157,44 @@
 - [ ] About Us Page
 
 ## User Interface Components
-- [ ] Property Cards
-- [ ] Search Filters
-- [ ] Booking Forms
-- [ ] Contact Forms
+### Base Components
+- [x] CSS Utilities for Dark/Light Mode
+  - [x] Color scheme variables
+  - [x] Common component classes
+  - [x] Responsive utility classes
+
+### Property Components
+- [x] Property Card (Volt Component)
+  - [x] Light/Dark mode support
+  - [x] Image with listing type badge
+  - [x] Property details display
+  - [x] WhatsApp inquiry modal
+  - [x] Price formatting by listing type
+- [ ] Search Filters (Livewire)
+  - [ ] Advanced filtering options
+  - [ ] Price range selector
+  - [ ] Location filter
+  - [ ] Property type filter
+- [ ] Property Gallery
+  - [ ] Image slider
+  - [ ] Thumbnail navigation
+  - [ ] Lightbox support
+
+### Form Components
+- [ ] Booking Form
+  - [ ] Date selection
+  - [ ] Guest information
+  - [ ] WhatsApp integration
+- [ ] Contact Form
+  - [ ] Input validation
+  - [ ] Success notifications
+  - [ ] Error handling
+
+### Layout Components
+- [x] App Layout (Using Laravel's built-in layout)
 - [ ] Navigation Menu
 - [ ] Footer
+- [ ] Sidebar variants
 
 ## Communication Features
 - [ ] WhatsApp Integration

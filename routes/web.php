@@ -11,6 +11,9 @@ Route::get('/', function () {
 Route::prefix('properties')->group(function () {
     Volt::route('/', 'propertylist')
         ->name('properties.index');
+    
+    Volt::route('/search', 'property-search')
+        ->name('properties.search');
         
     Volt::route('/{property}', 'property-details')
         ->name('properties.show');
