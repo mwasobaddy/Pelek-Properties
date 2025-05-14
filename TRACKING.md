@@ -1,10 +1,6 @@
 # Pelek Properties Implementation Tracking
 
-##- [x] Services Layer Implementation
-  - [x] PropertyService for CRUD operations
-  - [x] PropertySearchService with caching
-  - [x] PropertyImageService for image handling
-  - [x] BookingService for WhatsApp integrationCore Infrastructure Setup
+## Core Infrastructure Setup
 - [x] Laravel 12.x Installation
 - [x] Livewire/Volt Setup
 - [x] TailwindCSS Integration
@@ -13,6 +9,77 @@
 - [x] SweetAlert2 Integration
 - [x] Database Configuration (SQLite)
 - [x] Environment Setup
+
+## Livewire/Volt Components
+- [ ] Layouts
+  - [ ] Guest Layout (app.blade.php)
+  - [ ] Admin Layout (admin.blade.php)
+  - [ ] Navigation Component (Volt)
+  - [ ] Footer Component (Volt)
+
+- [ ] Page Components
+  - [ ] Home Page
+    - [ ] FeaturedProperties.php (Livewire)
+    - [ ] PropertyCategories.php (Volt)
+    - [ ] SearchHero.php (Livewire)
+    - [ ] CallToAction.php (Volt)
+  
+  - [ ] Property Pages
+    - [ ] PropertyList.php (Livewire)
+      - [ ] Advanced Filtering
+      - [ ] Sorting Options
+      - [ ] Pagination with @persist
+    - [ ] PropertyDetails.php (Livewire)
+      - [ ] Image Gallery
+      - [ ] Property Info
+      - [ ] Similar Properties
+    - [ ] PropertySearch.php (Livewire)
+      - [ ] Real-time Search with wire:model.live
+      - [ ] Filter Panel
+  
+  - [ ] Admin Dashboard
+    - [ ] PropertyManager.php (Livewire)
+    - [ ] ImageUploader.php (Livewire)
+    - [ ] PropertyForm.php (Livewire)
+    - [ ] AmenityManager.php (Volt)
+
+- [ ] Reusable Components (Volt)
+  - [ ] UI Components
+    - [ ] PropertyCard.php
+    - [ ] SearchFilters.php
+    - [ ] ImageGallery.php
+    - [ ] PriceDisplay.php
+    - [ ] AmenityList.php
+    - [ ] WhatsAppButton.php
+  
+  - [ ] Form Components
+    - [ ] PropertyFilter.php
+    - [ ] BookingForm.php
+    - [ ] ContactForm.php
+    - [ ] ImageUpload.php
+
+- [ ] Flux Integration
+  - [ ] Custom Theme Setup
+  - [ ] Extended Components
+    - [ ] x-flux-button
+    - [ ] x-flux-card
+    - [ ] x-flux-form
+    - [ ] x-flux-modal
+    - [ ] x-flux-alert
+
+- [ ] Notification System
+  - [ ] SweetAlert2 Integration
+    - [ ] Success Messages
+    - [ ] Error Handling
+    - [ ] Confirmation Dialogs
+    - [ ] Toast Notifications
+
+- [ ] Interactive Features
+  - [ ] Real-time Search
+  - [ ] Image Preview/Gallery
+  - [ ] WhatsApp Integration
+  - [ ] Form Validation
+  - [ ] Loading States with wire:loading
 
 ## Authentication & Authorization
 - [x] User Authentication Setup
