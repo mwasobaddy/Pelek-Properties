@@ -28,8 +28,10 @@ $resetFilters = function () {
     $this->onlyAvailable = false;
 };
 
-$properties = computed(function (PropertySearchService $propertySearchService) {
-    return $propertySearchService->search([
+$properties = computed(function () {
+    /** @var PropertySearchService $service */
+    $service = app(PropertySearchService::class);
+    return $service->search([
         'search' => $this->search,
         'property_type_id' => $this->propertyType,
         'min_price' => $this->priceRange ? explode('-', $this->priceRange)[0] : null,
@@ -40,9 +42,6 @@ $properties = computed(function (PropertySearchService $propertySearchService) {
 
 new #[Layout('components.layouts.app')] class extends Component {
     use WithPagination;
-            'properties' => $this->properties(),
-        ];
-    }
 } ?>
 
 <div class="container mx-auto px-4 py-8">
