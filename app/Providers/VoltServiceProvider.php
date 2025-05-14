@@ -22,6 +22,8 @@ class VoltServiceProvider extends ServiceProvider
     {
         Volt::mount([
             resource_path('views/livewire'),
+            resource_path('views/livewire/pages'),
+            resource_path('views/livewire/components'),
         ]);
     }
 }

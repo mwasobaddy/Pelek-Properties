@@ -9,13 +9,13 @@ Route::get('/', function () {
 
 // Property routes
 Route::prefix('properties')->group(function () {
-    Volt::route('/', 'propertylist')
+    Volt::route('/', 'pages.propertylist')
         ->name('properties.index');
     
-    Volt::route('/search', 'property-search')
+    Volt::route('/search', 'pages.property-search')
         ->name('properties.search');
         
-    Volt::route('/{property}', 'property-details')
+    Volt::route('/{property}', 'pages.property-details')
         ->name('properties.show');
 });
 
