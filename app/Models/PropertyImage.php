@@ -17,11 +17,13 @@ class PropertyImage extends Model
         'is_featured',
         'display_order',
         'alt_text',
+        'metadata',
     ];
 
     protected $casts = [
         'is_featured' => 'boolean',
         'display_order' => 'integer',
+        'metadata' => 'array',
     ];
 
     /**
@@ -38,6 +40,14 @@ class PropertyImage extends Model
     public function scopeFeatured($query)
     {
         return $query->where('is_featured', true);
+    }
+
+    /**
+     * Scope a query to only include airbnb images.
+     */
+    public function scopeAirbnb($query)
+    {
+        return $query->whereJsonContains('metadata->type', 'airbnb');
     }
 
     /**

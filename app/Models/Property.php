@@ -82,6 +82,24 @@ class Property extends Model
     {
         return $this->hasOne(PropertyImage::class)->where('is_featured', true);
     }
+    
+    /**
+     * Get all Airbnb-specific images for this property.
+     */
+    public function airbnbImages()
+    {
+        return $this->hasMany(PropertyImage::class)->whereJsonContains('metadata->type', 'airbnb')->ordered();
+    }
+    
+    /**
+     * Get the featured Airbnb image for this property.
+     */
+    public function featuredAirbnbImage()
+    {
+        return $this->hasOne(PropertyImage::class)
+            ->whereJsonContains('metadata->type', 'airbnb')
+            ->where('is_featured', true);
+    }
 
     /**
      * Get all amenities for this property.

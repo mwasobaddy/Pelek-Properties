@@ -4,9 +4,8 @@ use App\Models\Property;
 use function Livewire\Volt\{state};
 use Illuminate\Support\Facades\Storage;
  
-// Component state with computed properties and methods
+// Component state with computed properties
 state([
-    // Properties
     'property' => null, // This will receive the Property model
     'debug' => '',
     'currentImageIndex' => 0,
@@ -36,39 +35,40 @@ state([
     'featuredImage' => fn() => $this->property->featuredImage 
         ? Storage::url($this->property->featuredImage->image_path) 
         : asset('images/placeholder.jpg'),
-        
-    // Methods directly in state array
-    'mount' => function (Property $property) {
-        $this->property = $property;
-        
-        // For Airbnb properties, preload images for the slider
-        if ($property->listing_type === 'airbnb') {
-            $this->showingSlider = $property->images()->count() > 1;
-        }
-    },
-    
-    'nextImage' => function() {
-        $totalImages = count($this->propertyImages);
-        if ($totalImages <= 1) return;
-        
-        $this->currentImageIndex = ($this->currentImageIndex + 1) % $totalImages;
-    },
-    
-    'prevImage' => function() {
-        $totalImages = count($this->propertyImages);
-        if ($totalImages <= 1) return;
-        
-        $this->currentImageIndex = ($this->currentImageIndex - 1 + $totalImages) % $totalImages;
-    },
-    
-    'currentImage' => function() {
-        $images = $this->propertyImages;
-        if ($images->isEmpty()) return asset('images/placeholder.jpg');
-        
-        $image = $images[$this->currentImageIndex] ?? $images[0];
-        return Storage::url($image->image_path);
-    }
 ]);
+
+// Mount method to receive the property
+$mount = function (Property $property) {
+    $this->property = $property;
+    
+    // For Airbnb properties, preload images for the slider
+    if ($property->listing_type === 'airbnb') {
+        $this->showingSlider = $property->images()->count() > 1;
+    }
+};
+
+// Methods for image slider
+$nextImage = function() {
+    $totalImages = count($this->propertyImages());
+    if ($totalImages <= 1) return;
+    
+    $this->currentImageIndex = ($this->currentImageIndex + 1) % $totalImages;
+};
+
+$prevImage = function() {
+    $totalImages = count($this->propertyImages());
+    if ($totalImages <= 1) return;
+    
+    $this->currentImageIndex = ($this->currentImageIndex - 1 + $totalImages) % $totalImages;
+};
+
+$currentImage = function() {
+    $images = $this->propertyImages();
+    if ($images->isEmpty()) return asset('images/placeholder.jpg');
+    
+    $image = $images[$this->currentImageIndex] ?? $images[0];
+    return Storage::url($image->image_path);
+};
 ?>
 
 <div>
@@ -77,7 +77,7 @@ state([
         {{-- Image Section with Slider for Airbnb Properties --}}
         <div class="relative aspect-w-16 aspect-h-10 overflow-hidden">
             {{-- Main Image --}}
-            <img src="{{ $this->currentImage }}" 
+            <img src="{{ $this->currentImage() }}" 
                  alt="{{ $property->title }}" 
                  class="h-full w-full object-cover transition-all duration-500 group-hover:scale-110">
             
@@ -98,7 +98,7 @@ state([
                 
                 {{-- Image Counter --}}
                 <div class="absolute bottom-4 right-4 bg-black/50 rounded-full px-2 py-1 text-xs text-white">
-                    {{ $this->currentImageIndex + 1 }} / {{ count($this->propertyImages) }}
+                    {{ $this->currentImageIndex + 1 }} / {{ count($this->propertyImages()) }}
                 </div>
             @endif
             
@@ -201,7 +201,7 @@ state([
                 {{-- Modal Header with Property Image --}}
                 <div class="mb-4 flex items-center space-x-4">
                     <div class="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg">
-                        <img src="{{ $this->currentImage }}"
+                        <img src="{{ $this->currentImage() }}"
                             alt="{{ $property->title }}"
                             class="h-full w-full object-cover">
                     </div>

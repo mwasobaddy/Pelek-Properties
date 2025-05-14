@@ -53,6 +53,83 @@ class PropertyImageService
     }
 
     /**
+     * Store an Airbnb-specific property image
+     * These images can have special handling for Airbnb listings
+     */
+    public function storeAirbnbImage(Property $property, UploadedFile $file, bool $isFeatured = false): PropertyImage
+    {
+        // Generate unique filename with airbnb prefix
+        $filename = 'airbnb-' . Str::uuid() . '.' . $file->getClientOriginalExtension();
+        
+        // Get the next display order
+        $displayOrder = $property->images()->max('display_order') + 1;
+
+        // Store original image in airbnb subfolder
+        $imagePath = $file->storeAs(
+            "properties/{$property->id}/airbnb",
+            $filename,
+            'public'
+        );
+
+        // Create and store thumbnail with special dimensions optimized for Airbnb
+        // Airbnb prefers 1024x683 px images (3:2 ratio)
+        $thumbnail = Image::make($file)
+            ->fit(1024, 683)
+            ->encode($file->getClientOriginalExtension(), 90);
+
+        $thumbnailPath = "properties/{$property->id}/airbnb/thumbnails/" . $filename;
+        Storage::disk('public')->put($thumbnailPath, $thumbnail);
+
+        // If this is set as featured, unset other featured images
+        if ($isFeatured) {
+            $property->images()->update(['is_featured' => false]);
+        }
+
+        // Create image record with airbnb tag
+        $image = $property->images()->create([
+            'image_path' => $imagePath,
+            'thumbnail_path' => $thumbnailPath,
+            'is_featured' => $isFeatured,
+            'display_order' => $displayOrder,
+            'alt_text' => $property->title . ' - Airbnb',
+        ]);
+        
+        // Add metadata for airbnb images
+        $image->metadata = [
+            'type' => 'airbnb',
+            'optimized' => true,
+            'uploaded_at' => now()->toDateTimeString()
+        ];
+        $image->save();
+        
+        return $image;
+    }
+
+    /**
+     * Get all images for an Airbnb property
+     */
+    public function getAirbnbPropertyImages(Property $property)
+    {
+        if ($property->listing_type !== 'airbnb') {
+            // For non-Airbnb properties, just return the featured image
+            return collect([$property->featuredImage])->filter();
+        }
+        
+        // For Airbnb properties, get all images ordered by display order
+        $images = $property->images()
+            ->orderBy('is_featured', 'desc') // Featured images first
+            ->orderBy('display_order', 'asc')
+            ->get();
+            
+        // If no images, return empty collection
+        if ($images->isEmpty()) {
+            return collect();
+        }
+        
+        return $images;
+    }
+
+    /**
      * Store multiple property images
      */
     public function storeMany(Property $property, array $files): array

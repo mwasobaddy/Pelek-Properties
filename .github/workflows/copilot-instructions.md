@@ -1,7 +1,7 @@
 # Pelek Properties - Laravel Best Practices
 
 ## Tech Stack
-- **Laravel 12.x** (with built-in Livewire/Volt, Flux, Tailwind)
+- **Laravel 12.14.1** (with built-in Livewire/Volt #, Flux, Tailwind)
 - **Spatie Permissions** (v6) for role management
 - **SweetAlert2** for notifications
 - **MySQL** database
@@ -343,3 +343,17 @@ authentication services and one of Laravel's API authentication packages.
 - All blade must support both light and dark mode
 - Laravel Support these layouts. I would love to use the unless otherwise #fetch https://laravel.com/docs/12.x/starter-kits#livewire-available-layouts (No need to update the app.blade since it supports dark mode and uses flux). By Dark and light mode I meant that the components that you will create, must have the class for light and dark mode
 - Also note that volt components must be created inside the file "resources/views/livewire"
+
+I see what's happening now. In Laravel 12.14.1 with Livewire 3, there have been significant changes to how computed properties work in Volt components. Let me explain the fix:
+The Issue
+The error "Undefined variable $priceLabel" occurs because in newer versions of Livewire Volt, computed properties need to be defined differently. The previous computed() function approach is no longer working.
+The Solution
+I've updated the component to define computed properties directly inside the state() function as arrow functions:
+phpstate([
+    'property' => null,
+    'debug' => '',
+    // Add computed properties directly into state as arrow functions
+    'formattedPrice' => fn() => number_format(...),
+    'priceLabel' => fn() => match(...),
+]);
+This matches the latest Livewire Volt syntax where computed values are defined directly in the state array.
