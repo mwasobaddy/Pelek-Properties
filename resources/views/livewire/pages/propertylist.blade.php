@@ -1,48 +1,66 @@
 <?php
 
-use App\Models\Property;
 use App\Services\PropertySearchService;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
-use function Livewire\Volt\{state, computed};
 
-state([
-    'search' => '',
-    'propertyType' => null,
-    'priceRange' => null,
-    'onlyAvailable' => false
-]);
-
-$queryString = [
-    'search' => ['except' => ''],
-    'propertyType' => ['except' => ''],
-    'priceRange' => ['except' => ''],
-    'onlyAvailable' => ['except' => false],
-];
-
-$resetFilters = function () {
-    $this->search = '';
-    $this->propertyType = null;
-    $this->priceRange = null;
-    $this->onlyAvailable = false;
-};
-
-$properties = computed(function () {
-    /** @var PropertySearchService $service */
-    $service = app(PropertySearchService::class);
-    return $service->search([
-        'search' => $this->search,
-        'property_type_id' => $this->propertyType,
-        'min_price' => $this->priceRange ? explode('-', $this->priceRange)[0] : null,
-        'max_price' => $this->priceRange ? explode('-', $this->priceRange)[1] : null,
-        'status' => $this->onlyAvailable ? 'available' : null,
-    ]);
-});
-
-new #[Layout('components.layouts.app')] class extends Component {
+new #[Layout('components.layouts.guest')] class extends Component {
     use WithPagination;
-} ?>
+
+    protected $queryString = [
+        'search' => ['except' => ''],
+        'propertyType' => ['except' => ''],
+        'priceRange' => ['except' => ''],
+        'onlyAvailable' => ['except' => false],
+    ];
+
+    public $priceRange;
+    public $search = '';
+    public $propertyType = null;
+    public $onlyAvailable = false;
+    
+    public function mount()
+    {
+        // No need to store properties in mount
+    }
+
+    public function resetFilters()
+    {
+        $this->search = '';
+        $this->propertyType = null;
+        $this->priceRange = null;
+        $this->onlyAvailable = false;
+    }
+
+    public function with(): array
+    {
+        $min_price = null;
+        $max_price = null;
+        $priceRange = $this->priceRange;
+
+        if ($priceRange !== null && $priceRange !== '') {
+            $range = explode('-', (string) $priceRange);
+            if (!empty($range[0])) {
+                $min_price = (int) $range[0];
+            }
+            if (!empty($range[1])) {
+                $max_price = (int) $range[1];
+            }
+        }
+
+        return [
+            'properties' => app(PropertySearchService::class)->search([
+                'search' => $this->search,
+                'property_type_id' => $this->propertyType,
+                'min_price' => $min_price,
+                'max_price' => $max_price,
+                'status' => $this->onlyAvailable ? 'available' : null,
+            ])
+        ];
+    }
+}
+?>
 
 <div class="container mx-auto px-4 py-8">
     <!-- Search and Filters -->
@@ -81,42 +99,16 @@ new #[Layout('components.layouts.app')] class extends Component {
     <!-- Properties Grid -->
     <div wire:loading.delay.class="opacity-50">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            @foreach($properties as $property)
+            @forelse($properties as $property)
                 <div class="bg-white rounded-lg shadow-lg overflow-hidden">
                     <!-- Property Card -->
-                    <div class="relative">
-                        @if($property->images->isNotEmpty())
-                            <img 
-                                src="{{ $property->images->first()->url }}" 
-                                alt="{{ $property->title }}"
-                                class="w-full h-48 object-cover"
-                            >
-                        @endif
-                        <div class="absolute top-2 right-2">
-                            <span class="px-2 py-1 text-sm bg-indigo-500 text-white rounded-full">
-                                {{ $property->propertyType->name }}
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <div class="p-4">
-                        <h3 class="text-lg font-semibold mb-2">{{ $property->title }}</h3>
-                        <p class="text-gray-600 text-sm mb-4">{{ Str::limit($property->description, 100) }}</p>
-                        
-                        <div class="flex justify-between items-center">
-                            <span class="text-lg font-bold text-indigo-600">
-                                ${{ number_format($property->rental_price_daily) }} / day
-                            </span>
-                            <a 
-                                href="{{ route('properties.show', $property) }}" 
-                                class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition"
-                            >
-                                View Details
-                            </a>
-                        </div>
-                    </div>
+                    <livewire:components.property-card :property="$property" />
                 </div>
-            @endforeach
+            @empty
+                <div class="col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-4">
+                    <p class="text-center text-gray-500">No properties found.</p>
+                </div>
+            @endforelse
         </div>
 
         <div class="mt-8">

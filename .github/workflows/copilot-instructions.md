@@ -335,6 +335,11 @@ authentication. Many applications will use both Laravel's built-in cookie based
 authentication services and one of Laravel's API authentication packages.
 
 ## 22. Development Workflow
-     - Git branching strategy
-     - Code review process
-     - Documentation standards
+    - Git branching strategy
+    - Code review process
+    - Documentation standards
+
+## 23. Things to note
+- All blade must support both light and dark mode
+- Laravel Support these layouts. I would love to use the unless otherwise #fetch https://laravel.com/docs/12.x/starter-kits#livewire-available-layouts (No need to update the app.blade since it supports dark mode and uses flux). By Dark and light mode I meant that the components that you will create, must have the class for light and dark mode
+- Also note that volt components must be created inside the file "resources/views/livewire"
