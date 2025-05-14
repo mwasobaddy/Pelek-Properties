@@ -91,6 +91,18 @@ class PropertyService
     }
 
     /**
+     * Get all featured properties grouped by listing type
+     */
+    public function getAllFeaturedProperties(int $limit = 4): array
+    {
+        return [
+            'sale' => $this->getFeatured('sale', $limit)->all(),
+            'rent' => $this->getFeatured('rent', $limit)->all(),
+            'airbnb' => $this->getFeatured('airbnb', $limit)->all(),
+        ];
+    }
+
+    /**
      * Get properties by type with pagination
      */
     public function getByType(string $type, int $perPage = 12): LengthAwarePaginator

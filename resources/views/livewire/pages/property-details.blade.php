@@ -2,7 +2,7 @@
 use Livewire\Volt\Component;
 use function Livewire\Volt\{state, computed};
 
-new #[Layout('components.layouts.app')] class extends Component {se App\Models\Property;
+new #[Layout('components.layouts.guest')] class extends Component {se App\Models\Property;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 use function Livewire\Volt\{state, computed};

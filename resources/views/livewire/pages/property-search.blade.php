@@ -4,7 +4,7 @@ use Livewire\WithPagination;
 use Livewire\Volt\Component;
 use function Livewire\Volt\{state, computed};
 
-new #[Layout('components.layouts.app')] class extends Component {pp\Models\Property;
+new #[Layout('components.layouts.guest')] class extends Component {pp\Models\Property;
 use App\Models\PropertyType;
 use App\Services\PropertySearchService;
 use Livewire\Attributes\Layout;

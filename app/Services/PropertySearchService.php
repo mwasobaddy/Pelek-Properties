@@ -158,4 +158,18 @@ class PropertySearchService
             'avg' => (int) $stats->avg_price,
         ];
     }
+
+    /**
+     * Get count of properties by listing type
+     */
+    public function getPropertyCountsByType(): array
+    {
+        return Cache::remember('property_counts_by_type', 3600, function () {
+            return Property::query()
+                ->selectRaw('listing_type, count(*) as count')
+                ->groupBy('listing_type')
+                ->pluck('count', 'listing_type')
+                ->toArray();
+        });
+    }
 }
