@@ -1,6 +1,9 @@
-<?php
+<?puse Livewire\Attributes\Layout;
+use Livewire\Volt\Component;
+use Livewire\WithPagination;
+use function Livewire\Volt\{state, computed};
 
-use App\Models\Property;
+new #[Layout('components.layouts.app')] class extends Component {e App\Models\Property;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
