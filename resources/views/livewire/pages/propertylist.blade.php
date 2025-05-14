@@ -29,27 +29,22 @@ new #[Layout('component.layouts.app')] class extends Component {
         $this->reset('search', 'propertyType', 'priceRange', 'onlyAvailable');
     }
 
-    // We'll store the paginated properties
+    private PropertySearchService $propertySearchService;
+
+    public function boot(PropertySearchService $propertySearchService)
+    {
+        $this->propertySearchService = $propertySearchService;
+    }
+
     public function properties()
     {
-        return Property::query()
-            ->when($this->search, fn($query) => 
-                $query->where('title', 'like', '%' . $this->search . '%')
-                    ->orWhere('description', 'like', '%' . $this->search . '%')
-            )
-            ->when($this->propertyType, fn($query) => 
-                $query->where('property_type_id', $this->propertyType)
-            )
-            ->when($this->priceRange, function($query) {
-                [$min, $max] = explode('-', $this->priceRange);
-                return $query->whereBetween('rental_price_daily', [$min, $max]);
-            })
-            ->when($this->onlyAvailable, fn($query) => 
-                $query->where('is_available', true)
-            )
-            ->with(['propertyType', 'amenities', 'images'])
-            ->paginate(12);
-    }
+        return $this->propertySearchService->search([
+            'search' => $this->search,
+            'property_type_id' => $this->propertyType,
+            'min_price' => $this->priceRange ? explode('-', $this->priceRange)[0] : null,
+            'max_price' => $this->priceRange ? explode('-', $this->priceRange)[1] : null,
+            'status' => $this->onlyAvailable ? 'available' : null,
+        ]);
 
     public function with(): array
     {
@@ -96,7 +91,7 @@ new #[Layout('component.layouts.app')] class extends Component {
     <!-- Properties Grid -->
     <div wire:loading.delay.class="opacity-50">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            @foreach($properties as $property)
+            @foreach($this->properties as $property)
                 <div class="bg-white rounded-lg shadow-lg overflow-hidden">
                     <!-- Property Card -->
                     <div class="relative">
@@ -135,7 +130,7 @@ new #[Layout('component.layouts.app')] class extends Component {
         </div>
 
         <div class="mt-8">
-            {{ $properties->links() }}
+            {{ $this->properties->links() }}
         </div>
     </div>
 </div>
