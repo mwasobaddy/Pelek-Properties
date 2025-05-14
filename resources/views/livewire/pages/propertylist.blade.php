@@ -1,54 +1,45 @@
-<?puse Livewire\Attributes\Layout;
-use Livewire\Volt\Component;
-use Livewire\WithPagination;
-use function Livewire\Volt\{state, computed};
+<?php
 
-new #[Layout('components.layouts.app')] class extends Component {e App\Models\Property;
+use App\Models\Property;
+use App\Services\PropertySearchService;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
 use function Livewire\Volt\{state, computed};
 
-new #[Layout('component.layouts.app')] class extends Component {
+state([
+    'search' => '',
+    'propertyType' => null,
+    'priceRange' => null,
+    'onlyAvailable' => false
+]);
+
+$queryString = [
+    'search' => ['except' => ''],
+    'propertyType' => ['except' => ''],
+    'priceRange' => ['except' => ''],
+    'onlyAvailable' => ['except' => false],
+];
+
+$resetFilters = function () {
+    $this->search = '';
+    $this->propertyType = null;
+    $this->priceRange = null;
+    $this->onlyAvailable = false;
+};
+
+$properties = computed(function (PropertySearchService $propertySearchService) {
+    return $propertySearchService->search([
+        'search' => $this->search,
+        'property_type_id' => $this->propertyType,
+        'min_price' => $this->priceRange ? explode('-', $this->priceRange)[0] : null,
+        'max_price' => $this->priceRange ? explode('-', $this->priceRange)[1] : null,
+        'status' => $this->onlyAvailable ? 'available' : null,
+    ]);
+});
+
+new #[Layout('components.layouts.app')] class extends Component {
     use WithPagination;
-
-    public string $search = '';
-    public ?string $propertyType = null;
-    public ?string $priceRange = null;
-    public bool $onlyAvailable = false;
-
-    protected $queryString = [
-        'search' => ['except' => ''],
-        'propertyType' => ['except' => ''],
-        'priceRange' => ['except' => ''],
-        'onlyAvailable' => ['except' => false],
-    ];
-
-    public function resetFilters()
-    {
-        $this->reset('search', 'propertyType', 'priceRange', 'onlyAvailable');
-    }
-
-    private PropertySearchService $propertySearchService;
-
-    public function boot(PropertySearchService $propertySearchService)
-    {
-        $this->propertySearchService = $propertySearchService;
-    }
-
-    public function properties()
-    {
-        return $this->propertySearchService->search([
-            'search' => $this->search,
-            'property_type_id' => $this->propertyType,
-            'min_price' => $this->priceRange ? explode('-', $this->priceRange)[0] : null,
-            'max_price' => $this->priceRange ? explode('-', $this->priceRange)[1] : null,
-            'status' => $this->onlyAvailable ? 'available' : null,
-        ]);
-
-    public function with(): array
-    {
-        return [
             'properties' => $this->properties(),
         ];
     }
@@ -91,7 +82,7 @@ new #[Layout('component.layouts.app')] class extends Component {
     <!-- Properties Grid -->
     <div wire:loading.delay.class="opacity-50">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            @foreach($this->properties as $property)
+            @foreach($properties as $property)
                 <div class="bg-white rounded-lg shadow-lg overflow-hidden">
                     <!-- Property Card -->
                     <div class="relative">
@@ -130,7 +121,7 @@ new #[Layout('component.layouts.app')] class extends Component {
         </div>
 
         <div class="mt-8">
-            {{ $this->properties->links() }}
+            {{ $properties->links() }}
         </div>
     </div>
 </div>
