@@ -82,7 +82,7 @@ new class extends Component {
                             {{ $type === 'rent' ? 'bg-blue-100 dark:bg-blue-800' : '' }}
                             {{ $type === 'airbnb' ? 'bg-purple-100 dark:bg-purple-800' : '' }}"
                         >
-                            <x-flux-icon 
+                            <flux:icon 
                                 :name="$categories[$type]['icon']" 
                                 class="h-8 w-8
                                     {{ $type === 'sale' ? 'text-emerald-600 dark:text-emerald-300' : '' }}
@@ -97,7 +97,7 @@ new class extends Component {
                         {{ $categories[$type]['title'] }}
                         @if(isset($this->propertyCounts[$type]))
                             <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
-                                ({{ $this->propertyCounts[$type] }})
+                                ({{ $propertyCounts[$type] }})
                             </span>
                         @endif
                     </h3>
@@ -109,7 +109,7 @@ new class extends Component {
                     <ul class="space-y-3 mb-8">
                         @foreach($categories[$type]['features'] as $feature)
                             <li class="flex items-center text-gray-600 dark:text-gray-400">
-                                <x-flux-icon 
+                                <flux:icon 
                                     name="check-circle" 
                                     class="h-5 w-5 mr-2
                                         {{ $type === 'sale' ? 'text-emerald-500' : '' }}
@@ -132,7 +132,7 @@ new class extends Component {
                                 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
                         >
                             Explore {{ $categories[$type]['title'] }}
-                            <x-flux-icon name="arrow-right" class="ml-2 -mr-1 h-5 w-5" />
+                            <flux:icon name="arrow-right" class="ml-2 -mr-1 h-5 w-5" />
                         </a>
                     </div>
                 </div>

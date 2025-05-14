@@ -84,7 +84,7 @@ class PropertyService
             $query->where('listing_type', $type);
         }
 
-        return $query->with(['propertyType', 'featuredImage'])
+        return $query->with(['propertyType', 'featuredImage', 'images'])
                     ->latest()
                     ->take($limit)
                     ->get();

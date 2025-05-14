@@ -71,6 +71,16 @@ php artisan serve
 - WhatsApp Integration
 - Role-Based Access Control
 
+### Property Management
+- Comprehensive property listings with support for sales, rentals, and Airbnb properties
+- Advanced image management system
+  - Featured image support for all property types
+  - Ordered image galleries for Airbnb listings
+  - Automatic placeholder images
+  - Efficient image storage and delivery through Laravel's public disk
+- Featured properties showcase on homepage
+- Property categorization and filtering
+
 ## Project Structure 📁
 
 ```
@@ -104,6 +114,14 @@ resources/
 - Use Flux components where possible
 - Implement proper validation and authorization
 - Write tests for critical features
+
+## Image Handling
+The application uses Laravel's Storage facade for efficient image management:
+- Images are stored in the public disk for optimal delivery
+- Featured images are handled through a dedicated relationship
+- Fallback to placeholder images when no image is available
+- Special image ordering for Airbnb listings
+- Support for multiple image formats
 
 ## Testing 🧪
 

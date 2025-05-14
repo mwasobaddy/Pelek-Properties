@@ -13,16 +13,38 @@ new #[Layout('components.layouts.guest')] class extends Component {
         'propertyType' => ['except' => ''],
         'priceRange' => ['except' => ''],
         'onlyAvailable' => ['except' => false],
+        'listingType' => ['except' => ''],
     ];
 
     public $priceRange;
     public $search = '';
     public $propertyType = null;
     public $onlyAvailable = false;
+    public $listingType = null;
+    public $pageTitle = 'All Properties';
+    public $pageDescription = 'Browse our collection of properties';
     
-    public function mount()
+    public function mount($type = null)
     {
-        // No need to store properties in mount
+        if ($type) {
+            $this->listingType = $type;
+            
+            // Set page title and description based on listing type
+            switch ($type) {
+                case 'sale':
+                    $this->pageTitle = 'Properties for Sale';
+                    $this->pageDescription = "Discover your dream property in Nairobi's most desirable locations";
+                    break;
+                case 'rent':
+                    $this->pageTitle = 'Properties for Rent';
+                    $this->pageDescription = 'Find your perfect rental property in Nairobi';
+                    break;
+                case 'airbnb':
+                    $this->pageTitle = 'Airbnb Properties';
+                    $this->pageDescription = 'Find the perfect holiday home or short-term rental';
+                    break;
+            }
+        }
     }
 
     public function resetFilters()
@@ -31,6 +53,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
         $this->propertyType = null;
         $this->priceRange = null;
         $this->onlyAvailable = false;
+        // Don't reset listingType as it's part of the page context
     }
 
     public function with(): array
@@ -49,20 +72,36 @@ new #[Layout('components.layouts.guest')] class extends Component {
             }
         }
 
+        $searchParams = [
+            'search' => $this->search,
+            'property_type_id' => $this->propertyType,
+            'min_price' => $min_price,
+            'max_price' => $max_price,
+            'status' => $this->onlyAvailable ? 'available' : null,
+        ];
+
+        if ($this->listingType) {
+            $searchParams['listing_type'] = $this->listingType;
+        }
+
         return [
-            'properties' => app(PropertySearchService::class)->search([
-                'search' => $this->search,
-                'property_type_id' => $this->propertyType,
-                'min_price' => $min_price,
-                'max_price' => $max_price,
-                'status' => $this->onlyAvailable ? 'available' : null,
-            ])
+            'properties' => app(PropertySearchService::class)->search($searchParams)
         ];
     }
 }
 ?>
 
 <div class="container mx-auto px-4 py-8">
+    <!-- Page Header -->
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+            {{ $pageTitle }}
+        </h1>
+        <p class="mt-4 text-lg text-gray-600 dark:text-gray-400">
+            {{ $pageDescription }}
+        </p>
+    </div>
+
     <!-- Search and Filters -->
     <div class="mb-8 space-y-4">
         <div class="flex flex-col md:flex-row gap-4">

@@ -17,13 +17,14 @@ class PropertyImageFactory extends Factory
      */
     public function definition(): array
     {
-        $width = 1200;
-        $height = 800;
+        // Generate a random number for the placeholder image
+        $imageNumber = $this->faker->numberBetween(1, 5);
+        $basePath = 'properties/placeholders';
         
         return [
             'property_id' => Property::factory(),
-            'image_path' => $this->faker->imageUrl($width, $height, 'house'),
-            'thumbnail_path' => $this->faker->imageUrl($width / 4, $height / 4, 'house'),
+            'image_path' => "{$basePath}/property-{$imageNumber}.jpg",
+            'thumbnail_path' => "{$basePath}/property-{$imageNumber}-thumb.jpg",
             'is_featured' => $this->faker->boolean(20),
             'display_order' => $this->faker->numberBetween(1, 10),
             'alt_text' => $this->faker->sentence(),

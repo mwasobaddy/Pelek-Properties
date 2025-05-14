@@ -1,13 +1,16 @@
-<?puse Livewire\Attributes\Layout;
-use Livewire\Volt\Component;
-use function Livewire\Volt\{state, computed};
+<?php
 
-new #[Layout('components.layouts.guest')] class extends Component {se App\Models\Property;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 use function Livewire\Volt\{state, computed};
 
-new #[Layout('component.layouts.app')] class extends Component {
+new #[Layout('components.layouts.guest')] class extends Component {
+use App\Models\Property;
+use Livewire\Attributes\Layout;
+use Livewire\Volt\Component;
+use function Livewire\Volt\{state, computed};
+
+// new #[Layout('components.layouts.guest')] class extends Component {
     public Property $property;
 
     public function mount(Property $property)

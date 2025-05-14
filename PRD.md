@@ -191,3 +191,28 @@ The website is ready for launch when:
 - Multi-language support
 - Virtual tours
 - Automated email notifications
+
+## Image Management Requirements
+
+### Property Images
+- Each property can have multiple images
+- One image can be designated as the featured image
+- Images are stored in the public disk for optimal delivery
+- Image paths are stored relative to the storage disk
+
+### Featured Images
+- All property types support featured images
+- Featured images are displayed prominently on the home page
+- Default placeholder images are provided when no image is available
+
+### Image Display Requirements
+- Homepage featured properties must display their featured image
+- Property cards must handle missing images gracefully
+- Airbnb listings must display images in the specified order
+- Image URLs must be properly generated using Storage::disk('public')->url()
+
+### Image Storage Requirements
+- Images must be stored in the public disk
+- Image paths must be relative to maintain portability
+- Placeholder images must be available for properties without images
+- Support for multiple image formats (jpg, png, webp)

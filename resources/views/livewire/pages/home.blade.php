@@ -1,8 +1,13 @@
 <?php
 
+use App\Services\PropertySearchService;
+use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
+use Livewire\WithPagination;
 
 new #[Layout('components.layouts.guest')] class extends Component {
+    use WithPagination;
+
     public function with(): array
     {
         return [];
@@ -18,6 +23,9 @@ new #[Layout('components.layouts.guest')] class extends Component {
 
     {{-- Property Categories Section --}}
     <livewire:components.property-categories />
+
+    {{-- Property Services Section --}}
+    <livewire:components.property-services />
 
     {{-- Call to Action Section --}}
     <livewire:components.call-to-action />

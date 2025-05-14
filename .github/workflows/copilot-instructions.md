@@ -357,3 +357,34 @@ phpstate([
     'priceLabel' => fn() => match(...),
 ]);
 This matches the latest Livewire Volt syntax where computed values are defined directly in the state array.
+
+## Code Examples and Best Practices
+
+### Image Handling
+When working with property images, follow these patterns:
+
+```php
+// Accessing featured image URL in Livewire components
+public function getImageUrl()
+{
+    $image = $this->property->featuredImage;
+    return $image 
+        ? Storage::disk('public')->url($image->image_path)
+        : asset('images/placeholder.webp');
+}
+
+// Handling property images collection
+public function getPropertyImages()
+{
+    return $this->property->listing_type === 'airbnb' 
+        ? $this->property->images()->orderBy('display_order')->get()
+        : collect([$this->property->featuredImage])->filter();
+}
+```
+
+### Best Practices
+1. Always use Storage::disk('public')->url() for generating image URLs
+2. Provide fallback placeholder images
+3. Filter null values from image collections
+4. Use proper image relationships based on property type
+5. Handle image ordering for Airbnb listings

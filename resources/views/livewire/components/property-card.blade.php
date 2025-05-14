@@ -28,14 +28,18 @@ state([
         'airbnb' => 'Per Night',
         default => 'Price',
     },
-    
+
+    // Property images handling
     'propertyImages' => fn() => $this->property->listing_type === 'airbnb' 
         ? $this->property->images()->orderBy('display_order')->get()
-        : collect([$this->property->featuredImage]),
+        : collect([$this->property->featuredImage])->filter(),
     
-    'featuredImage' => fn() => $this->property->featuredImage 
-        ? Storage::url($this->property->featuredImage->image_path) 
-        : asset('images/placeholder.jpg'),
+    'currentImage' => function() {
+        $image = $this->property->featuredImage;
+        return $image 
+            ? Storage::disk('public')->url($image->image_path)
+            : asset('images/placeholder.webp');
+    },
         
     // Methods directly in state array
     'mount' => function (Property $property) {
@@ -59,15 +63,6 @@ state([
         if ($totalImages <= 1) return;
         
         $this->currentImageIndex = ($this->currentImageIndex - 1 + $totalImages) % $totalImages;
-    },
-    
-    'currentImage' => function() {
-        // $images = $this->propertyImages;
-        // if ($images->isEmpty()) 
-        return asset('images/placeholder.webp');
-        
-        $image = $images[$this->currentImageIndex] ?? $images[0];
-        return Storage::url($image->image_path);
     }
 ]);
 ?>
@@ -78,12 +73,12 @@ state([
         {{-- Image Section with Slider for Airbnb Properties --}}
         <div class="relative aspect-w-16 aspect-h-10 overflow-hidden">
             {{-- Main Image --}}
-            <img src="{{ $this->currentImage }}" 
+            <img src="{{ $currentImage }}" 
                  alt="{{ $property->title }}" 
                  class="h-full w-full object-cover transition-all duration-500 group-hover:scale-110">
             
             {{-- Slider Controls (only for Airbnb properties with multiple images) --}}
-            @if($property->listing_type === 'airbnb' && $this->showingSlider)
+            @if($property->listing_type === 'airbnb' && $showingSlider)
                 <div class="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button wire:click="prevImage" class="bg-black/50 rounded-full p-2 text-white hover:bg-black/70 transition">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -99,7 +94,7 @@ state([
                 
                 {{-- Image Counter --}}
                 <div class="absolute bottom-4 right-4 bg-black/50 rounded-full px-2 py-1 text-xs text-white">
-                    {{ $this->currentImageIndex + 1 }} / {{ count($this->propertyImages) }}
+                    {{ $currentImageIndex + 1 }} / {{ count($propertyImages) }}
                 </div>
             @endif
             
@@ -118,12 +113,9 @@ state([
             {{-- Save/Favorite Button Overlay --}}
             <button class="absolute right-4 top-4 rounded-full bg-white/80 p-2 text-gray-700 opacity-0 transition-opacity duration-300 hover:bg-white dark:bg-gray-800/80 dark:text-gray-200 dark:hover:bg-gray-800 group-hover:opacity-100">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                 </svg>
             </button>
-            
-            {{-- Gradient Overlay for Better Text Contrast --}}
-            <div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
         </div>
 
         {{-- Content Section with Improved Typography and Spacing --}}
@@ -148,47 +140,32 @@ state([
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M3 7v11m0-7h18m0 0v7m-5-7v7m-4-7v7m-4-7v7" />
                     </svg>
-                    <p class="mt-1 text-sm font-medium text-gray-700 dark:text-gray-300">{{ $property->bedrooms }} <span class="text-xs text-gray-500 dark:text-gray-400">Beds</span></p>
+                    <span class="mt-1 text-xs">{{ $property->bedrooms }} Beds</span>
                 </div>
                 <div class="flex flex-col items-center rounded-lg bg-gray-50 p-2 text-center dark:bg-gray-700/50">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M22 2H2v20h20V2zM7 12h10M7 12a3 3 0 1 0 0-6M7 12a3 3 0 1 1 0 6M17 12a3 3 0 1 0 0-6M17 12a3 3 0 1 1 0 6" />
+                        <path d="M9 6h11M9 12h11M9 18h11M5 6v.01M5 12v.01M5 18v.01" />
                     </svg>
-                    <p class="mt-1 text-sm font-medium text-gray-700 dark:text-gray-300">{{ $property->bathrooms }} <span class="text-xs text-gray-500 dark:text-gray-400">Baths</span></p>
+                    <span class="mt-1 text-xs">{{ $property->bathrooms }} Baths</span>
                 </div>
                 <div class="flex flex-col items-center rounded-lg bg-gray-50 p-2 text-center dark:bg-gray-700/50">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="3" width="18" height="18" rx="2" />
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
                         <path d="M3 9h18M9 21V9" />
                     </svg>
-                    <p class="mt-1 text-sm font-medium text-gray-700 dark:text-gray-300">{{ $property->size }} <span class="text-xs text-gray-500 dark:text-gray-400">m²</span></p>
+                    <span class="mt-1 text-xs">{{ number_format($property->size) }} sqft</span>
                 </div>
             </div>
 
-            {{-- Price and CTA Section --}}
-            <div class="mt-5 flex flex-col border-t border-gray-100 pt-5 dark:border-gray-700">
-                <div>
-                    <span class="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ $this->priceLabel }}</span>
-                    <p class="text-xl font-semibold text-gray-900 dark:text-white">KES {{ $this->formattedPrice }}</p>
-                </div>
-
-                <div class="flex space-x-2 mt-4 justify-start">
-                    {{-- Airbnb Management Links --}}
-                    <!-- View Details Button -->
-                    <a href="{{ route('properties.show', $property) }}" 
-                        class="inline-flex items-center rounded-full bg-indigo-500 px-3 py-2 text-sm font-medium text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-indigo-600 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                            <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
-                        </svg>
-                        View
-                    </a>
-                
-                    {{-- Inquire Button --}}
-                    <button wire:click="$dispatch('modal-show', { name: 'whatsapp-modal-{{ $property->id }}', scope: '{{ $this->getId() }}' })"
-                        class="inline-flex items-center rounded-full bg-green-500 px-3 py-2 text-sm font-medium text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-green-600 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-offset-gray-800"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            {{-- Pricing Section with CTA --}}
+            <div class="mt-6">
+                <div class="flex items-end justify-between">
+                    <div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ $priceLabel }}</p>
+                        <p class="text-xl font-bold text-gray-900 dark:text-white">${{ $formattedPrice }}</p>
+                    </div>
+                    <button wire:click="$dispatch('open-modal', { name: 'whatsapp-modal-{{ $property->id }}' })" class="flex items-center rounded-lg bg-green-500 px-3 py-2 text-sm font-medium text-white transition-all duration-300 hover:bg-green-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="mr-1.5 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                         </svg>
                         Inquire
@@ -203,7 +180,7 @@ state([
                 {{-- Modal Header with Property Image --}}
                 <div class="mb-4 flex items-center space-x-4">
                     <div class="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg">
-                        <img src="{{ $this->currentImage }}"
+                        <img src="{{ $currentImage }}"
                             alt="{{ $property->title }}"
                             class="h-full w-full object-cover">
                     </div>
@@ -222,19 +199,21 @@ state([
 
                 {{-- Modal Footer with Actions --}}
                 <div class="flex justify-end space-x-3">
-                    <button wire:click="$dispatch('modal-close', { name: 'whatsapp-modal-{{ $property->id }}', scope: '{{ $this->getId() }}' })"
-                        class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:focus:ring-offset-gray-800"
+                    <button 
+                        wire:click="$dispatch('close-modal', { name: 'whatsapp-modal-{{ $property->id }}' })"
+                        class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
                     >
                         Cancel
                     </button>
-
-                    <a href="https://wa.me/{{ $property->whatsapp_number }}" target="_blank"
-                        class="inline-flex items-center rounded-lg bg-green-500 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-300 hover:bg-green-600 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-offset-gray-800"
+                    <a 
+                        href="https://wa.me/{{ preg_replace('/[^0-9+]/', '', $property->whatsapp_number) }}?text={{ urlencode("Hi, I'm interested in the property: {$property->title}") }}"
+                        target="_blank"
+                        class="rounded-lg bg-green-500 px-4 py-2 text-sm font-medium text-white hover:bg-green-600 flex items-center"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2C6.48 2 2 6.48 2 12c0 1.82.49 3.53 1.35 5L2 22l5-1.35C8.47 21.51 10.18 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V6h2v6z"/>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 012.41 5.83c0 4.54-3.7 8.23-8.24 8.23-1.48 0-2.93-.39-4.19-1.15l-.3-.17-3.12.82.83-3.04-.2-.32a8.188 8.188 0 01-1.26-4.38c.01-4.54 3.7-8.24 8.25-8.24M8.53 7.33c-.16 0-.43.06-.66.31-.22.25-.87.86-.87 2.07 0 1.22.89 2.39 1 2.56.14.17 1.76 2.67 4.25 3.73.59.27 1.05.42 1.41.53.59.19 1.13.16 1.56.1.48-.07 1.46-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.07-.1-.23-.16-.48-.27-.25-.14-1.47-.74-1.69-.82-.23-.08-.37-.12-.56.12-.16.25-.64.81-.78.97-.15.17-.29.19-.53.07-.26-.13-1.06-.39-2-1.23-.74-.66-1.23-1.47-1.38-1.72-.12-.24-.01-.39.11-.5.11-.11.27-.29.37-.44.13-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.11-.56-1.35-.77-1.84-.2-.48-.4-.42-.56-.43-.14 0-.3-.01-.47-.01z" />
                         </svg>
-                        Continue to WhatsApp
+                        Open WhatsApp
                     </a>
                 </div>
             </div>
