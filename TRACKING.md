@@ -39,6 +39,11 @@
   - [x] Amenity with HasFactory
   - [x] PropertyImage with HasFactory
   - [x] All relationships and scopes
+- [x] Factory Classes
+  - [x] PropertyType with predefined types
+  - [x] Property with flexible states (sale/rent/airbnb)
+  - [x] Amenity with categorized items
+  - [x] PropertyImage with featured state
 - [ ] Services Layer Implementation
 - [ ] Property CRUD Operations
 - [ ] Property Search & Filters
@@ -71,6 +76,7 @@
 
 ## Frontend Implementation
 - [ ] Responsive Layout
+- [ ] Support light mode and dark mode
 - [ ] Home Page
   - [ ] Featured Properties Carousel
   - [ ] Category Highlights
