@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
-use App\Livewire\AirbnbImageUpload;
 
 Route::get('/', function () {
     return view('welcome');
@@ -35,7 +34,7 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
         // Property management
         Route::prefix('properties')->name('properties.')->group(function () {
-            Route::get('{property}/airbnb-photos', AirbnbImageUpload::class)
+            Volt::route('{property}/airbnb-photos', 'airbnb-image-upload-volt')
                 ->name('airbnb-photos');
         });
     });

@@ -62,8 +62,9 @@ state([
     },
     
     'currentImage' => function() {
-        $images = $this->propertyImages;
-        if ($images->isEmpty()) return asset('images/placeholder.jpg');
+        // $images = $this->propertyImages;
+        // if ($images->isEmpty()) 
+        return asset('images/placeholder.webp');
         
         $image = $images[$this->currentImageIndex] ?? $images[0];
         return Storage::url($image->image_path);
@@ -165,13 +166,14 @@ state([
             </div>
 
             {{-- Price and CTA Section --}}
-            <div class="mt-5 flex items-center justify-between border-t border-gray-100 pt-5 dark:border-gray-700">
+            <div class="mt-5 flex flex-col border-t border-gray-100 pt-5 dark:border-gray-700">
                 <div>
                     <span class="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ $this->priceLabel }}</span>
                     <p class="text-xl font-semibold text-gray-900 dark:text-white">KES {{ $this->formattedPrice }}</p>
                 </div>
 
-                <div class="flex space-x-2">
+                <div class="flex space-x-2 mt-4 justify-start">
+                    {{-- Airbnb Management Links --}}
                     <!-- View Details Button -->
                     <a href="{{ route('properties.show', $property) }}" 
                         class="inline-flex items-center rounded-full bg-indigo-500 px-3 py-2 text-sm font-medium text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-indigo-600 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
@@ -196,7 +198,7 @@ state([
         </div>
 
         {{-- WhatsApp Modal --}}
-        <flux:modal name="whatsapp-modal-{{ $property->id }}" dismissible class="max-w-md">
+        <flux:modal name="whatsapp-modal-{{ $property->id }}" dismissible class="max-w-md self-center justify-self-center">
             <div class="p-1">
                 {{-- Modal Header with Property Image --}}
                 <div class="mb-4 flex items-center space-x-4">
