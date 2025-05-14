@@ -7,6 +7,15 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
+// Property routes
+Route::prefix('properties')->group(function () {
+    Volt::route('/', 'propertylist')
+        ->name('properties.index');
+        
+    Volt::route('/{property}', 'property-details')
+        ->name('properties.show');
+});
+
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
