@@ -17,23 +17,25 @@ class PropertyTypeFactory extends Factory
      */
     public function definition(): array
     {
-        $name = $this->faker->unique()->randomElement([
-            'Apartment',
-            'House',
-            'Villa',
-            'Townhouse',
-            'Studio',
-            'Penthouse',
-            'Cottage',
-            'Mansion',
-            'Bungalow',
-            'Duplex'
-        ]);
+        $propertyTypes = [
+            'Apartment' => 'Modern living spaces in multi-unit buildings, perfect for urban dwellers.',
+            'House' => 'Traditional single-family homes with private space and gardens.',
+            'Villa' => 'Luxury standalone properties with premium amenities and space.',
+            'Townhouse' => 'Multi-level homes sharing walls with adjacent properties.',
+            'Studio' => 'Compact, open-plan living spaces ideal for singles or couples.',
+            'Penthouse' => 'Premium top-floor apartments with exclusive features.',
+            'Cottage' => 'Charming small houses, often in rural or scenic locations.',
+            'Mansion' => 'Large, luxurious properties with extensive grounds.',
+            'Bungalow' => 'Single-story homes perfect for easy living.',
+            'Duplex' => 'Two-story apartments with separate entrances.'
+        ];
 
+        $name = $this->faker->unique()->randomElement(array_keys($propertyTypes));
+        
         return [
             'name' => $name,
             'slug' => Str::slug($name),
-            'description' => $this->faker->paragraph(),
+            'description' => $propertyTypes[$name],
         ];
     }
 }

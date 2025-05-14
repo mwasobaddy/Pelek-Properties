@@ -14,6 +14,9 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RolesAndPermissionsSeeder::class,
+            PropertyTypeSeeder::class,
+            AmenitySeeder::class,
+            PropertySeeder::class,
         ]);
 
         // Create default admin user

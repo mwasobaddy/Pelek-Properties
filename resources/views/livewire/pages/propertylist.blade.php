@@ -102,7 +102,37 @@ new #[Layout('components.layouts.guest')] class extends Component {
             @forelse($properties as $property)
                 <div class="bg-white rounded-lg shadow-lg overflow-hidden">
                     <!-- Property Card -->
-                    <livewire:components.property-card :property="$property" />
+                    <div class="relative">
+                        @if($property->images->isNotEmpty())
+                            <img 
+                                src="{{ $property->images->first()->url }}" 
+                                alt="{{ $property->title }}"
+                                class="w-full h-48 object-cover"
+                            >
+                        @endif
+                        <div class="absolute top-2 right-2">
+                            <span class="px-2 py-1 text-sm bg-indigo-500 text-white rounded-full">
+                                {{ $property->propertyType->name }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold mb-2">{{ $property->title }}</h3>
+                        <p class="text-gray-600 text-sm mb-4">{{ Str::limit($property->description, 100) }}</p>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-lg font-bold text-indigo-600">
+                                ${{ number_format($property->rental_price_daily) }} / day
+                            </span>
+                            <a 
+                                href="{{ route('properties.show', $property) }}" 
+                                class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition"
+                            >
+                                View Details
+                            </a>
+                        </div>
+                    </div>
                 </div>
             @empty
                 <div class="col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-4">
