@@ -33,7 +33,12 @@
   - [x] Amenities Table
   - [x] Property Images Table
   - [x] Property-Amenity Pivot Table
-- [-] Models & Relationships
+- [x] Models & Relationships
+  - [x] PropertyType with HasFactory
+  - [x] Property with HasFactory, SoftDeletes
+  - [x] Amenity with HasFactory
+  - [x] PropertyImage with HasFactory
+  - [x] All relationships and scopes
 - [ ] Services Layer Implementation
 - [ ] Property CRUD Operations
 - [ ] Property Search & Filters
@@ -69,7 +74,7 @@
 - [ ] Home Page
   - [ ] Featured Properties Carousel
   - [ ] Category Highlights
-  - [ ] CTAs
+  - [ ] CTAs (On booking , they are redirected to WhatsApp for booking)
 - [ ] Property Listing Pages
 - [ ] Property Detail Pages
 - [ ] Blog Pages
