@@ -13,14 +13,8 @@ class PropertySeeder extends Seeder
 {
     public function run(): void
     {
-        // Create an admin user if it doesn't exist
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@example.com'],
-            [
-                'name' => 'Admin User',
-                'password' => bcrypt('password'),
-            ]
-        );
+        // Get the admin user
+        $admin = User::where('email', 'admin@pelekproperties.com')->firstOrFail();
 
         // Get all property types (they should exist from PropertyTypeSeeder)
         $propertyTypes = PropertyType::all();

@@ -9,11 +9,23 @@
 
             <a href="{{ route('dashboard') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse" wire:navigate>
                 <x-app-logo />
-            </a>
-
-            <flux:navlist variant="outline">
-                <flux:navlist.group :heading="__('Platform')" class="grid">
-                    <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
+            </a>                <flux:navlist variant="outline">
+                    <flux:navlist.group :heading="__('navigation.platform')" class="grid">
+                        <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('navigation.dashboard') }}</flux:navlist.item>
+                        
+                        @can('view property management')
+                        <flux:navlist.group :heading="__('navigation.property_management')" class="grid">
+                            <flux:navlist.item icon="building-office-2" :href="route('management.contracts')" :current="request()->routeIs('management.contracts')" wire:navigate>
+                                {{ __('navigation.management_contracts') }}
+                            </flux:navlist.item>
+                            <flux:navlist.item icon="wrench-screwdriver" :href="route('management.maintenance')" :current="request()->routeIs('management.maintenance')" wire:navigate>
+                                {{ __('navigation.maintenance_requests') }}
+                            </flux:navlist.item>
+                            <flux:navlist.item icon="chart-bar" :href="route('management.financials')" :current="request()->routeIs('management.financials')" wire:navigate>
+                                {{ __('navigation.financial_records') }}
+                            </flux:navlist.item>
+                        </flux:navlist.group>
+                        @endcan
                 </flux:navlist.group>
             </flux:navlist>
 
@@ -21,11 +33,11 @@
 
             <flux:navlist variant="outline">
                 <flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-                {{ __('Repository') }}
+                {{ __('navigation.repository') }}
                 </flux:navlist.item>
 
                 <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
-                {{ __('Documentation') }}
+                {{ __('navigation.documentation') }}
                 </flux:navlist.item>
             </flux:navlist>
 

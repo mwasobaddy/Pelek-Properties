@@ -56,6 +56,10 @@ Route::middleware(['auth'])->group(function () {
             Volt::route('/manage', 'admin.manage-rental-properties')
                 ->name('manage');
             
+            // Financial reporting
+            Volt::route('/financials', 'admin.property-financial-report')
+                ->name('financials');
+                
             // Photos management
             Volt::route('/{property}/photos', 'admin.property-photos')
                 ->name('photos');

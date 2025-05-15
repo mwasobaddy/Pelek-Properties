@@ -1,7 +1,24 @@
 # Pelek Properties Implementation Tracking
 
 ## Core Infrastructure Setup
-- [x] Laravel 12.x Installation
+- [x] Laravel### 4. Property Management Services
+- [-] Database Schema
+  - [x] Management contracts
+  - [ ] Maintenance tracking
+  - [x] Financial records
+- [-] Models & Relationships
+  - [x] ManagementContract model
+  - [ ] MaintenanceRequest model
+  - [x] FinancialRecord model
+- [x] Services
+  - [x] PropertyManagementService
+  - [x] MaintenanceService
+  - [x] FinancialService
+- [ ] UI Components
+  - [-] PropertyManagerDashboard (In Progress)
+  - [ ] MaintenanceRequestForm
+  - [ ] FinancialReports
+  - [ ] ContractManagementation
 - [x] Livewire/Volt Setup
 - [x] TailwindCSS Integration
 - [x] Flux Integration
@@ -85,18 +102,18 @@
   - [x] Commercial lease management
 
 ### 4. Property Management Services
-- [ ] Database Schema
-  - [ ] Management contracts
-  - [ ] Maintenance tracking
-  - [ ] Financial records
-- [ ] Models & Relationships
-  - [ ] ManagementContract model
-  - [ ] MaintenanceRequest model
-  - [ ] FinancialRecord model
-- [ ] Services
-  - [ ] PropertyManagementService
-  - [ ] MaintenanceService
-  - [ ] FinancialService
+- [x] Database Schema
+  - [x] Management contracts
+  - [x] Maintenance tracking
+  - [x] Financial records
+- [x] Models & Relationships
+  - [x] ManagementContract model
+  - [x] MaintenanceRecord model
+  - [x] FinancialRecord model
+- [x] Services
+  - [x] PropertyManagementService
+  - [x] MaintenanceService
+  - [x] FinancialService
 - [ ] Components
   - [ ] PropertyManagerDashboard
   - [ ] MaintenanceRequestForm

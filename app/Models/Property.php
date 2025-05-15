@@ -37,6 +37,10 @@ class Property extends Model
         'airbnb_price_monthly',
         'availability_calendar',
         'whatsapp_number',
+        'management_fee_percentage',
+        'base_management_fee',
+        'management_payment_schedule',
+        'management_services_included',
     ];
 
     protected $casts = [
@@ -56,6 +60,9 @@ class Property extends Model
         'price_per_square_foot' => 'decimal:2',
         'year_built' => 'integer',
         'last_renovated' => 'date',
+        'management_services_included' => 'array',
+        'management_fee_percentage' => 'decimal:2',
+        'base_management_fee' => 'decimal:2',
     ];
 
     /**
@@ -287,5 +294,46 @@ class Property extends Model
             ->whereDate('lease_start', '<=', now())
             ->whereDate('lease_end', '>=', now())
             ->exists();
+    }
+
+    /**
+     * Get the management contracts for this property
+     */
+    public function managementContracts(): HasMany
+    {
+        return $this->hasMany(ManagementContract::class);
+    }
+
+    /**
+     * Get the active management contract for this property
+     */
+    public function activeContract()
+    {
+        return $this->hasOne(ManagementContract::class)->active();
+    }
+
+    /**
+     * Get the financial records for this property
+     */
+    public function financialRecords(): HasMany
+    {
+        return $this->hasMany(FinancialRecord::class);
+    }
+
+    /**
+     * Get the financial records summary for the current month
+     */
+    public function getCurrentMonthFinancials(): array
+    {
+        $records = $this->financialRecords()
+            ->whereMonth('transaction_date', now()->month)
+            ->whereYear('transaction_date', now()->year)
+            ->get();
+
+        return [
+            'income' => $records->where('transaction_type', 'income')->sum('amount'),
+            'expenses' => $records->where('transaction_type', 'expense')->sum('amount'),
+            'pending' => $records->where('status', 'pending')->count(),
+        ];
     }
 }
