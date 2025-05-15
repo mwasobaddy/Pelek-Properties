@@ -14,22 +14,19 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RolesAndPermissionsSeeder::class,
+            PropertyTypeSeeder::class,
+            AmenitySeeder::class,
+            PropertySeeder::class,
+            AvailabilityCalendarSeeder::class,
         ]);
 
-        // Create admin user
-        $admin = \App\Models\User::create([
+        // Create default admin user
+        $user = User::factory()->create([
             'name' => 'Admin User',
             'email' => 'admin@pelekproperties.com',
             'password' => bcrypt('password'),
         ]);
-        $admin->assignRole('admin');
 
-        $this->call([
-            PropertyTypeSeeder::class,
-            AmenitySeeder::class,
-            FacilitySeeder::class,
-            PropertySeeder::class,
-            CommercialPropertySeeder::class,
-        ]);
+        $user->assignRole('admin');
     }
 }

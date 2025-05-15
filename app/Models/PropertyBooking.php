@@ -30,6 +30,27 @@ class PropertyBooking extends Model
         'total_amount' => 'decimal:2'
     ];
 
+    protected static function booted()
+    {
+        // When a booking is created or status changes to confirmed
+        static::saved(function ($booking) {
+            if ($booking->status === 'confirmed') {
+                $booking->property->blockDatesForBooking($booking);
+            }
+        });
+
+        // When a booking is cancelled, make dates available again
+        static::updated(function ($booking) {
+            if ($booking->isDirty('status') && $booking->status === 'cancelled') {
+                // Regenerate availability for the booking period
+                $booking->property->generateAvailabilityCalendar(
+                    $booking->check_in,
+                    $booking->check_out
+                );
+            }
+        });
+    }
+
     public function property(): BelongsTo
     {
         return $this->belongsTo(Property::class);
@@ -46,7 +67,9 @@ class PropertyBooking extends Model
         return $query->where('status', 'confirmed');
     }
 
-    // Check if dates are available
+    /**
+     * Check if dates are available, considering both availability calendar and existing bookings
+     */
     public static function areDatesAvailable($propertyId, $checkIn, $checkOut, $excludeBookingId = null)
     {
         $query = self::where('property_id', $propertyId)

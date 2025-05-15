@@ -11,16 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('property_images', function (Blueprint $table) {
+        Schema::create('availability_calendar', function (Blueprint $table) {
             $table->id();
             $table->foreignId('property_id')->constrained()->onDelete('cascade');
-            $table->string('image_path');
-            $table->string('thumbnail_path')->nullable();
-            $table->string('alt_text')->nullable();
-            $table->boolean('is_featured')->default(false);
-            $table->integer('display_order')->default(0);
-            $table->json('metadata')->nullable(); // Store image metadata (size, dimensions, etc.)
+            $table->date('date');
+            $table->enum('status', ['available', 'booked', 'blocked', 'maintenance']);
+            $table->decimal('custom_price', 10, 2)->nullable();
+            $table->json('notes')->nullable();
             $table->timestamps();
+
+            // Ensure we don't have duplicate dates for the same property
+            $table->unique(['property_id', 'date']);
         });
     }
 
@@ -29,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('property_images');
+        Schema::dropIfExists('availability_calendar');
     }
 };

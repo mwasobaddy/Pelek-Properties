@@ -139,6 +139,14 @@ class Property extends Model
      */
     public function isAvailable(string $checkIn, string $checkOut, ?int $excludeBookingId = null): bool
     {
+        // Check in availability calendar first
+        $hasAvailabilityConflict = Availability::areDatesAvailable($this->id, $checkIn, $checkOut);
+        
+        if (!$hasAvailabilityConflict) {
+            return false;
+        }
+
+        // Then check in bookings
         return PropertyBooking::areDatesAvailable($this->id, $checkIn, $checkOut, $excludeBookingId);
     }
 
@@ -210,5 +218,47 @@ class Property extends Model
         $type = str_replace('_', ' ', ucfirst($this->commercial_type));
         $size = number_format($this->total_square_feet) . ' sq ft';
         return "{$type} Space • {$size}";
+    }
+
+    /**
+     * Get the availability calendar entries for this property.
+     */
+    public function availability()
+    {
+        return $this->hasMany(Availability::class);
+    }
+
+    /**
+     * Generate or update availability calendar for a date range
+     */
+    public function generateAvailabilityCalendar(
+        string $startDate,
+        string $endDate,
+        string $defaultStatus = 'available',
+        ?float $customPrice = null
+    ): void {
+        Availability::generateForDateRange(
+            $this->id,
+            $startDate,
+            $endDate,
+            $defaultStatus,
+            $customPrice ?: $this->airbnb_price_nightly
+        );
+    }
+
+    /**
+     * Block dates in availability calendar for a booking
+     */
+    public function blockDatesForBooking(PropertyBooking $booking): void
+    {
+        Availability::blockDatesForBooking(
+            $this->id,
+            $booking->check_in,
+            $booking->check_out,
+            [
+                'booking_id' => $booking->id,
+                'guest_name' => $booking->guest_name,
+            ]
+        );
     }
 }

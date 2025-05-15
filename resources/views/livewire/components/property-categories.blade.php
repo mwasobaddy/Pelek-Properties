@@ -7,45 +7,93 @@ use function Livewire\Volt\{state, computed};
 new class extends Component {
     public array $categories = [
         'sale' => [
-            'title' => 'Properties for Sale',
-            'description' => 'Find your dream home in Nairobi\'s most desirable neighborhoods',
-            'icon' => 'home',
-            'color' => 'emerald',
+            'title' => 'Houses and Plots for Sale',
+            'description' => 'Premium residential properties and land plots in prime locations',
+            'icon' => 'home-modern',
+            'color' => 'blue',
             'route' => 'properties.sale',
-            'accent' => 'from-emerald-400 to-green-500',
+            'accent' => 'from-indigo-400 to-blue-500',
             'features' => [
-                'Premium locations',
-                'Verified properties',
-                'Flexible financing options',
-                'Expert property guidance'
+                'Residential homes & land plots',
+                'Prime locations with growth potential',
+                'Transparent pricing & documentation',
+                'Financing assistance available',
+                'Property inspection support'
             ]
         ],
         'rent' => [
             'title' => 'Rental Properties',
-            'description' => 'Discover quality rental homes for long-term stays',
-            'icon' => 'building-office',
-            'color' => 'blue',
+            'description' => 'Quality homes and apartments for long-term rental',
+            'icon' => 'home',
+            'color' => 'teal',
             'route' => 'properties.rent',
-            'accent' => 'from-blue-400 to-indigo-500',
+            'accent' => 'from-teal-400 to-emerald-500',
             'features' => [
-                'Monthly & yearly leases',
-                'Well-maintained properties',
-                'Secure neighborhoods',
-                'Professional management'
+            'Houses and apartments',
+            'Flexible lease terms',
+            'Background-checked properties',
+            'Transparent pricing',
+            'Virtual tours available'
             ]
         ],
         'airbnb' => [
-            'title' => 'Airbnb Stays',
-            'description' => 'Luxury furnished accommodations for your short stay',
-            'icon' => 'calendar',
-            'color' => 'purple',
+            'title' => 'Furnished Airbnb Stays',
+            'description' => 'Luxury furnished accommodations for both short and extended stays',
+            'icon' => 'building-library',
+            'color' => 'teal',
             'route' => 'properties.airbnb',
-            'accent' => 'from-purple-400 to-fuchsia-500',
+            'accent' => 'from-cyan-400 to-teal-500',
             'features' => [
-                'Fully furnished',
-                'Instant booking',
-                'Premium amenities',
-                'Flexible stay duration'
+            'Fully furnished premium units',
+            'Flexible booking periods',
+            'Professional cleaning service',
+            '24/7 concierge support',
+            'Airport transfer services'
+            ]
+        ],
+        'commercial' => [
+            'title' => 'Commercial Spaces',
+            'description' => 'Prime commercial offices and retail spaces in strategic locations',
+            'icon' => 'building-office-2',
+            'color' => 'cyan',
+            'route' => 'properties.commercial',
+            'accent' => 'from-blue-400 to-cyan-500',
+            'features' => [
+            'Office spaces & retail units',
+            'Prime business locations',
+            'Customizable spaces',
+            'High-speed internet ready',
+            'Meeting room facilities'
+            ]
+        ],
+        'management' => [
+            'title' => 'Property Management',
+            'description' => 'Comprehensive property management solutions for property owners',
+            'icon' => 'cog-6-tooth',
+            'color' => 'green',
+            'route' => 'properties.management',
+            'accent' => 'from-emerald-400 to-green-500',
+            'features' => [
+            'Tenant screening & placement',
+            'Rent collection & accounting',
+            'Maintenance coordination',
+            'Regular property inspections',
+            'Legal compliance handling'
+            ]
+        ],
+        'valuation' => [
+            'title' => 'Property Valuation',
+            'description' => 'Accurate property valuation services for buyers and sellers',
+            'icon' => 'calculator',
+            'color' => 'purple',
+            'route' => 'properties.valuation',
+            'accent' => 'from-purple-400 to-pink-500',
+            'features' => [
+            'Comprehensive market analysis',
+            'Detailed property reports',
+            'Expert appraisals',
+            'Competitive pricing strategy',
+            'Free initial consultation'
             ]
         ]
     ];

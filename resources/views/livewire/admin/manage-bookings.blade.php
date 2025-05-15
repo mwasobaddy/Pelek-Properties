@@ -42,25 +42,29 @@ new class extends Component {
         $this->validate();
 
         $property = Property::findOrFail($this->propertyId);
-
-        // Check availability
+        $checkIn = \Carbon\Carbon::parse($this->checkIn);
+        $checkOut = \Carbon\Carbon::parse($this->checkOut);
+        
+        // Check availability in both calendar and bookings
         if (!$property->isAvailable($this->checkIn, $this->checkOut)) {
             $this->addError('checkIn', 'These dates are not available');
             return;
         }
 
-        // Calculate total amount based on stay duration
-        $checkIn = \Carbon\Carbon::parse($this->checkIn);
-        $checkOut = \Carbon\Carbon::parse($this->checkOut);
+        // Calculate total amount based on stay duration and availability calendar prices
         $nights = $checkIn->diffInDays($checkOut);
+        $pricePerNight = $property->availability()
+            ->whereBetween('date', [$checkIn, $checkOut])
+            ->avg('custom_price') ?? match($property->listing_type) {
+                'airbnb' => $property->airbnb_price_nightly,
+                'rent' => $property->rental_price_daily,
+                default => 0,
+            };
 
-        $totalAmount = match($property->listing_type) {
-            'airbnb' => $property->airbnb_price_nightly * $nights,
-            'rent' => $property->rental_price_daily * $nights,
-            default => 0,
-        };
+        $totalAmount = $pricePerNight * $nights;
 
-        PropertyBooking::create([
+        // Create the booking
+        $booking = PropertyBooking::create([
             'property_id' => $this->propertyId,
             'admin_id' => auth()->id(),
             'check_in' => $this->checkIn,
@@ -101,23 +105,26 @@ new class extends Component {
 
         $booking = PropertyBooking::findOrFail($this->selectedBookingId);
         $property = Property::findOrFail($this->propertyId);
+        $checkIn = \Carbon\Carbon::parse($this->checkIn);
+        $checkOut = \Carbon\Carbon::parse($this->checkOut);
 
-        // Check availability excluding current booking
+        // Check availability in both calendar and bookings
         if (!$property->isAvailable($this->checkIn, $this->checkOut, $this->selectedBookingId)) {
             $this->addError('checkIn', 'These dates are not available');
             return;
         }
 
-        // Calculate total amount
-        $checkIn = \Carbon\Carbon::parse($this->checkIn);
-        $checkOut = \Carbon\Carbon::parse($this->checkOut);
+        // Get the average nightly rate from availability calendar or default pricing
         $nights = $checkIn->diffInDays($checkOut);
+        $pricePerNight = $property->availability()
+            ->whereBetween('date', [$checkIn, $checkOut])
+            ->avg('custom_price') ?? match($property->listing_type) {
+                'airbnb' => $property->airbnb_price_nightly,
+                'rent' => $property->rental_price_daily,
+                default => 0,
+            };
 
-        $totalAmount = match($property->listing_type) {
-            'airbnb' => $property->airbnb_price_nightly * $nights,
-            'rent' => $property->rental_price_daily * $nights,
-            default => 0,
-        };
+        $totalAmount = $pricePerNight * $nights;
 
         $booking->update([
             'check_in' => $this->checkIn,
@@ -187,11 +194,11 @@ new class extends Component {
             {{ $isEditing ? 'Edit Booking' : 'Create New Booking' }}
         </h2>
 
-        <form wire:submit.prevent="{{ $isEditing ? 'updateBooking' : 'createBooking' }}" class="space-y-4">
-            <!-- Property Selection -->
+        <!-- Property Selection -->
+        <div class="space-y-6">
             <div>
                 <label for="propertyId" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Property</label>
-                <select wire:model="propertyId" id="propertyId" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300">
+                <select wire:model.live="propertyId" id="propertyId" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300">
                     <option value="">Select a property</option>
                     @foreach($this->properties as $property)
                         <option value="{{ $property->id }}">{{ $property->title }} ({{ ucfirst($property->listing_type) }})</option>
@@ -200,16 +207,23 @@ new class extends Component {
                 @error('propertyId') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
 
+            <!-- Calendar View -->
+            @if($propertyId && $property = App\Models\Property::find($propertyId))
+                <livewire:admin.property-availability-calendar :property="$property" :key="$propertyId" />
+            @endif
+        </div>
+
+        <form wire:submit.prevent="{{ $isEditing ? 'updateBooking' : 'createBooking' }}" class="mt-6 space-y-4">
             <!-- Dates -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label for="checkIn" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Check In</label>
-                    <input type="date" wire:model="checkIn" id="checkIn" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300">
+                    <input type="date" wire:model.live="checkIn" id="checkIn" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300">
                     @error('checkIn') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
                 <div>
                     <label for="checkOut" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Check Out</label>
-                    <input type="date" wire:model="checkOut" id="checkOut" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300">
+                    <input type="date" wire:model.live="checkOut" id="checkOut" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300">
                     @error('checkOut') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
             </div>
