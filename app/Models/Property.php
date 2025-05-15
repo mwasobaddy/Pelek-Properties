@@ -49,6 +49,13 @@ class Property extends Model
         'airbnb_price_nightly' => 'decimal:2',
         'airbnb_price_weekly' => 'decimal:2',
         'airbnb_price_monthly' => 'decimal:2',
+        'commercial_amenities' => 'array',
+        'zoning_info' => 'array',
+        'has_parking' => 'boolean',
+        'total_square_feet' => 'decimal:2',
+        'price_per_square_foot' => 'decimal:2',
+        'year_built' => 'integer',
+        'last_renovated' => 'date',
     ];
 
     /**
@@ -157,5 +164,51 @@ class Property extends Model
     public function scopeAvailable($query)
     {
         return $query->where('status', 'available');
+    }
+
+    /**
+     * Get all facilities for this property.
+     */
+    public function facilities(): BelongsToMany
+    {
+        return $this->belongsToMany(Facility::class, 'property_facilities')
+            ->withPivot(['details', 'last_maintenance', 'next_maintenance', 'maintenance_notes'])
+            ->withTimestamps();
+    }
+
+    /**
+     * Scope a query to only include commercial properties.
+     */
+    public function scopeCommercial($query)
+    {
+        return $query->where('listing_type', 'commercial');
+    }
+
+    /**
+     * Scope a query to only include properties of a specific commercial type.
+     */
+    public function scopeCommercialType($query, string $type)
+    {
+        return $query->where('commercial_type', $type);
+    }
+
+    /**
+     * Get the formatted price per square foot.
+     */
+    public function getFormattedPricePerSqftAttribute(): string
+    {
+        return $this->price_per_square_foot
+            ? 'KES ' . number_format($this->price_per_square_foot, 2) . '/sq ft'
+            : 'Price on request';
+    }
+
+    /**
+     * Get the commercial summary for this property.
+     */
+    public function getCommercialSummaryAttribute(): string
+    {
+        $type = str_replace('_', ' ', ucfirst($this->commercial_type));
+        $size = number_format($this->total_square_feet) . ' sq ft';
+        return "{$type} Space • {$size}";
     }
 }

@@ -19,6 +19,9 @@ Route::prefix('properties')->group(function () {
     Volt::route('/rent', 'pages.rental-properties')
         ->name('properties.rent');
     
+    Volt::route('/commercial', 'pages.commercial-properties')
+        ->name('properties.commercial');
+
     Volt::route('/airbnb', 'pages.propertylist', ['type' => 'airbnb'])
         ->name('properties.airbnb');
     

@@ -45,6 +45,20 @@ return new class extends Migration
             $table->decimal('airbnb_price_weekly', 12, 2)->nullable();
             $table->decimal('airbnb_price_monthly', 12, 2)->nullable();
             $table->json('availability_calendar')->nullable();
+
+            // Commercial-specific fields
+            $table->enum('commercial_type', ['office', 'retail', 'industrial', 'warehouse', 'mixed_use'])->nullable();
+            $table->integer('total_floors')->nullable();
+            $table->decimal('total_square_feet', 12, 2)->nullable();
+            $table->decimal('price_per_square_foot', 12, 2)->nullable();
+            $table->boolean('has_parking')->default(false);
+            $table->integer('parking_spaces')->nullable();
+            $table->json('commercial_amenities')->nullable();
+            $table->text('commercial_terms')->nullable();
+            $table->json('zoning_info')->nullable();
+            $table->integer('year_built')->nullable();
+            $table->date('last_renovated')->nullable();
+            $table->enum('energy_rating', ['A', 'B', 'C', 'D', 'E', 'F', 'G'])->nullable();
             
             $table->boolean('is_featured')->default(false);
             $table->json('additional_features')->nullable();
