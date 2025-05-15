@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
+use App\Livewire\PropertyBookingForm;
 
 // Home page route using Volt component
 Volt::route('/', 'pages.home')->name('home');
@@ -32,7 +33,23 @@ Route::prefix('properties')->group(function () {
     // Individual property details
     Volt::route('/{property}', 'pages.properties.show')
         ->name('properties.show');
+
+    // Booking form route
+    Route::get('/{property}/book', PropertyBookingForm::class)
+        ->name('properties.book');
 });
+
+// Valuation Services routes
+Route::prefix('services')->name('services.')->group(function () {
+    Volt::route('/valuation', 'pages.services.valuation')
+        ->name('valuation');
+    Volt::route('/property-management', 'pages.services.property-management')
+        ->name('management');
+});
+
+// Static pages
+Volt::route('/about', 'pages.about')->name('about');
+Volt::route('/contact', 'pages.contact')->name('contact');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])

@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Services\WhatsAppService;
+use App\Notifications\BookingConfirmation;
 
 class PropertyBooking extends Model
 {
@@ -32,6 +34,32 @@ class PropertyBooking extends Model
 
     protected static function booted()
     {
+        static::created(function ($booking) {
+            try {
+                // Send email notification
+                $booking->notify(new BookingConfirmation($booking));
+
+                // Send WhatsApp message
+                if ($booking->guest_phone) {
+                    app(WhatsAppService::class)->sendMessage(
+                        $booking->guest_phone,
+                        "✨ Booking Confirmed ✨\n\n" .
+                        "Hello {$booking->guest_name}!\n\n" .
+                        "Your booking for {$booking->property->title} has been confirmed.\n\n" .
+                        "Check-in: {$booking->check_in->format('D, M d, Y')}\n" .
+                        "Check-out: {$booking->check_out->format('D, M d, Y')}\n" .
+                        "Total Amount: KES " . number_format($booking->total_amount, 2) . "\n\n" .
+                        "For any questions, please contact us!"
+                    );
+                }
+            } catch (\Exception $e) {
+                \Log::error('Booking notification failed', [
+                    'booking_id' => $booking->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+        });
+
         // When a booking is created or status changes to confirmed
         static::saved(function ($booking) {
             if ($booking->status === 'confirmed') {
