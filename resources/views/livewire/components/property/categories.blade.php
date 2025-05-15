@@ -65,36 +65,6 @@ new class extends Component {
             'High-speed internet ready',
             'Meeting room facilities'
             ]
-        ],
-        'management' => [
-            'title' => 'Property Management',
-            'description' => 'Comprehensive property management solutions for property owners',
-            'icon' => 'cog-6-tooth',
-            'color' => 'green',
-            'route' => 'properties.management',
-            'accent' => 'from-emerald-400 to-green-500',
-            'features' => [
-            'Tenant screening & placement',
-            'Rent collection & accounting',
-            'Maintenance coordination',
-            'Regular property inspections',
-            'Legal compliance handling'
-            ]
-        ],
-        'valuation' => [
-            'title' => 'Property Valuation',
-            'description' => 'Accurate property valuation services for buyers and sellers',
-            'icon' => 'calculator',
-            'color' => 'purple',
-            'route' => 'properties.valuation',
-            'accent' => 'from-purple-400 to-pink-500',
-            'features' => [
-            'Comprehensive market analysis',
-            'Detailed property reports',
-            'Expert appraisals',
-            'Competitive pricing strategy',
-            'Free initial consultation'
-            ]
         ]
     ];
 
@@ -122,9 +92,9 @@ new class extends Component {
 
         <!-- Tab Navigation -->
         <div class="mb-12 flex flex-wrap justify-center gap-2 sm:gap-4">
-            @foreach(['sale', 'rent', 'airbnb'] as $type)
-                <button 
-                    @click="activeTab = '{{ $type }}'" 
+            @foreach(['sale', 'rent', 'airbnb', 'commercial'] as $type)
+                <button
+                    @click="activeTab = '{{ $type }}'"
                     :class="activeTab === '{{ $type }}' ? 'bg-[#02c9c2] text-white shadow-lg scale-105' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'"
                     class="px-6 py-3 rounded-full font-medium text-sm sm:text-base transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02c9c2] dark:focus:ring-offset-gray-900 flex items-center shadow-md"
                 >
@@ -141,9 +111,9 @@ new class extends Component {
 
         <!-- Tab Content -->
         <div class="relative">
-            @foreach(['sale', 'rent', 'airbnb'] as $type)
-                <div 
-                    x-show="activeTab === '{{ $type }}'" 
+            @foreach(['sale', 'rent', 'airbnb', 'commercial'] as $type)
+                <div
+                    x-show="activeTab === '{{ $type }}'"
                     x-transition:enter="transition ease-out duration-300"
                     x-transition:enter-start="opacity-0 transform translate-y-4"
                     x-transition:enter-end="opacity-100 transform translate-y-0"

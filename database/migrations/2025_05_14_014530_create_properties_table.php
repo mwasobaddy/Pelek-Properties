@@ -19,9 +19,10 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->text('description');
             $table->string('type');
-            $table->enum('listing_type', ['sale', 'rent', 'airbnb']);
+            $table->enum('listing_type', ['sale', 'rent', 'airbnb', 'commercial'])->default('sale');
             $table->decimal('price', 12, 2);
             $table->decimal('size', 10, 2)->nullable();
+            $table->string('square_range')->nullable(); // For categorizing property sizes
             $table->string('location');
             $table->string('city');
             $table->string('address')->nullable();

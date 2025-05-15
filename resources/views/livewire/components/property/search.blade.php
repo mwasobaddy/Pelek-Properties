@@ -85,7 +85,7 @@ new class extends Component {
                 <div class="mb-6">
                     <label class="text-sm font-medium text-white/90 dark:text-white/80">I'm looking to:</label>
                     <div class="mt-2.5 flex flex-wrap gap-2 rounded-xl bg-white/5 dark:bg-zinc-800/30 p-1.5">
-                        @foreach(['all' => 'All Properties', 'sale' => 'Buy', 'rent' => 'Rent', 'airbnb' => 'Book Stay'] as $value => $label)
+                        @foreach(['all' => 'All Properties', 'sale' => 'Buy', 'rent' => 'Rent', 'airbnb' => 'Book Stay', 'commercial' => 'Commercial'] as $value => $label)
                             <button
                                 wire:click="$set('listingType', '{{ $value }}')"
                                 @click="activeTab = '{{ $value }}'"
@@ -104,6 +104,8 @@ new class extends Component {
                                     <flux:icon name="home" class="h-4 w-4 mr-1.5" />
                                 @elseif($value === 'airbnb')
                                     <flux:icon name="calendar" class="h-4 w-4 mr-1.5" />
+                                @elseif($value === 'commercial')
+                                    <flux:icon name="briefcase" class="h-4 w-4 mr-1.5" />
                                 @endif
                                 {{ $label }}
                                 @if(isset($this->propertyStats[$value]))
@@ -198,7 +200,8 @@ new class extends Component {
                 @foreach([
                     'sale' => ['For Sale', 'shopping-bag', 'from-teal-400 to-emerald-500'],
                     'rent' => ['For Rent', 'home', 'from-cyan-400 to-teal-500'],
-                    'airbnb' => ['Short Stays', 'calendar', 'from-emerald-400 to-teal-500']
+                    'airbnb' => ['Short Stays', 'calendar', 'from-emerald-400 to-teal-500'],
+                    'commercial' => ['Commercial', 'briefcase', 'from-emerald-400 to-teal-500'],
                 ] as $type => $data)
                     <div 
                         @click="activeTab = '{{ $type }}'; $wire.set('listingType', '{{ $type }}')"

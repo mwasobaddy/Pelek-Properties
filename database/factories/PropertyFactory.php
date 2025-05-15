@@ -23,12 +23,13 @@ class PropertyFactory extends Factory
     public function definition(): array
     {
         $title = $this->faker->words(4, true);
-        $listingType = $this->faker->randomElement(['sale', 'rent', 'airbnb']);
+        $listingType = $this->faker->randomElement(['sale', 'rent', 'airbnb', 'commercial']);
         $basePrice = $this->faker->numberBetween(50000, 1000000);
         $type = match ($listingType) {
             'sale' => 'residential',
             'rent' => 'residential',
             'airbnb' => 'vacation',
+            'commercial' => $this->faker->randomElement(['office', 'retail', 'industrial', 'warehouse', 'mixed_use']),
         };
 
         return [
@@ -44,7 +45,16 @@ class PropertyFactory extends Factory
             'city' => 'Nairobi',
             'bedrooms' => $this->faker->numberBetween(1, 6),
             'bathrooms' => $this->faker->numberBetween(1, 4),
-            'size' => $this->faker->numberBetween(50, 500),
+            'size' => $size = $this->faker->numberBetween(30, 1000),
+            'square_range' => match(true) {
+                $size <= 50 => '0-50',
+                $size <= 100 => '50-100',
+                $size <= 200 => '100-200',
+                $size <= 300 => '200-300',
+                $size <= 500 => '300-500',
+                default => '500+'
+            },
+            'floors' => $this->faker->numberBetween(1, 20),
             'listing_type' => $listingType,
             'status' => $this->faker->randomElement(['available', 'under_contract', 'sold', 'rented']),
             'is_featured' => $this->faker->boolean(20),
@@ -144,6 +154,32 @@ class PropertyFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'listing_type' => 'airbnb',
             'type' => 'vacation',
+        ]);
+    }
+    /**
+     * Indicate that the property is for commercial use.
+     */
+    public function forCommercial(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'listing_type' => 'commercial',
+            'type' => $this->faker->randomElement(['office', 'retail', 'industrial', 'warehouse', 'mixed_use']),
+            'rental_price_daily' => null,
+            'rental_price_monthly' => null,
+            'airbnb_price_nightly' => null,
+            'airbnb_price_weekly' => null,
+            'airbnb_price_monthly' => null,
+            'availability_calendar' => null,
+        ]);
+    }
+
+    /**
+     * Indicate that the property is sold.
+     */
+    public function sold(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => 'sold',
         ]);
     }
 }

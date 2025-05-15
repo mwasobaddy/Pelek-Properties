@@ -18,6 +18,7 @@ state([
             'sale' => $this->property->price,
             'rent' => $this->property->rental_price_monthly,
             'airbnb' => $this->property->airbnb_price_nightly,
+            'commercial' => $this->property->commercial_price_monthly,
             default => 0,
         }, 2
     ),
@@ -26,6 +27,7 @@ state([
         'sale' => 'Price',
         'rent' => 'Monthly Rent',
         'airbnb' => 'Per Night',
+        'commercial' => 'Monthly Rent',
         default => 'Price',
     },
 
@@ -99,12 +101,13 @@ state([
             @endif
             
             {{-- Listing Badge --}}
-            <div class="absolute left-4 top-4 z-10">
+            <div class="absolute left-4 top-4 z-1">
                 <span @class([
                     'inline-flex items-center rounded-full px-3 py-1 text-xs font-medium tracking-wide shadow-sm',
                     'bg-blue-500/90 text-white backdrop-blur-sm' => $property->listing_type === 'rent',
                     'bg-emerald-500/90 text-white backdrop-blur-sm' => $property->listing_type === 'sale',
                     'bg-purple-500/90 text-white backdrop-blur-sm' => $property->listing_type === 'airbnb',
+                    'bg-yellow-500/90 text-white backdrop-blur-sm' => $property->listing_type === 'commercial',
                 ])>
                     {{ ucfirst($property->listing_type) }}
                 </span>

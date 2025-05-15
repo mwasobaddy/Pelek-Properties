@@ -33,6 +33,14 @@ new class extends Component {
             'route' => 'properties.airbnb',
             'icon' => 'calendar',
             'accent' => 'from-emerald-400 to-teal-500'
+        ],
+        'commercial' => [
+            'title' => 'Commercial Spaces for Rent',
+            'subtitle' => 'Prime locations for your business needs',
+            'cta' => 'View Commercial Listings',
+            'route' => 'properties.commercial',
+            'icon' => 'building-office-2',
+            'accent' => 'from-blue-400 to-cyan-500'
         ]
     ];
 
@@ -62,7 +70,7 @@ new class extends Component {
         <!-- Tab Navigation -->
         <div class="mb-12 flex flex-wrap justify-center gap-2 sm:gap-4">
             @php $hasAnyProperties = false; @endphp
-            @foreach(['sale', 'rent', 'airbnb'] as $type)
+            @foreach(['sale', 'rent', 'airbnb', 'commercial'] as $type)
                 @if(isset($this->featuredProperties[$type]) && count($this->featuredProperties[$type]) > 0)
                     @php $hasAnyProperties = true; @endphp
                     <button 
@@ -80,7 +88,7 @@ new class extends Component {
         @if($hasAnyProperties)
             <!-- Tab Content -->
             <div class="relative">
-                @foreach(['sale', 'rent', 'airbnb'] as $type)
+                @foreach(['sale', 'rent', 'airbnb', 'commercial'] as $type)
                     @if(isset($this->featuredProperties[$type]) && count($this->featuredProperties[$type]) > 0)
                         <div 
                             x-show="activeTab === '{{ $type }}'" 

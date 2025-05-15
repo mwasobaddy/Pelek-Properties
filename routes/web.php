@@ -14,16 +14,16 @@ Route::prefix('properties')->group(function () {
         ->name('properties.index');
     
     // Property type-specific routes
-    Volt::route('/sale', 'pages.properties.index', ['type' => 'sale'])
+    Volt::route('?propertyListingType=sale', 'pages.properties.index')
         ->name('properties.sale');
-    
-    Volt::route('/rent', 'pages.properties.rental')
+
+    Volt::route('?propertyListingType=rent', 'pages.properties.index')
         ->name('properties.rent');
-    
-    Volt::route('/commercial', 'pages.properties.commercial')
+
+    Volt::route('?propertyListingType=commercial', 'pages.properties.index')
         ->name('properties.commercial');
 
-    Volt::route('/airbnb', 'pages.properties.index', ['type' => 'airbnb'])
+    Volt::route('?propertyListingType=airbnb', 'pages.properties.index')
         ->name('properties.airbnb');
     
     // Property search route

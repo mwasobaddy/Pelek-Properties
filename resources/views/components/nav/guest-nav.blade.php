@@ -39,6 +39,7 @@
                         <a href="{{ route('properties.sale') }}" class="block px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">For Sale</a>
                         <a href="{{ route('properties.rent') }}" class="block px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">For Rent</a>
                         <a href="{{ route('properties.airbnb') }}" class="block px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">Airbnb</a>
+                        <a href="{{ route('properties.commercial') }}" class="block px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">Commercial</a>
                     </div>
                 </div>
                 

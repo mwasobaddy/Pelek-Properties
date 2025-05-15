@@ -10,7 +10,7 @@ new class extends Component {
             'icon' => 'building-library',
             'color' => 'teal',
             'accent' => 'from-cyan-400 to-teal-500',
-            'route' => 'home',
+            'route' => 'properties.airbnb', 
             'modal_type' => 'airbnb',
             'features' => [
                 'Fully furnished premium units',
@@ -26,7 +26,7 @@ new class extends Component {
             'icon' => 'home',
             'color' => 'teal',
             'accent' => 'from-teal-400 to-emerald-500',
-            'route' => 'home',
+            'route' => 'properties.rent',
             'modal_type' => 'rent',
             'features' => [
                 'Houses and apartments',
@@ -42,7 +42,7 @@ new class extends Component {
             'icon' => 'building-office-2',
             'color' => 'cyan',
             'accent' => 'from-blue-400 to-cyan-500',
-            'route' => 'home',
+            'route' => 'properties.commercial',
             'modal_type' => 'inquiry',
             'features' => [
                 'Office spaces & retail units',
@@ -58,7 +58,7 @@ new class extends Component {
             'icon' => 'cog-6-tooth',
             'color' => 'green',
             'accent' => 'from-emerald-400 to-green-500',
-            'route' => 'home',
+            'route' => 'properties.management',
             'modal_type' => 'management',
             'features' => [
                 'Tenant screening & placement',
@@ -74,7 +74,7 @@ new class extends Component {
             'icon' => 'home-modern',
             'color' => 'blue',
             'accent' => 'from-indigo-400 to-blue-500',
-            'route' => 'home',
+            'route' => 'properties.sale',
             'modal_type' => 'sale',
             'features' => [
             'Residential homes & land plots',
@@ -90,7 +90,7 @@ new class extends Component {
             'icon' => 'calculator',
             'color' => 'purple',
             'accent' => 'from-purple-400 to-pink-500',
-            'route' => 'home',
+            'route' => 'properties.valuation',
             'modal_type' => 'valuation',
             'features' => [
                 'Comprehensive market analysis',

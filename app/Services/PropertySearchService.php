@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Property;
+use App\Models\Amenity;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
@@ -22,7 +23,29 @@ class PropertySearchService
 
             $this->applyFilters($query, $filters);
 
-            return $query->latest()->paginate($perPage);
+            // Apply custom sorting if provided
+            if (!empty($filters['sort'])) {
+                switch ($filters['sort']) {
+                    case 'name_asc':
+                        $query->orderBy('title', 'asc');
+                        break;
+                    case 'name_desc':
+                        $query->orderBy('title', 'desc');
+                        break;
+                    case 'newest':
+                        $query->latest();
+                        break;
+                    case 'oldest':
+                        $query->oldest();
+                        break;
+                    default:
+                        $query->latest();
+                }
+            } else {
+                $query->latest();
+            }
+
+            return $query->paginate($perPage);
         });
     }
 
@@ -65,6 +88,11 @@ class PropertySearchService
             $query->where('property_type_id', $filters['property_type_id']);
         }
 
+        // Property base type filter
+        if (!empty($filters['type'])) {
+            $query->where('type', $filters['type']);
+        }
+
         // Amenities filter
         if (!empty($filters['amenities'])) {
             $query->whereHas('amenities', function ($q) use ($filters) {
@@ -83,6 +111,16 @@ class PropertySearchService
         }
         if (!empty($filters['max_size'])) {
             $query->where('size', '<=', $filters['max_size']);
+        }
+
+        // Square range filter (predefined ranges)
+        if (!empty($filters['square_range'])) {
+            $query->where('square_range', $filters['square_range']);
+        }
+
+        // Floors filter
+        if (!empty($filters['floors'])) {
+            $query->where('floors', $filters['floors']);
         }
 
         // Text search
@@ -169,6 +207,19 @@ class PropertySearchService
                 ->selectRaw('listing_type, count(*) as count')
                 ->groupBy('listing_type')
                 ->pluck('count', 'listing_type')
+                ->toArray();
+        });
+    }
+
+    /**
+     * Get all available amenities
+     */
+    public function getAvailableAmenities(): array
+    {
+        return Cache::remember('available_amenities', 3600, function () {
+            return Amenity::query()
+                ->orderBy('name')
+                ->pluck('name')
                 ->toArray();
         });
     }
