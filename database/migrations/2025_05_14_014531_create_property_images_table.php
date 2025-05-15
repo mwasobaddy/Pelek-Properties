@@ -13,11 +13,13 @@ return new class extends Migration
     {
         Schema::create('property_images', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('property_id')->constrained()->onDelete('cascade');
+            $table->foreignId('property_id')->constrained()->cascadeOnDelete();
             $table->string('image_path');
+            $table->string('thumbnail_path')->nullable();
             $table->boolean('is_featured')->default(false);
             $table->integer('display_order')->default(0);
-            $table->json('metadata')->nullable(); // Store image metadata (size, dimensions, etc.)
+            $table->string('alt_text')->nullable();
+            $table->json('meta')->nullable();
             $table->timestamps();
         });
     }
