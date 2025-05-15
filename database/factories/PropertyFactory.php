@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Property;
 use App\Models\PropertyType;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -12,6 +13,8 @@ use Illuminate\Support\Str;
  */
 class PropertyFactory extends Factory
 {
+    protected $model = Property::class;
+
     /**
      * Define the model's default state.
      *
@@ -22,6 +25,11 @@ class PropertyFactory extends Factory
         $title = $this->faker->words(4, true);
         $listingType = $this->faker->randomElement(['sale', 'rent', 'airbnb']);
         $basePrice = $this->faker->numberBetween(50000, 1000000);
+        $type = match ($listingType) {
+            'sale' => 'residential',
+            'rent' => 'residential',
+            'airbnb' => 'vacation',
+        };
 
         return [
             'user_id' => User::factory(),
@@ -29,6 +37,7 @@ class PropertyFactory extends Factory
             'title' => ucwords($title),
             'slug' => Str::slug($title),
             'description' => $this->faker->paragraphs(3, true),
+            'type' => $type,
             'price' => $basePrice,
             'location' => $this->faker->address(),
             'neighborhood' => $this->faker->city(),
@@ -40,8 +49,8 @@ class PropertyFactory extends Factory
             'status' => $this->faker->randomElement(['available', 'under_contract', 'sold', 'rented']),
             'is_featured' => $this->faker->boolean(20),
             'additional_features' => $this->generateAdditionalFeatures(),
-            'rental_price_daily' => $listingType !== 'sale' ? $basePrice * 0.0005 : null,
-            'rental_price_monthly' => $listingType !== 'sale' ? $basePrice * 0.01 : null,
+            'rental_price_daily' => $listingType === 'rent' ? $basePrice * 0.0005 : null,
+            'rental_price_monthly' => $listingType === 'rent' ? $basePrice * 0.01 : null,
             'airbnb_price_nightly' => $listingType === 'airbnb' ? $basePrice * 0.0007 : null,
             'airbnb_price_weekly' => $listingType === 'airbnb' ? $basePrice * 0.004 : null,
             'airbnb_price_monthly' => $listingType === 'airbnb' ? $basePrice * 0.015 : null,
@@ -102,6 +111,7 @@ class PropertyFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'listing_type' => 'sale',
+            'type' => 'residential',
             'rental_price_daily' => null,
             'rental_price_monthly' => null,
             'airbnb_price_nightly' => null,
@@ -118,6 +128,7 @@ class PropertyFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'listing_type' => 'rent',
+            'type' => 'residential',
             'airbnb_price_nightly' => null,
             'airbnb_price_weekly' => null,
             'airbnb_price_monthly' => null,
@@ -132,6 +143,7 @@ class PropertyFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'listing_type' => 'airbnb',
+            'type' => 'vacation',
         ]);
     }
 }

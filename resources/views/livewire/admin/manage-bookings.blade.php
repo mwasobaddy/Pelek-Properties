@@ -242,13 +242,13 @@ new class extends Component {
 
             <div class="flex justify-end space-x-3">
                 @if($isEditing)
-                    <x-flux-button type="button" wire:click="resetForm" variant="secondary">
+                    <flux:button type="button" wire:click="resetForm" variant="secondary">
                         Cancel
-                    </x-flux-button>
+                    </flux:button>
                 @endif
-                <x-flux-button type="submit">
+                <flux:button type="submit">
                     {{ $isEditing ? 'Update Booking' : 'Create Booking' }}
-                </x-flux-button>
+                </flux:button>
             </div>
         </form>
     </div>
@@ -275,12 +275,12 @@ new class extends Component {
                             </div>
                             <div class="flex items-center space-x-2">
                                 @if($booking->status === 'confirmed')
-                                    <x-flux-button size="sm" wire:click="editBooking({{ $booking->id }})">
+                                    <flux:button size="sm" wire:click="editBooking({{ $booking->id }})">
                                         Edit
-                                    </x-flux-button>
-                                    <x-flux-button size="sm" variant="danger" wire:click="cancelBooking({{ $booking->id }})">
+                                    </flux:button>
+                                    <flux:button size="sm" variant="danger" wire:click="cancelBooking({{ $booking->id }})">
                                         Cancel
-                                    </x-flux-button>
+                                    </flux:button>
                                 @else
                                     <span class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
                                         Cancelled

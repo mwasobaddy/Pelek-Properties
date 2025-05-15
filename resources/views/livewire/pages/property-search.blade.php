@@ -103,14 +103,14 @@ use function Livewire\Volt\{state, computed};
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div class="flex-1">
             <div class="relative">
-                <x-flux-input 
+                <flux:input 
                     type="text"
                     wire:model.live.debounce.300ms="search"
                     placeholder="Search properties by location, title or description..."
                     class="w-full pr-10"
                 />
                 <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-                    <x-flux-icon 
+                    <flux:icon 
                         name="magnifying-glass"
                         class="h-5 w-5 text-gray-400 dark:text-gray-600"
                     />
@@ -119,31 +119,31 @@ use function Livewire\Volt\{state, computed};
         </div>
         
         <div class="flex items-center gap-4">
-            <x-flux-dropdown>
+            <flux:dropdown>
                 <x-slot name="trigger">
-                    <x-flux-button>
+                    <flux:button>
                         {{ $sortOptions[$sortBy] }}
-                        <x-flux-icon name="chevron-down" class="ml-2 h-4 w-4"/>
-                    </x-flux-button>
+                        <flux:icon name="chevron-down" class="ml-2 h-4 w-4"/>
+                    </flux:button>
                 </x-slot>
                 
                 @foreach($sortOptions as $value => $label)
-                    <x-flux-dropdown-item 
+                    <flux:dropdown-item 
                         wire:click="$set('sortBy', '{{ $value }}')"
                         :active="$sortBy === $value"
                     >
                         {{ $label }}
-                    </x-flux-dropdown-item>
+                    </flux:dropdown-item>
                 @endforeach
-            </x-flux-dropdown>
+            </flux:dropdown>
 
-            <x-flux-button
+            <flux:button
                 wire:click="toggleFilters"
                 variant="secondary"
             >
-                <x-flux-icon name="adjustments-horizontal" class="h-5 w-5 mr-2"/>
+                <flux:icon name="adjustments-horizontal" class="h-5 w-5 mr-2"/>
                 Filters
-            </x-flux-button>
+            </flux:button>
         </div>
     </div>
 
@@ -154,7 +154,7 @@ use function Livewire\Volt\{state, computed};
                 <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
                     {{ $propertyTypes->firstWhere('id', $type)->name }}
                     <button wire:click="setType('{{ $type }}')" class="ml-2 text-indigo-600 hover:text-indigo-500">
-                        <x-flux-icon name="x-mark" class="h-4 w-4"/>
+                        <flux:icon name="x-mark" class="h-4 w-4"/>
                     </button>
                 </span>
             @endif
@@ -163,7 +163,7 @@ use function Livewire\Volt\{state, computed};
                 <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
                     {{ $priceRanges[$priceRange] }}
                     <button wire:click="setPriceRange('{{ $priceRange }}')" class="ml-2 text-indigo-600 hover:text-indigo-500">
-                        <x-flux-icon name="x-mark" class="h-4 w-4"/>
+                        <flux:icon name="x-mark" class="h-4 w-4"/>
                     </button>
                 </span>
             @endif
@@ -238,7 +238,7 @@ use function Livewire\Volt\{state, computed};
     <div wire:loading.delay.class="opacity-50">
         @if($properties->isEmpty())
             <div class="text-center py-12">
-                <x-flux-icon name="magnifying-glass" class="mx-auto h-12 w-12 text-gray-400"/>
+                <flux:icon name="magnifying-glass" class="mx-auto h-12 w-12 text-gray-400"/>
                 <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No properties found</h3>
                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                     Try adjusting your search or filter criteria

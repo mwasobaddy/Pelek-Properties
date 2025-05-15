@@ -136,7 +136,7 @@ new class extends Component {
             <!-- Empty State with Visual Enhancement -->
             <div class="text-center py-16 px-4 border border-dashed border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 shadow-sm">
                 <div class="flex flex-col items-center">
-                    <flux:icon name="home-x" class="h-16 w-16 text-gray-400 dark:text-gray-500 mb-4" />
+                    <flux:icon name="home" class="h-16 w-16 text-gray-400 dark:text-gray-500 mb-4" />
                     <h3 class="text-xl font-medium text-gray-700 dark:text-gray-300 mb-2">No Featured Properties</h3>
                     <p class="text-gray-500 dark:text-gray-400 max-w-md">We're currently updating our featured listings. Please check back soon for new properties.</p>
                 </div>

@@ -192,12 +192,12 @@ new class extends Component {
 
         <!-- Reset Filters -->
         <div class="mt-6">
-            <x-flux-button 
+            <flux:button 
                 wire:click="resetFilters"
                 variant="secondary"
             >
                 Reset Filters
-            </x-flux-button>
+            </flux:button>
         </div>
     </div>
 

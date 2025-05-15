@@ -222,9 +222,9 @@ Create permissions:
 ## Flux Components:
 
 html
-<x-flux-button icon="home" wire:click="search">
+<flux:button icon="home" wire:click="search">
     Find Properties
-</x-flux-button>
+</flux:button>
 
 Tailwind Best Practices:
 - Use @apply for reusable styles
