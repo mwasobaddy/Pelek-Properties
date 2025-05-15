@@ -42,21 +42,25 @@
   - [x] AdminBookingManagement
   - [ ] AvailabilityCalendar improvements
 
-### 2. Rental Properties
-- [ ] Database Schema
-  - [ ] Rental-specific fields
-  - [ ] Tenant information tracking
-  - [ ] Admin booking management
-- [ ] Models & Relationships
-  - [ ] Update Property model with rental methods
-  - [ ] Add rental-specific relationships
-- [ ] Services
-  - [ ] RentalPropertyService
-  - [ ] TenantService
-- [ ] Components
-  - [ ] RentalPropertyList
-  - [ ] RentalPropertyCard with WhatsApp
-  - [ ] AdminRentalManagement
+### 2. Rental Properties [-]
+- [x] Database Schema
+  - [x] Rental-specific fields
+  - [x] Tenant information tracking
+  - [x] Property metadata
+- [x] Models & Relationships
+  - [x] Update Property model with rental methods
+  - [x] Add rental-specific fields and casts
+- [x] Services
+  - [x] RentalPropertyService
+  - [x] Rental property filtering
+- [x] Components
+  - [x] RentalPropertyList with filters
+  - [x] RentalPropertyCard with WhatsApp
+  - [x] Advanced search filters
+- [ ] Admin Features
+  - [ ] Rental property management
+  - [ ] Availability tracking
+  - [ ] Tenant information management
 
 ### 3. Commercial Spaces
 - [ ] Database Schema

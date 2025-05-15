@@ -12,11 +12,11 @@ Route::prefix('properties')->group(function () {
     Volt::route('/', 'pages.propertylist')
         ->name('properties.index');
     
-    // Property type-specific routes using the same component
+    // Property type-specific routes
     Volt::route('/sale', 'pages.propertylist', ['type' => 'sale'])
         ->name('properties.sale');
     
-    Volt::route('/rent', 'pages.propertylist', ['type' => 'rent'])
+    Volt::route('/rent', 'pages.rental-properties')
         ->name('properties.rent');
     
     Volt::route('/airbnb', 'pages.propertylist', ['type' => 'airbnb'])

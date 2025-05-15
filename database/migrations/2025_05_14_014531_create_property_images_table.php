@@ -15,10 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('property_id')->constrained()->onDelete('cascade');
             $table->string('image_path');
-            $table->string('thumbnail_path')->nullable();
             $table->boolean('is_featured')->default(false);
             $table->integer('display_order')->default(0);
-            $table->string('alt_text')->nullable();
+            $table->json('metadata')->nullable(); // Store image metadata (size, dimensions, etc.)
             $table->timestamps();
         });
     }
