@@ -16,17 +16,17 @@ new #[Layout('components.layouts.guest')] class extends Component {
 
 <div>
     {{-- Hero Section with Search --}}
-    <livewire:components.search-hero />
+    <livewire:components.property.search />
 
     {{-- Property Categories Section --}}
-    <livewire:components.property-categories />
+    <livewire:components.property.categories />
 
     {{-- Featured Properties Section --}}
-    <livewire:components.featured-properties />
+    <livewire:components.ui.featured-properties />
 
     {{-- Property Services Section --}}
-    <livewire:components.property-services />
+    <livewire:components.property.services />
 
     {{-- Call to Action Section --}}
-    <livewire:components.call-to-action />
+    <livewire:components.ui.call-to-action />
 </div>

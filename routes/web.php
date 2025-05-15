@@ -9,28 +9,28 @@ Volt::route('/', 'pages.home')->name('home');
 // Property routes
 Route::prefix('properties')->group(function () {
     // Main property listing route
-    Volt::route('/', 'pages.propertylist')
+    Volt::route('/', 'pages.properties.index')
         ->name('properties.index');
     
     // Property type-specific routes
-    Volt::route('/sale', 'pages.propertylist', ['type' => 'sale'])
+    Volt::route('/sale', 'pages.properties.index', ['type' => 'sale'])
         ->name('properties.sale');
     
-    Volt::route('/rent', 'pages.rental-properties')
+    Volt::route('/rent', 'pages.properties.rental')
         ->name('properties.rent');
     
-    Volt::route('/commercial', 'pages.commercial-properties')
+    Volt::route('/commercial', 'pages.properties.commercial')
         ->name('properties.commercial');
 
-    Volt::route('/airbnb', 'pages.propertylist', ['type' => 'airbnb'])
+    Volt::route('/airbnb', 'pages.properties.index', ['type' => 'airbnb'])
         ->name('properties.airbnb');
     
     // Property search route
-    Volt::route('/search', 'pages.property-search')
+    Volt::route('/search', 'pages.properties.index')
         ->name('properties.search');
     
     // Individual property details
-    Volt::route('/{property}', 'pages.property-details')
+    Volt::route('/{property}', 'pages.properties.show')
         ->name('properties.show');
 });
 
@@ -50,24 +50,28 @@ Route::middleware(['auth'])->group(function () {
         // Property management
         Route::prefix('properties')->name('properties.')->group(function () {
             // Property listing and management
-            Volt::route('/', 'admin.property-list')
+            Volt::route('/', 'pages.admin.properties.index')
                 ->name('index');
             
-            Volt::route('/manage', 'admin.manage-rental-properties')
+            Volt::route('/manage', 'pages.admin.properties.manage')
                 ->name('manage');
             
             // Financial reporting
-            Volt::route('/financials', 'admin.property-financial-report')
+            Volt::route('/financials', 'pages.admin.properties.financial-report')
                 ->name('financials');
                 
             // Photos management
-            Volt::route('/{property}/photos', 'admin.property-photos')
+            Volt::route('/{property}/photos', 'pages.admin.properties.photos')
                 ->name('photos');
+
+            // Commercial properties management
+            Volt::route('/commercial', 'pages.admin.properties.commercial')
+                ->name('commercial');
         });
 
         // Booking management
         Route::prefix('bookings')->name('bookings.')->group(function () {
-            Volt::route('/', 'admin.manage-bookings')
+            Volt::route('/', 'pages.admin.bookings.index')
                 ->name('index');
         });
     });

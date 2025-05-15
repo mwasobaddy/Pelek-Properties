@@ -105,7 +105,7 @@ new class extends Component {
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 xl:gap-8">
                                 @foreach($this->featuredProperties[$type] as $property)
                                     <div class="group transform transition duration-500 hover:scale-105 hover:-translate-y-1">
-                                        <livewire:components.property-card 
+                                        <livewire:components.property.card 
                                             :property="$property" 
                                             :key="'featured-'.$type.'-'.$property->id" 
                                         />

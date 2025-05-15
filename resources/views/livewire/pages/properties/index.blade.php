@@ -1,9 +1,12 @@
 <?php
 
+use Livewire\WithPagination;
+use Livewire\Volt\Component;
+use function Livewire\Volt\{state};
+use App\Models\Property;
+use App\Models\PropertyType;
 use App\Services\PropertySearchService;
 use Livewire\Attributes\Layout;
-use Livewire\Volt\Component;
-use Livewire\WithPagination;
 
 new #[Layout('components.layouts.guest')] class extends Component {
     use WithPagination;
@@ -23,13 +26,12 @@ new #[Layout('components.layouts.guest')] class extends Component {
     public $listingType = null;
     public $pageTitle = 'All Properties';
     public $pageDescription = 'Browse our collection of properties';
-    
+
     public function mount($type = null)
     {
         if ($type) {
             $this->listingType = $type;
             
-            // Set page title and description based on listing type
             switch ($type) {
                 case 'sale':
                     $this->pageTitle = 'Properties for Sale';
@@ -53,7 +55,6 @@ new #[Layout('components.layouts.guest')] class extends Component {
         $this->propertyType = null;
         $this->priceRange = null;
         $this->onlyAvailable = false;
-        // Don't reset listingType as it's part of the page context
     }
 
     public function with(): array
@@ -85,7 +86,8 @@ new #[Layout('components.layouts.guest')] class extends Component {
         }
 
         return [
-            'properties' => app(PropertySearchService::class)->search($searchParams)
+            'properties' => app(PropertySearchService::class)->search($searchParams),
+            'propertyTypes' => PropertyType::all()
         ];
     }
 }
@@ -113,6 +115,15 @@ new #[Layout('components.layouts.guest')] class extends Component {
                     class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
                 >
             </div>
+            <select 
+                wire:model.live="propertyType"
+                class="w-full md:w-48 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+            >
+                <option value="">All Types</option>
+                @foreach($propertyTypes as $type)
+                    <option value="{{ $type->id }}">{{ $type->name }}</option>
+                @endforeach
+            </select>
             <div class="flex gap-4">
                 <button 
                     wire:click="resetFilters"

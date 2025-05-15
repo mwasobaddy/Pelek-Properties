@@ -151,27 +151,36 @@ Content types:
 
 ### 4.2 Dynamic Features
 
-1. **Smart Search & Filters**
+1. **Component Organization**
+   - Clear separation of pages and components
+   - Logical grouping by feature and responsibility
+   - Reusable components in dedicated directories
+   - Admin components separated from public components
+   - Property-specific components grouped together
+   - Form components isolated for reusability
+   - UI components separated from business logic
+
+2. **Smart Search & Filters**
    - Cross-category property search
    - Intuitive filtering interface
 
-2. **Booking System**
+3. **Booking System**
    - Airbnb availability calendars
    - Date selection for inquiries
 
-3. **Promotional Tools**
+4. **Promotional Tools**
    - Admin-controlled featured listings
    - Special offer highlighting
 
-4. **Future: Payment Integration**
+5. **Future: Payment Integration**
    - Booking invoices
    - M-Pesa/PayPal/card payments
 
-5. **Live Communication**
+6. **Live Communication**
    - WhatsApp chat integration
    - Real-time support options
 
-6. **Content Management**
+7. **Content Management**
    - WordPress (or similar) CMS
    - Staff-friendly interface for:
      - Listing management
@@ -209,6 +218,10 @@ Content types:
 | Scalability | Growth-ready architecture |
 | Maintainability | Well-documented, easy CMS |
 | Accessibility | WCAG compliance where possible |
+| Code Organization | - Clear component hierarchy
+                    - Logical feature grouping
+                    - Consistent naming conventions
+                    - Proper use of Volt syntax |
 
 ## 6. Release Criteria
 The website is ready for launch when:

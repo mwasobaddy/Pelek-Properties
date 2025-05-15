@@ -1,24 +1,18 @@
-@php
-use Livewire\Volt\Component;
-use Livewire\Attributes\Layout;
+<?php
+
 use App\Models\Property;
-use function Livewire\Volt\{state, computed};
+use Livewire\Volt\Component;
 
-new #[Layout('components.layouts.app')] class extends Component {
-    public function mount()
+new class extends Component {
+    public function with(): array
     {
-        $this->authorize('manage-properties');
+        return [
+            'properties' => Property::with(['propertyType', 'images'])
+                ->latest()
+                ->get()
+        ];
     }
-
-    #[computed]
-    public function properties()
-    {
-        return Property::with(['propertyType', 'images'])
-            ->latest()
-            ->get();
-    }
-}
-@endphp
+} ?>
 
 <div>
     <div class="py-12">
@@ -36,7 +30,7 @@ new #[Layout('components.layouts.app')] class extends Component {
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        @foreach($this->properties as $property)
+                        @foreach($properties as $property)
                             <div class="bg-white dark:bg-gray-700 rounded-lg shadow overflow-hidden">
                                 @if($property->images->isNotEmpty())
                                     <img 

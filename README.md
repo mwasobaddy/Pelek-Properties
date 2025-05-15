@@ -112,10 +112,19 @@ app/
     └── Components/  # Reusable view components
 resources/
 ├── views/
-│   ├── components/  # Reusable Livewire components
-│   ├── flux/        # Customized Flux components
-│   ├── livewire/    # Livewire pages and components
-│   └── layouts/     # Layout templates
+│   └── livewire/
+│       ├── pages/              # Full page components
+│       │   ├── properties/     # Property-related pages
+│       │   ├── admin/         # Admin pages
+│       │   └── settings/      # User settings pages
+│       ├── components/        # Reusable components
+│       │   ├── property/      # Property-related components
+│       │   ├── forms/        # Form components
+│       │   ├── ui/          # UI components
+│       │   └── layout/      # Layout components
+│       └── admin/           # Admin-specific components
+│           ├── components/  # Admin reusable components
+│           └── widgets/    # Admin dashboard widgets
 ├── css/
 └── js/
 ```
@@ -131,8 +140,11 @@ resources/
 
 - Follow PSR-12 coding standards
 - Use service layer pattern for business logic
-- Keep Livewire components small and focused
-- Use Flux components where possible
+- Organize Livewire components by feature and responsibility
+- Keep components small and focused
+- Use proper Volt syntax for all components
+- Group related components in appropriate directories
+- Maintain consistent naming conventions
 - Implement proper validation and authorization
 - Write tests for critical features
 

@@ -63,6 +63,12 @@ class Property extends Model
         'management_services_included' => 'array',
         'management_fee_percentage' => 'decimal:2',
         'base_management_fee' => 'decimal:2',
+        'is_for_sale' => 'boolean',
+        'sale_price' => 'decimal:2',
+        'property_documents' => 'array',
+        'mortgage_available' => 'boolean',
+        'has_title_deed' => 'boolean',
+        'completion_date' => 'date',
     ];
 
     /**
@@ -335,5 +341,69 @@ class Property extends Model
             'expenses' => $records->where('transaction_type', 'expense')->sum('amount'),
             'pending' => $records->where('status', 'pending')->count(),
         ];
+    }
+
+    /**
+     * Get viewing appointments for this property
+     */
+    public function viewingAppointments()
+    {
+        return $this->hasMany(ViewingAppointment::class);
+    }
+
+    /**
+     * Get offers for this property
+     */
+    public function offers()
+    {
+        return $this->hasMany(PropertyOffer::class);
+    }
+
+    /**
+     * Scope for properties that are for sale
+     */
+    public function scopeForSale($query)
+    {
+        return $query->where('is_for_sale', true);
+    }
+
+    /**
+     * Scope for properties with mortgages available
+     */
+    public function scopeMortgageAvailable($query)
+    {
+        return $query->where('mortgage_available', true);
+    }
+
+    /**
+     * Check if property has any active offers
+     */
+    public function hasActiveOffers(): bool
+    {
+        return $this->offers()->active()->exists();
+    }
+
+    /**
+     * Get active offers count
+     */
+    public function getActiveOffersCountAttribute(): int
+    {
+        return $this->offers()->active()->count();
+    }
+
+    /**
+     * Get formatted sale price
+     */
+    public function getFormattedSalePriceAttribute(): string
+    {
+        return 'KES ' . number_format($this->sale_price, 2);
+    }
+
+    /**
+     * Check if property is under development
+     */
+    public function isUnderDevelopment(): bool
+    {
+        return in_array($this->development_status, ['under_construction', 'off_plan']);
     }
 }
