@@ -62,7 +62,7 @@
   - [x] Availability tracking
   - [x] Tenant information management
 
-### 3. Commercial Spaces [-]
+### 3. Commercial Spaces [COMPLETED]
 - [x] Database Schema
   - [x] Commercial properties table fields
   - [x] Facilities tracking
@@ -79,10 +79,10 @@
   - [x] CommercialPropertyList
   - [x] Advanced filter system
   - [x] Facility selection interface
-- [ ] Admin Features
-  - [ ] Commercial property management
-  - [ ] Facility maintenance tracking
-  - [ ] Commercial lease management
+- [x] Admin Features
+  - [x] Commercial property management
+  - [x] Facility maintenance tracking
+  - [x] Commercial lease management
 
 ### 4. Property Management Services
 - [ ] Database Schema
