@@ -41,9 +41,9 @@ Route::prefix('properties')->group(function () {
 
 // Valuation Services routes
 Route::prefix('services')->name('services.')->group(function () {
-    Volt::route('/valuation', 'pages.services.valuation')
+    Volt::route('/valuation', 'pages.services.valuation.index')
         ->name('valuation');
-    Volt::route('/property-management', 'pages.services.property-management')
+    Volt::route('/property-management', 'pages.services.property-management.index')
         ->name('management');
 });
 
