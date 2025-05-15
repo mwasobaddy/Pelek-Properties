@@ -22,179 +22,124 @@
   - [x] Computed properties as arrow functions
   - [x] Component methods inside state array
 
-## Livewire/Volt Components
-- NB All blade must support both light and dark mode
-- [ ] Page Components
-  - [x] Home Page
-    - [x] FeaturedProperties.php (Livewire)
-    - [x] PropertyCategories.php (Volt)
-    - [x] SearchHero.php (Livewire)
-    - [x] CallToAction.php (Volt)
-  
-  - [ ] Property Pages
-    - [x] PropertyList.php (Volt)
-      - [x] Advanced Filtering
-      - [x] Sorting Options
-      - [x] Pagination with @persist
-    - [x] PropertyDetails.php (Volt)
-      - [x] Image Gallery
-      - [x] Property Info
-      - [x] Similar Properties
-    - [x] PropertySearch.php (Volt)
-      - [x] Real-time Search with wire:model.live
-      - [x] Filter Panel
-      - [x] URL-persisted filters
-      - [x] Price range filtering
-      - [x] Property type filtering
-  
-  - [ ] Admin Dashboard
-    - [ ] PropertyManager.php (Livewire)
-    - [x] AirbnbImageUpload.php (Volt)
-      - [x] Image upload with previews
-      - [x] Featured image selection
-      - [x] Image deletion
-      - [x] Airbnb-specific optimization
-    - [ ] PropertyForm.php (Livewire)
-    - [ ] AmenityManager.php (Volt)
+## Core Services Implementation
 
-- [ ] Reusable Components (Volt)
-  - [ ] UI Components
-    - [x] PropertyCard.php (with dark mode support)
-      - [x] Dynamic pricing by property type
-      - [x] Image slider for Airbnb properties
-      - [x] WhatsApp inquiry modal
-      - [x] Responsive layout 
-    - [ ] SearchFilters.php
-    - [x] ImageGallery.php (implemented in property card)
-    - [x] PriceDisplay.php (implemented in property card)
-    - [ ] AmenityList.php
-    - [x] WhatsAppButton.php (implemented in property card)
-  
-  - [ ] Form Components
-    - [x] PropertyFilter.php (implemented in PropertySearch)
-    - [ ] BookingForm.php
-    - [ ] ContactForm.php
-    - [x] ImageUpload.php (implemented in AirbnbImageUpload)
-
-- [x] Flux Integration
-  - [x] Custom Theme Setup
-  - [x] Extended Components
-    - [x] x-flux-button (used in UI)
-    - [x] x-flux-card (used in UI)
-    - [ ] x-flux-form
-    - [x] x-flux-modal (used in WhatsApp inquiry)
-    - [ ] x-flux-alert
-
-- [ ] Notification System
-  - [ ] SweetAlert2 Integration
-    - [ ] Success Messages
-    - [ ] Error Handling
-    - [ ] Confirmation Dialogs
-    - [ ] Toast Notifications
-
-- [x] Interactive Features
-  - [x] Real-time Search (implemented in PropertySearch)
-  - [x] Image Preview/Gallery (implemented in PropertyCard and AirbnbImageUpload)
-  - [x] WhatsApp Integration (Inquiry buttons with dynamic phone numbers)
-  - [x] Form Validation (implemented in AirbnbImageUpload)
-  - [x] Loading States with wire:loading (used in image uploads and search)
-
-## Authentication & Authorization
-- [x] User Authentication Setup
-- [x] Role & Permission Configuration
-  - [x] Admin Role (Full Access)
-  - [x] Property Manager Role
-  - [x] Content Editor Role
-  - [x] Service Manager Role
-- [-] User Management Interface
-- [x] Role Assignment System
-- [x] Granular Permissions:
-  - [x] Property Management (8 permissions)
-  - [x] Content Management (6 permissions)
-  - [x] Service Management (4 permissions)
-  - [x] User Management (5 permissions)
-  - [x] System Management (4 permissions)
-
-## Property Management
-- [x] Database Migrations
-  - [x] Properties Table (with listing types: sale, rent, airbnb)
-  - [x] Property Types Table
-  - [x] Amenities Table
-  - [x] Property Images Table (with featured image support)
-  - [x] Property-Amenity Pivot Table
-  - [x] Metadata column for property images (for Airbnb images)
+### 1. Furnished Airbnb Stays [IN PROGRESS]
+- [x] Database Schema
+  - [x] Airbnb-specific fields in properties table
+  - [x] Admin-only booking management table
+  - [x] Guest information tracking
 - [x] Models & Relationships
-  - [x] PropertyType with HasFactory
-  - [x] Property with HasFactory, SoftDeletes
-  - [x] Amenity with HasFactory
-  - [x] PropertyImage with HasFactory (with featured image handling)
-  - [x] All relationships and scopes
-  - [x] Custom scopes for listing types
-  - [x] Special relationships for Airbnb images
-- [x] Factory Classes
-  - [x] PropertyType with predefined types
-  - [x] Property with flexible states (sale/rent/airbnb)
-  - [x] Amenity with categorized items
-  - [x] PropertyImage with featured state
-- [x] Services Layer Implementation
-  - [x] PropertyImageService with specialized image handling
-  - [x] PropertySearchService with advanced filtering
-  - [x] BookingService structure
-- [x] Property CRUD Operations
-  - [x] Reading properties with complex filters
-  - [x] Creating and updating Airbnb images
-- [x] Property Search & Filters
-  - [x] Advanced filtering by price, type, location
-  - [x] Multi-parameter search
-- [x] Image Upload System
-  - [x] General property images upload
-  - [x] Specialized Airbnb image upload with thumbnails
-  - [x] Featured image management
+  - [x] Property model with Airbnb methods
+  - [x] PropertyBooking model
+  - [x] Admin booking relationships
+- [x] Services
+  - [x] PropertyService with Airbnb features
+  - [x] BookingService for admin management
+- [x] Components
+  - [x] AirbnbPropertyList integration
+  - [x] AirbnbPropertyCard with WhatsApp
+  - [x] AdminBookingManagement
+  - [ ] AvailabilityCalendar improvements
 
-## Rental System
-- [ ] Rental Properties Management
-- [ ] Rental Inquiry System
-- [ ] Tenant Application Process
-- [ ] Rental Documentation
+### 2. Rental Properties
+- [ ] Database Schema
+  - [ ] Rental-specific fields
+  - [ ] Tenant information tracking
+  - [ ] Admin booking management
+- [ ] Models & Relationships
+  - [ ] Update Property model with rental methods
+  - [ ] Add rental-specific relationships
+- [ ] Services
+  - [ ] RentalPropertyService
+  - [ ] TenantService
+- [ ] Components
+  - [ ] RentalPropertyList
+  - [ ] RentalPropertyCard with WhatsApp
+  - [ ] AdminRentalManagement
 
-## Sales System
-- [ ] Sales Properties Management
-- [ ] Sales Inquiry System
-- [ ] Property Viewing Scheduler
-- [ ] Sales Documentation
+### 3. Commercial Spaces
+- [ ] Database Schema
+  - [ ] Commercial properties table
+  - [ ] Facilities tracking
+  - [ ] Commercial lease management
+- [ ] Models & Relationships
+  - [ ] CommercialProperty model
+  - [ ] Facility model
+  - [ ] CommercialLease model
+- [ ] Services
+  - [ ] CommercialPropertyService
+  - [ ] FacilityManagementService
+- [ ] Components
+  - [ ] CommercialPropertyList
+  - [ ] CommercialPropertyCard
+  - [ ] FacilityManager
 
-## Airbnb Integration
-- [x] Airbnb Property Management
-  - [x] Property Card with Airbnb-specific pricing
-  - [x] Image slider for multiple property photos
-  - [x] Airbnb-specific metadata in database
-- [x] Airbnb Image Management
-  - [x] Dedicated image uploader for Airbnb properties (Volt component)
-  - [x] Featured image selection
-  - [x] Multiple image management with drag preview
-- [ ] Availability Calendar
-- [ ] Booking System
-- [ ] Pricing Management
-- [ ] Guest Communication
+### 4. Property Management Services
+- [ ] Database Schema
+  - [ ] Management contracts
+  - [ ] Maintenance tracking
+  - [ ] Financial records
+- [ ] Models & Relationships
+  - [ ] ManagementContract model
+  - [ ] MaintenanceRequest model
+  - [ ] FinancialRecord model
+- [ ] Services
+  - [ ] PropertyManagementService
+  - [ ] MaintenanceService
+  - [ ] FinancialService
+- [ ] Components
+  - [ ] PropertyManagerDashboard
+  - [ ] MaintenanceRequestForm
+  - [ ] FinancialReports
 
-## Content Management
-- [ ] Blog System Setup
-- [ ] Content Categories
-- [ ] Article Management
-- [ ] Media Library
+### 5. Houses and Plots for Sale
+- [ ] Database Schema
+  - [ ] Sale-specific fields
+  - [ ] Viewing appointments
+  - [ ] Property offers
+- [ ] Models & Relationships
+  - [ ] Property sale methods
+  - [ ] ViewingAppointment model
+  - [ ] PropertyOffer model
+- [ ] Services
+  - [ ] SalePropertyService
+  - [ ] ViewingService
+- [ ] Components
+  - [ ] SalePropertyList
+  - [ ] SalePropertyCard
+  - [ ] ViewingScheduler
 
-## Frontend Implementation
-- [ ] Responsive Layout
-- [ ] Support light mode and dark mode
-- [ ] Home Page
-  - [ ] Featured Properties Carousel
-  - [ ] Category Highlights
-  - [ ] CTAs (On booking , they are redirected to WhatsApp for booking)
-- [ ] Property Listing Pages
-- [ ] Property Detail Pages
-- [ ] Blog Pages
-- [ ] Contact Page
-- [ ] About Us Page
+### 6. Property Valuation Services
+- [ ] Database Schema
+  - [ ] Valuation requests
+  - [ ] Market analysis data
+  - [ ] Valuation reports
+- [ ] Models & Relationships
+  - [ ] ValuationRequest model
+  - [ ] MarketAnalysis model
+  - [ ] ValuationReport model
+- [ ] Services
+  - [ ] ValuationService
+  - [ ] MarketAnalysisService
+- [ ] Components
+  - [ ] ValuationRequestForm
+  - [ ] MarketAnalysisReport
+  - [ ] ValuationCalculator
+
+## Shared Components
+- [x] WhatsApp Integration
+  - [x] Direct property inquiry via WhatsApp
+  - [x] Automated message templates
+  - [x] Modal confirmation before redirecting
+- [x] Admin Management
+  - [x] Property CRUD operations
+  - [x] Booking management
+  - [x] Image management
+- [x] Image Handling
+  - [x] Multi-image upload
+  - [x] Featured image support
+  - [x] Optimized storage
 
 ## User Interface Components
 ### Base Components
@@ -245,105 +190,56 @@
 - [ ] Footer
 - [ ] Sidebar variants
 
-## Communication Features
-- [x] WhatsApp Integration
-  - [x] Direct property inquiry via WhatsApp
-  - [x] Dynamic phone number by property
-  - [x] Modal confirmation before redirecting
-- [ ] Contact Form
-- [x] Inquiry System
-  - [x] WhatsApp-based inquiry for properties
-- [x] Notification System
-  - [x] Flash notifications for form submissions
-  - [x] Error handling notifications
-  - [x] Success confirmations
+## Authentication & Authorization
+- [x] User Authentication Setup
+- [x] Role & Permission Configuration
+  - [x] Admin Role (Full Access)
+  - [x] Property Manager Role
+  - [x] Content Editor Role
+  - [x] Service Manager Role
+- [-] User Management Interface
+- [x] Role Assignment System
+- [x] Granular Permissions:
+  - [x] Property Management (8 permissions)
+  - [x] Content Management (6 permissions)
+  - [x] Service Management (4 permissions)
+  - [x] User Management (5 permissions)
+  - [x] System Management (4 permissions)
 
-## Testing
+## Testing & Quality Assurance
 - [ ] Unit Tests
+  - [ ] Service tests
+  - [ ] Model tests
+  - [ ] Component tests
 - [ ] Feature Tests
+  - [ ] Property management
+  - [ ] Booking flows
+  - [ ] WhatsApp integration
 - [ ] Integration Tests
 - [ ] UI Tests
 
-## Performance Optimization
-- [x] Image Optimization
-  - [x] Thumbnail generation for Airbnb images
-  - [x] Optimized image dimensions
-- [ ] Caching Implementation
-- [x] Database Query Optimization
-  - [x] Eager loading relationships
-  - [x] Optimized search queries
-- [x] Asset Minification (Vite built-in)
-
-## Security Measures
-- [x] Input Validation
-  - [x] Form validation in Livewire components
-  - [x] File upload validation
-- [x] CSRF Protection (Laravel built-in)
-- [x] XSS Prevention (Laravel built-in)
-- [x] Role-based Access Control
-  - [x] Spatie permissions integration
-  - [x] Route protection
-- [x] Data Encryption (Laravel built-in)
-
 ## Documentation
-- [ ] API Documentation
-- [ ] User Manual
-- [ ] Admin Guide
-- [ ] Developer Guide
+- [ ] Technical Documentation
+  - [ ] System architecture
+  - [ ] Database schema
+  - [ ] API endpoints
+- [ ] User Guides
+  - [ ] Admin manual
+  - [ ] Property manager guide
+  - [ ] Content editor guide
+- [ ] Process Documentation
+  - [ ] Booking management
+  - [ ] Property listing
+  - [ ] Image handling
 
-## Deployment
+## Deployment & DevOps
 - [ ] Server Configuration
-- [ ] SSL Setup
-- [ ] Database Migration
-- [ ] Asset Compilation
-- [ ] Environment Configuration
-
-## Post-Launch
+- [ ] CI/CD Pipeline
 - [ ] Monitoring Setup
 - [ ] Backup System
-- [ ] Error Logging
-- [ ] Analytics Integration
-
-## New Services Implementation
-
-### Commercial Properties
-- [ ] Database Setup
-  - [ ] Commercial properties migration
-  - [ ] Commercial property types
-  - [ ] Facility features
-- [ ] Models
-  - [ ] CommercialProperty
-  - [ ] CommercialPropertyType
-  - [ ] Facility
-- [ ] Components
-  - [ ] CommercialPropertyList
-  - [ ] CommercialPropertyCard
-  - [ ] CommercialPropertyDetails
-  - [ ] CommercialPropertySearch
-
-### Property Management
-- [ ] Database Setup
-  - [ ] Management contracts
-  - [ ] Service requests
-  - [ ] Maintenance records
-- [ ] Components
-  - [ ] PropertyManagementDashboard
-  - [ ] ManagementServiceRequest
-  - [ ] MaintenanceTickets
-  - [ ] FinancialReports
-
-### Property Valuation
-- [ ] Database Setup
-  - [ ] Valuation requests
-  - [ ] Valuation reports
-- [ ] Components
-  - [ ] ValuationRequestForm
-  - [ ] ValuationCalculator
-  - [ ] MarketAnalysisReport
-  - [ ] ValuationHistory
 
 Progress Legend:
 - [x] Completed
-- [ ] Pending
 - [-] In Progress
+- [ ] Pending
 - [!] Needs Review

@@ -1,10 +1,152 @@
-<nav class="bg-white shadow-md">
-    <div class="container mx-auto px-4 py-2 flex justify-between items-center">
-        <a href="/" class="text-lg font-bold">Pelek Properties</a>
-        <ul class="flex space-x-4">
-            <li><a href="/properties" class="text-gray-700 hover:text-blue-500">Properties</a></li>
-            <li><a href="/about" class="text-gray-700 hover:text-blue-500">About Us</a></li>
-            <li><a href="/contact" class="text-gray-700 hover:text-blue-500">Contact</a></li>
-        </ul>
+<nav x-data="{ open: false, darkMode: localStorage.getItem('darkMode') === 'true', properties: false }" 
+    x-init="$watch('darkMode', val => { localStorage.setItem('darkMode', val); document.documentElement.classList.toggle('dark', val) }); 
+    document.documentElement.classList.toggle('dark', darkMode)"
+    class="sticky top-0 z-50 bg-white dark:bg-gray-900 backdrop-blur-lg bg-opacity-80 dark:bg-opacity-80 border-b border-gray-100 dark:border-gray-800 transition-all duration-300 ease-in-out">
+    <div class="container mx-auto px-4 lg:px-8">
+        <div class="flex justify-between items-center py-4">
+            <!-- Logo -->
+            <div class="flex items-center">
+                <a href="/" class="flex items-center space-x-2 group">
+                    <div class="w-8 h-8 bg-gradient-to-br from-[#012e2b] to-[#02c9c2] rounded-lg transition-transform duration-300 group-hover:rotate-6"></div>
+                    <span class="text-gray-900 dark:text-white font-extrabold text-xl tracking-tight">Pelek<span class="text-[#02c9c2] dark:text-[#3fe8e2]">Properties</span></span>
+                </a>
+            </div>
+            
+            <!-- Desktop Navigation - Hidden on mobile -->
+            <div class="hidden md:flex items-center space-x-8">
+                <!-- Properties Dropdown -->
+                <div class="relative" x-data="{ open: false }">
+                    <button @click="open = !open" 
+                            @click.away="open = false"
+                            class="text-gray-700 dark:text-gray-200 hover:text-[#02c9c2] dark:hover:text-[#3fe8e2] transition duration-300 flex items-center"
+                            :aria-expanded="open">
+                        <span>Properties</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 transition-transform duration-300" 
+                            :class="{'rotate-180': open}" 
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div x-cloak x-show="open" 
+                        x-transition:enter="transition ease-out duration-200" 
+                        x-transition:enter-start="opacity-0 translate-y-1" 
+                        x-transition:enter-end="opacity-100 translate-y-0" 
+                        x-transition:leave="transition ease-in duration-150" 
+                        x-transition:leave-start="opacity-100 translate-y-0" 
+                        x-transition:leave-end="opacity-0 translate-y-1"
+                        class="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-100 dark:border-gray-700 z-50 overflow-hidden">
+                        <a href="{{ route('properties.index') }}" class="block px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">All Properties</a>
+                        <a href="{{ route('properties.sale') }}" class="block px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">For Sale</a>
+                        <a href="{{ route('properties.rent') }}" class="block px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">For Rent</a>
+                        <a href="{{ route('properties.airbnb') }}" class="block px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">Airbnb</a>
+                    </div>
+                </div>
+                
+                <a href="/about" class="text-gray-700 dark:text-gray-200 hover:text-[#02c9c2] dark:hover:text-[#3fe8e2] transition duration-300 relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-[#02c9c2] dark:after:bg-[#3fe8e2] after:transition-all after:duration-300">About Us</a>
+                <a href="/contact" class="text-gray-700 dark:text-gray-200 hover:text-[#02c9c2] dark:hover:text-[#3fe8e2] transition duration-300 relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-[#02c9c2] dark:after:bg-[#3fe8e2] after:transition-all after:duration-300">Contact</a>
+            </div>
+            
+            <!-- Auth Links & Dark Mode - Hidden on mobile -->
+            <div class="hidden md:flex items-center space-x-4">
+                <!-- Dark mode toggle -->
+                <button @click="darkMode = !darkMode" class="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition duration-300" aria-label="Toggle dark mode">
+                    <svg x-show="!darkMode" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                    </svg>
+                    <svg x-show="darkMode" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+
+                @guest
+                    <a href="{{ route('login') }}" class="text-gray-700 dark:text-gray-200 hover:text-[#02c9c2] dark:hover:text-[#3fe8e2] font-medium px-3 py-2 rounded-md transition duration-300">Log in</a>
+                    <a href="{{ route('register') }}" class="bg-gradient-to-r from-[#02c9c2] to-[#02a8a2] hover:from-[#012e2b] hover:to-[#014e4a] dark:hover:from-[#02c9c2] dark:hover:to-[#02a8a2] text-white font-medium px-4 py-2 rounded-md shadow-md hover:shadow-lg transition-all duration-300">Register</a>
+                @else
+                    <a href="{{ route('dashboard') }}" class="text-gray-700 dark:text-gray-200 hover:text-[#02c9c2] dark:hover:text-[#3fe8e2] transition duration-300">Dashboard</a>
+                @endguest
+            </div>
+            
+            <!-- Mobile menu button -->
+            <div class="md:hidden flex items-center space-x-2">
+                <!-- Dark mode mobile -->
+                <button @click="darkMode = !darkMode" class="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition duration-300" aria-label="Toggle dark mode">
+                    <svg x-show="!darkMode" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                    </svg>
+                    <svg x-show="darkMode" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                
+                <button @click="open = !open" class="outline-none p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300" aria-label="Toggle menu">
+                    <svg x-show="!open" class="w-6 h-6 text-gray-700 dark:text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                    <svg x-show="open" class="w-6 h-6 text-gray-700 dark:text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div x-cloak x-show="open"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 -translate-y-4"
+            x-transition:enter-end="opacity-100 translate-y-0"
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100 translate-y-0"
+            x-transition:leave-end="opacity-0 -translate-y-4"
+            class="md:hidden pb-6">
+            
+            <!-- Properties accordion -->
+            <div class="space-y-1">
+                <button @click="properties = !properties" class="flex justify-between items-center w-full py-2 text-gray-700 dark:text-gray-200 hover:text-[#02c9c2] dark:hover:text-[#3fe8e2]">
+                    Properties
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-300" :class="{'rotate-180': properties}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                <div x-show="properties" x-cloak class="pl-4 border-l-2 border-[#02c9c2] dark:border-[#3fe8e2] space-y-1">
+                    <a href="{{ route('properties.index') }}" class="block py-2 text-gray-700 dark:text-gray-300 hover:text-[#02c9c2] dark:hover:text-[#3fe8e2]">All Properties</a>
+                    <a href="{{ route('properties.sale') }}" class="block py-2 text-gray-700 dark:text-gray-300 hover:text-[#02c9c2] dark:hover:text-[#3fe8e2]">For Sale</a>
+                    <a href="{{ route('properties.rent') }}" class="block py-2 text-gray-700 dark:text-gray-300 hover:text-[#02c9c2] dark:hover:text-[#3fe8e2]">For Rent</a>
+                    <a href="{{ route('properties.airbnb') }}" class="block py-2 text-gray-700 dark:text-gray-300 hover:text-[#02c9c2] dark:hover:text-[#3fe8e2]">Airbnb</a>
+                </div>
+            </div>
+            
+            <a href="/about" class="flex items-center py-2 text-gray-700 dark:text-gray-200 hover:text-[#02c9c2] dark:hover:text-[#3fe8e2]">About Us</a>
+            <a href="/contact" class="flex items-center py-2 text-gray-700 dark:text-gray-200 hover:text-[#02c9c2] dark:hover:text-[#3fe8e2]">Contact</a>
+            
+            <div class="pt-4 border-t border-gray-200 dark:border-gray-700 mt-4 space-y-2">
+                @guest
+                    <a href="{{ route('login') }}" class="block py-2 text-gray-700 dark:text-gray-200 hover:text-[#02c9c2] dark:hover:text-[#3fe8e2]">
+                        <span class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                            </svg>
+                            Log in
+                        </span>
+                    </a>
+                    <a href="{{ route('register') }}" class="block py-2 text-[#02c9c2] dark:text-[#3fe8e2] hover:text-[#018a85] dark:hover:text-[#7df3ee] font-medium">
+                        <span class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                            </svg>
+                            Register
+                        </span>
+                    </a>
+                @else
+                    <a href="{{ route('dashboard') }}" class="block py-2 text-gray-700 dark:text-gray-200 hover:text-[#02c9c2] dark:hover:text-[#3fe8e2]">
+                        <span class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                            Dashboard
+                        </span>
+                    </a>
+                @endguest
+            </div>
+        </div>
     </div>
 </nav>

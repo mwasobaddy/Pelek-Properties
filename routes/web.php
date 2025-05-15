@@ -49,6 +49,12 @@ Route::middleware(['auth'])->group(function () {
             Volt::route('{property}/airbnb-photos', 'airbnb-image-upload-volt')
                 ->name('airbnb-photos');
         });
+
+        // Booking management
+        Route::prefix('bookings')->name('bookings.')->group(function () {
+            Volt::route('/', 'admin.manage-bookings')
+                ->name('index');
+        });
     });
 });
 

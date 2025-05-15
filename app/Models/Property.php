@@ -112,6 +112,30 @@ class Property extends Model
     }
 
     /**
+     * Get all bookings for this property.
+     */
+    public function bookings(): HasMany
+    {
+        return $this->hasMany(PropertyBooking::class);
+    }
+
+    /**
+     * Get all active bookings for this property.
+     */
+    public function activeBookings(): HasMany
+    {
+        return $this->hasMany(PropertyBooking::class)->where('status', 'confirmed');
+    }
+
+    /**
+     * Check if the property is available for the given dates.
+     */
+    public function isAvailable(string $checkIn, string $checkOut, ?int $excludeBookingId = null): bool
+    {
+        return PropertyBooking::areDatesAvailable($this->id, $checkIn, $checkOut, $excludeBookingId);
+    }
+
+    /**
      * Scope a query to only include featured properties.
      */
     public function scopeFeatured($query)
