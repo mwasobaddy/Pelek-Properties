@@ -261,4 +261,31 @@ class Property extends Model
             ]
         );
     }
+
+    /**
+     * Get the tenant information for this property
+     */
+    public function tenantInfo()
+    {
+        return $this->hasOne(TenantInfo::class);
+    }
+
+    /**
+     * Get the maintenance records for this property
+     */
+    public function maintenanceRecords()
+    {
+        return $this->hasMany(MaintenanceRecord::class);
+    }
+
+    /**
+     * Check if the property is currently occupied
+     */
+    public function isOccupied(): bool
+    {
+        return $this->tenantInfo()
+            ->whereDate('lease_start', '<=', now())
+            ->whereDate('lease_end', '>=', now())
+            ->exists();
+    }
 }

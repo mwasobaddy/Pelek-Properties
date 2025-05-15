@@ -24,7 +24,7 @@
 
 ## Core Services Implementation
 
-### 1. Furnished Airbnb Stays [IN PROGRESS]
+### 1. Furnished Airbnb Stays [COMPLETED]
 - [x] Database Schema
   - [x] Airbnb-specific fields in properties table
   - [x] Admin-only booking management table
@@ -40,9 +40,9 @@
   - [x] AirbnbPropertyList integration
   - [x] AirbnbPropertyCard with WhatsApp
   - [x] AdminBookingManagement
-  - [ ] AvailabilityCalendar improvements
+  - [x] AvailabilityCalendar improvements
 
-### 2. Rental Properties [-]
+### 2. Rental Properties [IN PROGRESS]
 - [x] Database Schema
   - [x] Rental-specific fields
   - [x] Tenant information tracking
@@ -57,10 +57,10 @@
   - [x] RentalPropertyList with filters
   - [x] RentalPropertyCard with WhatsApp
   - [x] Advanced search filters
-- [ ] Admin Features
-  - [ ] Rental property management
-  - [ ] Availability tracking
-  - [ ] Tenant information management
+- [x] Admin Features
+  - [x] Rental property management
+  - [x] Availability tracking
+  - [x] Tenant information management
 
 ### 3. Commercial Spaces [-]
 - [x] Database Schema

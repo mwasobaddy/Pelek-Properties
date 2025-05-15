@@ -46,11 +46,19 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
     
     // Admin routes
-    Route::prefix('admin')->name('admin.')->group(function () {
+    Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
         // Property management
         Route::prefix('properties')->name('properties.')->group(function () {
-            Volt::route('{property}/airbnb-photos', 'airbnb-image-upload-volt')
-                ->name('airbnb-photos');
+            // Property listing and management
+            Volt::route('/', 'admin.property-list')
+                ->name('index');
+            
+            Volt::route('/manage', 'admin.manage-rental-properties')
+                ->name('manage');
+            
+            // Photos management
+            Volt::route('/{property}/photos', 'admin.property-photos')
+                ->name('photos');
         });
 
         // Booking management
