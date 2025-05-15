@@ -81,6 +81,27 @@ php artisan serve
 - Featured properties showcase on homepage
 - Property categorization and filtering
 
+### Commercial Property Management
+- Office space listings and management
+- Retail unit management
+- Industrial space solutions
+- Commercial tenant screening
+- Facility management services
+
+### Property Management Services
+- Comprehensive tenant management
+- Maintenance coordination
+- Financial reporting and accounting
+- Marketing services
+- Vendor relationship management
+
+### Property Valuation Services
+- Professional property valuations
+- Market analysis reports
+- Investment potential assessment
+- Online valuation requests
+- Detailed valuation reports
+
 ## Project Structure 📁
 
 ```

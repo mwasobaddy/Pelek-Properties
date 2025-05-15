@@ -81,13 +81,55 @@ This document covers requirements for the initial website launch. Future enhance
   - Instant booking inquiry
   - Clear pricing (nightly/weekly/monthly)
 
+#### Commercial Spaces
+- Listing features:
+  - Office spaces
+  - Retail units
+  - Warehouses
+  - Industrial spaces
+- Search/filter by:
+  - Type of space
+  - Size (square footage)
+  - Location
+  - Price range
+  - Available facilities
+
 #### Property Management Services
-- Service offerings:
-  - Tenant screening
+Comprehensive service offerings:
+- Tenant Management:
+  - Screening and selection
+  - Lease administration
   - Rent collection
+  - Tenant communication
+- Property Maintenance:
+  - Regular inspections
   - Maintenance coordination
+  - Emergency repairs
+  - Vendor management
+- Financial Services:
+  - Rent collection
   - Financial reporting
-- Landlord/investor contact CTA
+  - Expense tracking
+  - Budget management
+- Marketing Services:
+  - Property listing
+  - Professional photography
+  - Virtual tours
+  - Marketing strategy
+
+#### Property Valuation Services
+- Service Types:
+  - Market value assessment
+  - Rental value assessment
+  - Investment potential analysis
+  - Development land valuation
+- Features:
+  - Professional valuation report
+  - Market analysis
+  - Comparable property analysis
+  - Investment recommendations
+  - Online booking system
+  - Valuation request form
 
 #### About Us
 - Brand story

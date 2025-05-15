@@ -304,6 +304,44 @@
 - [ ] Error Logging
 - [ ] Analytics Integration
 
+## New Services Implementation
+
+### Commercial Properties
+- [ ] Database Setup
+  - [ ] Commercial properties migration
+  - [ ] Commercial property types
+  - [ ] Facility features
+- [ ] Models
+  - [ ] CommercialProperty
+  - [ ] CommercialPropertyType
+  - [ ] Facility
+- [ ] Components
+  - [ ] CommercialPropertyList
+  - [ ] CommercialPropertyCard
+  - [ ] CommercialPropertyDetails
+  - [ ] CommercialPropertySearch
+
+### Property Management
+- [ ] Database Setup
+  - [ ] Management contracts
+  - [ ] Service requests
+  - [ ] Maintenance records
+- [ ] Components
+  - [ ] PropertyManagementDashboard
+  - [ ] ManagementServiceRequest
+  - [ ] MaintenanceTickets
+  - [ ] FinancialReports
+
+### Property Valuation
+- [ ] Database Setup
+  - [ ] Valuation requests
+  - [ ] Valuation reports
+- [ ] Components
+  - [ ] ValuationRequestForm
+  - [ ] ValuationCalculator
+  - [ ] MarketAnalysisReport
+  - [ ] ValuationHistory
+
 Progress Legend:
 - [x] Completed
 - [ ] Pending
