@@ -2,13 +2,13 @@
 
 ## Core Infrastructure Setup
 - [x] Laravel### 4. Property Management Services
-- [-] Database Schema
+- [x] Database Schema
   - [x] Management contracts
-  - [ ] Maintenance tracking
+  - [x] Maintenance tracking
   - [x] Financial records
-- [-] Models & Relationships
+- [x] Models & Relationships
   - [x] ManagementContract model
-  - [ ] MaintenanceRequest model
+  - [x] MaintenanceRequest model (as MaintenanceRecord)
   - [x] FinancialRecord model
 - [x] Services
   - [x] PropertyManagementService
@@ -231,9 +231,23 @@
 
 ### Layout Components
 - [x] App Layout (Using Laravel's built-in layout)
-- [ ] Navigation Menu
-- [ ] Footer
-- [ ] Sidebar variants
+- [-] Navigation Menu (In Progress)
+- [-] Footer (In Progress)
+- [-] Sidebar variants (In Progress)
+
+### File Structure Organization [COMPLETED]
+- [x] Organized Livewire Components
+  - [x] Pages directory for full pages
+    - [x] Admin pages in pages/admin
+    - [x] Public pages in pages/properties
+    - [x] Auth pages in pages/auth
+  - [x] Components directory for reusable parts
+    - [x] Property components in components/property
+    - [x] Form components in components/forms
+    - [x] UI components in components/ui
+  - [x] Admin-specific components
+    - [x] Components in admin/components
+    - [x] Widgets in admin/widgets
 
 ## Authentication & Authorization
 - [x] User Authentication Setup
