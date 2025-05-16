@@ -51,6 +51,7 @@ class DatabaseSeeder extends Seeder
             PropertySeeder::class,
             AvailabilityCalendarSeeder::class,
             PropertyManagementSeeder::class,
+            BlogPostSeeder::class,
         ];
 
         // Run all seeders in sequence

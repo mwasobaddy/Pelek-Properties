@@ -11,6 +11,8 @@ Volt::route('/contact', 'pages.contact')->name('contact');
 Volt::route('/cookie-policy', 'pages.legal.cookie-policy')->name('cookies');
 Volt::route('/privacy-policy', 'pages.legal.privacy-policy')->name('privacy');
 Volt::route('/terms-of-service', 'pages.legal.terms-of-service')->name('terms');
+Volt::route('/blog', 'pages.blog.index')->name('blog.index');
+Volt::route('/blog/{post:slug}', 'pages.blog.show')->name('blog.show');
 
 // Property routes
 Route::prefix('properties')->group(function () {
@@ -52,10 +54,6 @@ Route::prefix('services')->name('services.')->group(function () {
         ->name('management');
 });
 
-// Static pages
-Volt::route('/about', 'pages.about')->name('about');
-Volt::route('/contact', 'pages.contact')->name('contact');
-
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
@@ -67,9 +65,6 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/password', 'settings.password')->name('settings.password');
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
     
-    // Admin routes
-    // Blog routes
-    Volt::route('/blog', 'pages.blog')->name('blog.index');
 
     Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
         // Blog management
