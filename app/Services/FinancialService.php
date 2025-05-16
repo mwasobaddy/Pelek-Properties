@@ -12,6 +12,19 @@ use Illuminate\Support\Facades\DB;
 class FinancialService
 {
     /**
+     * Get revenue for current month across all managed properties
+     */
+    public function getCurrentMonthRevenue(): float
+    {
+        return FinancialRecord::query()
+            ->where('transaction_type', 'income')
+            ->where('status', 'completed')
+            ->whereMonth('transaction_date', now()->month)
+            ->whereYear('transaction_date', now()->year)
+            ->sum('amount');
+    }
+
+    /**
      * Record a financial transaction
      */
     public function recordTransaction(

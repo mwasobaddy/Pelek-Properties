@@ -16,6 +16,24 @@ class PropertyManagementService
     ) {}
 
     /**
+     * Get all properties with active management contracts
+     */
+    public function getManagedProperties(): Collection
+    {
+        return Property::query()
+            ->whereHas('managementContracts', function ($query) {
+                $query->where('status', 'active');
+            })
+            ->with([
+                'managementContracts' => fn($query) => $query->where('status', 'active'),
+                'tenantInfo',
+                'maintenanceRecords',
+                'financialRecords'
+            ])
+            ->get();
+    }
+
+    /**
      * Create a new management contract
      */
     public function createContract(Property $property, array $contractData): ManagementContract

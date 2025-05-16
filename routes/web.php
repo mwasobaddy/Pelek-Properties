@@ -54,19 +54,24 @@ Route::prefix('services')->name('services.')->group(function () {
         ->name('management');
 });
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Volt::route('dashboard', 'pages.admin.dashboard')->name('dashboard');
 
-Route::middleware(['auth'])->group(function () {
+    // Management Routes
+    Route::prefix('management')->name('management.')->group(function () {
+        Volt::route('/contracts', 'pages.admin.management.contracts')->name('contracts');
+        Volt::route('/maintenance', 'pages.admin.management.maintenance')->name('maintenance');
+        Volt::route('/financials', 'pages.admin.management.financials')->name('financials');
+    });
+
     Route::redirect('settings', 'settings/profile');
 
     Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
     Volt::route('settings/password', 'settings.password')->name('settings.password');
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
-    
 
-    Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+
+    Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified'])->group(function () {
         // Blog management
         Volt::route('/blog', 'pages.admin.blog.index')
             ->name('blog.index')
@@ -93,6 +98,10 @@ Route::middleware(['auth'])->group(function () {
             Volt::route('/commercial', 'pages.admin.properties.commercial')
                 ->name('commercial');
         });
+
+        // Management Contracts
+        Volt::route('/contracts', 'pages.admin.management.contracts')
+            ->name('management.contracts');
 
         // Booking management
         Route::prefix('bookings')->name('bookings.')->group(function () {

@@ -1,51 +1,68 @@
 <?php
 
-use function Livewire\Volt\{state, computed};
+use Livewire\Volt\Component;
+use function Livewire\Volt\{state};
 use App\Services\PropertyManagementService;
 use App\Services\MaintenanceService;
 use App\Services\FinancialService;
 use App\Models\Property;
 use App\Models\ManagementContract;
 use App\Models\MaintenanceRecord;
+use Livewire\Attributes\Computed;
 
-state([
-    'properties' => fn() => [],
-    'activeContracts' => fn() => 0,
-    'pendingMaintenance' => fn() => 0,
-    'monthlyRevenue' => fn() => 0.00,
-    'selectedProperty' => null,
-    'tab' => 'overview',
-    'loading' => false,
-]);
+new class extends Component {
+    /** @var \Illuminate\Database\Eloquent\Collection */
+    public $properties;
+    public int $activeContracts = 0;
+    public int $pendingMaintenance = 0;
+    public float $monthlyRevenue = 0.00;
+    public ?Property $selectedProperty = null;
+    public string $tab = 'overview';
+    public bool $loading = false;
 
-$mount = function (
-    PropertyManagementService $propertyService,
-    MaintenanceService $maintenanceService,
-    FinancialService $financialService
-) {
-    abort_if(!auth()->user()->can('manage_properties'), 403);
-    
-    $this->properties = $propertyService->getManagedProperties();
-    $this->activeContracts = ManagementContract::where('status', 'active')->count();
-    $this->pendingMaintenance = MaintenanceRecord::where('status', 'pending')->count();
-    $this->monthlyRevenue = $financialService->getCurrentMonthRevenue();
+    public function mount(
+        PropertyManagementService $propertyService,
+        MaintenanceService $maintenanceService,
+        FinancialService $financialService
+    ): void {
+        // abort_if(!auth()->user()->can('manage_properties'), 403);
+        
+        $this->properties = $propertyService->getManagedProperties();
+        $this->activeContracts = ManagementContract::where('status', 'active')->count();
+        $this->pendingMaintenance = MaintenanceRecord::where('status', 'pending')->count();
+        $this->monthlyRevenue = $financialService->getCurrentMonthRevenue();
+    }
+
+    public function selectProperty(Property $property): void 
+    {
+        $this->selectedProperty = $property;
+    }
+
+    public function changeTab(string $tab): void
+    {
+        $this->tab = $tab;
+    }
+
+    #[Computed]
+    public function formattedRevenue(): string
+    {
+        return number_format($this->monthlyRevenue, 2);
+    }
+
+    #[Computed]
+    public function propertiesCount(): int 
+    {
+        return count($this->properties);
+    }
+
+    #[Computed]
+    public function urgentMaintenanceCount(): int
+    {
+        return MaintenanceRecord::where('priority', 'high')
+            ->where('status', 'pending')
+            ->count();
+    }
 };
-
-$selectProperty = function (Property $property) {
-    $this->selectedProperty = $property;
-};
-
-$changeTab = function (string $tab) {
-    $this->tab = $tab;
-};
-
-computed([
-    'formattedRevenue' => fn() => number_format($this->monthlyRevenue, 2),
-    'propertiesCount' => fn() => count($this->properties),
-    'urgentMaintenanceCount' => fn() => MaintenanceRecord::where('priority', 'high')
-        ->where('status', 'pending')
-        ->count(),
-]);
 
 ?>
 
@@ -63,7 +80,7 @@ computed([
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Managed Properties</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $propertiesCount }}</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $this->propertiesCount }}</p>
                 </div>
                 <div class="p-3 bg-blue-100 dark:bg-blue-900 rounded-full">
                     <svg class="w-6 h-6 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,9 +111,9 @@ computed([
                 <div>
                     <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Pending Maintenance</p>
                     <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $pendingMaintenance }}</p>
-                    @if($urgentMaintenanceCount > 0)
+                    @if($this->urgentMaintenanceCount > 0)
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
-                            {{ $urgentMaintenanceCount }} Urgent
+                            {{ $this->urgentMaintenanceCount }} Urgent
                         </span>
                     @endif
                 </div>
