@@ -15,38 +15,34 @@ class PropertySearchService
      */
     public function search(array $filters, int $perPage = 12): LengthAwarePaginator
     {
-        $cacheKey = $this->generateCacheKey($filters, $perPage);
+        $query = Property::query()
+            ->with(['propertyType', 'featuredImage', 'amenities']);
 
-        return Cache::remember($cacheKey, 3600, function () use ($filters, $perPage) {
-            $query = Property::query()
-                ->with(['propertyType', 'featuredImage', 'amenities']);
+        $this->applyFilters($query, $filters);
 
-            $this->applyFilters($query, $filters);
-
-            // Apply custom sorting if provided
-            if (!empty($filters['sort'])) {
-                switch ($filters['sort']) {
-                    case 'name_asc':
-                        $query->orderBy('title', 'asc');
-                        break;
-                    case 'name_desc':
-                        $query->orderBy('title', 'desc');
-                        break;
-                    case 'newest':
-                        $query->latest();
-                        break;
-                    case 'oldest':
-                        $query->oldest();
-                        break;
-                    default:
-                        $query->latest();
-                }
-            } else {
-                $query->latest();
+        // Apply custom sorting if provided
+        if (!empty($filters['sort'])) {
+            switch ($filters['sort']) {
+                case 'name_asc':
+                    $query->orderBy('title', 'asc');
+                    break;
+                case 'name_desc':
+                    $query->orderBy('title', 'desc');
+                    break;
+                case 'newest':
+                    $query->latest();
+                    break;
+                case 'oldest':
+                    $query->oldest();
+                    break;
+                default:
+                    $query->latest();
             }
+        } else {
+            $query->latest();
+        }
 
-            return $query->paginate($perPage);
-        });
+        return $query->paginate($perPage);
     }
 
     /**
@@ -137,10 +133,10 @@ class PropertySearchService
     /**
      * Generate a cache key based on the search filters
      */
-    private function generateCacheKey(array $filters, int $perPage): string
+    private function generateCacheKey(array $filters, int $perPage, int $currentPage): string
     {
         ksort($filters); // Sort by key for consistent cache keys
-        return 'property_search_' . md5(json_encode($filters) . $perPage);
+        return 'property_search_' . md5(json_encode($filters) . $perPage . $currentPage);
     }
 
     /**

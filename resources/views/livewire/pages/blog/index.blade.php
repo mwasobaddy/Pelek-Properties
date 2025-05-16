@@ -147,7 +147,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                 @endforeach
         </div>
 
-        <div class="mt-8">
+        <div class="mt-12">
             {{ $this->posts->links('components.pagination') }}
         </div>
     </div>

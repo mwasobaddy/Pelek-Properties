@@ -7,41 +7,73 @@ use Livewire\Volt\Component;
 use function Livewire\Volt\{state, computed};
 
 new class extends Component {
-    #[Url]
     public string $search = '';
-
-    #[Url]
     public ?string $type = '';
-
-    #[Url]
     public ?string $city = '';
-
+    public ?int $minPrice = null;
+    public ?int $maxPrice = null;
+    public array $selectedAmenities = [];
     public string $listingType = 'all';
 
-    public function search()
+    public array $propertyTypes = [];
+    public array $cities = [];
+    public array $propertyStats = [];
+    public array $priceRanges = [];
+    public array $amenities = [];
+
+    public function takeToSearch()
     {
+        // Format price range
+        $priceRange = null;
+        if ($this->minPrice !== null || $this->maxPrice !== null) {
+            $priceRange = ($this->minPrice ?? '') . '-' . ($this->maxPrice ?? '');
+        }
+
         $params = array_filter([
             'search' => $this->search,
-            'type' => $this->type,
+            'propertyType' => $this->type,
             'city' => $this->city,
-            'listing_type' => $this->listingType !== 'all' ? $this->listingType : null,
-        ]);
+            'priceRange' => $priceRange,
+            'amenities' => !empty($this->selectedAmenities) ? implode(',', $this->selectedAmenities) : null,
+            'propertyListingType' => $this->listingType !== 'all' ? $this->listingType : null,
+        ], function($value) {
+            return $value !== '' && $value !== null;
+        });
 
-        $this->redirect(route('properties.search', $params));
+        return $this->redirect(route('properties.index', $params));
+    }
+
+    public function mount()
+    {
+        $this->loadComputedProperties();
+    }
+
+    public function loadComputedProperties()
+    {
+        $searchService = app(PropertySearchService::class);
+        
+        $this->propertyTypes = PropertyType::orderBy('name')->get()->toArray();
+        $this->cities = $searchService->getAvailableCities();
+        $this->propertyStats = $searchService->getPropertyCountsByType();
+        $this->priceRanges = $searchService->getPriceRanges($this->listingType !== 'all' ? $this->listingType : null);
+        $this->amenities = $searchService->getAvailableAmenities();
+    }
+
+    public function updatedListingType($value)
+    {
+        $this->priceRanges = app(PropertySearchService::class)->getPriceRanges($value !== 'all' ? $value : null);
+        $this->minPrice = null;
+        $this->maxPrice = null;
     }
 
     public function with(): array
     {
         return [
-            'propertyTypes' => computed(function () {
-                return PropertyType::orderBy('name')->get();
-            }),
-            'cities' => computed(function () {
-                return app(PropertySearchService::class)->getAvailableCities();
-            }),
-            'propertyStats' => computed(function () {
-                return app(PropertySearchService::class)->getPropertyCountsByType();
-            }),
+            'propertyTypes' => $this->propertyTypes,
+            'cities' => $this->cities,
+            'propertyStats' => $this->propertyStats,
+            'priceRanges' => $this->priceRanges,
+            'amenities' => $this->amenities,
         ];
     }
 } ?>
@@ -85,7 +117,7 @@ new class extends Component {
                 <div class="mb-6">
                     <label class="text-sm font-medium text-white/90 dark:text-white/80">I'm looking to:</label>
                     <div class="mt-2.5 flex flex-wrap gap-2 rounded-xl bg-white/5 dark:bg-zinc-800/30 p-1.5">
-                        @foreach(['all' => 'All Properties', 'sale' => 'Buy', 'rent' => 'Rent', 'airbnb' => 'Book Stay', 'commercial' => 'Commercial'] as $value => $label)
+                        @foreach(['all' => 'All Properties', 'sale' => 'Sale', 'rent' => 'Rent', 'airbnb' => 'Airbnb', 'commercial' => 'Commercial'] as $value => $label)
                             <button
                                 wire:click="$set('listingType', '{{ $value }}')"
                                 @click="activeTab = '{{ $value }}'"
@@ -130,12 +162,12 @@ new class extends Component {
                         <label class="block text-sm font-medium text-white/90 dark:text-white/80 mb-1.5">Property Type</label>
                         <div class="relative group">
                             <select 
-                                wire:model.live="type"
+                                wire:model="type"
                                 class="w-full appearance-none rounded-lg border-0 bg-white/10 dark:bg-zinc-800/50 py-3 pl-4 pr-10 text-white ring-1 ring-white/20 dark:ring-white/10 transition-all duration-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:bg-white/15 dark:focus:bg-zinc-800/80 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm group-hover:ring-[#02c9c2]/50"
                             >
                                 <option value="">Any Type</option>
                                 @foreach($propertyTypes as $propertyType)
-                                    <option value="{{ $propertyType->id }}">{{ $propertyType->name }}</option>
+                                    <option value="{{ $propertyType['id'] }}">{{ $propertyType['name'] }}</option>
                                 @endforeach
                             </select>
                             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-zinc-400 group-hover:text-[#02c9c2] transition-colors duration-200">
@@ -149,7 +181,7 @@ new class extends Component {
                         <label class="block text-sm font-medium text-white/90 dark:text-white/80 mb-1.5">Location</label>
                         <div class="relative group">
                             <select 
-                                wire:model.live="city"
+                                wire:model="city"
                                 class="w-full appearance-none rounded-lg border-0 bg-white/10 dark:bg-zinc-800/50 py-3 pl-4 pr-10 text-white ring-1 ring-white/20 dark:ring-white/10 transition-all duration-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:bg-white/15 dark:focus:bg-zinc-800/80 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm group-hover:ring-[#02c9c2]/50"
                             >
                                 <option value="">Any Location</option>
@@ -172,10 +204,63 @@ new class extends Component {
                             </div>
                             <input 
                                 type="text" 
-                                wire:model.live.debounce.300ms="search"
+                                wire:model="search"
                                 placeholder="Search by location, title or features..."
                                 class="block w-full rounded-lg border-0 bg-white/10 dark:bg-zinc-800/50 py-3 pl-10 pr-3 text-white ring-1 ring-white/20 dark:ring-white/10 transition-all duration-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:bg-white/15 dark:focus:bg-zinc-800/80 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm group-hover:ring-[#02c9c2]/50"
                             >
+                        </div>
+                    </div>
+
+                    {{-- Price Range Inputs --}}
+                    <div class="lg:col-span-2">
+                        <label class="block text-sm font-medium text-white/90 dark:text-white/80 mb-1.5">Price Range</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="relative group">
+                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-zinc-400">
+                                    <span class="text-sm">From</span>
+                                </div>
+                                <input 
+                                    type="number" 
+                                    wire:model="minPrice"
+                                    placeholder="{{ isset($priceRanges['min']) ? number_format($priceRanges['min']) : '0' }}"
+                                    class="block w-full rounded-lg border-0 bg-white/10 dark:bg-zinc-800/50 py-3 pl-16 pr-3 text-white ring-1 ring-white/20 dark:ring-white/10 transition-all duration-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:bg-white/15 dark:focus:bg-zinc-800/80 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm group-hover:ring-[#02c9c2]/50"
+                                >
+                            </div>
+                            <div class="relative group">
+                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-zinc-400">
+                                    <span class="text-sm">To</span>
+                                </div>
+                                <input 
+                                    type="number" 
+                                    wire:model="maxPrice"
+                                    placeholder="{{ isset($priceRanges['max']) ? number_format($priceRanges['max']) : '0' }}"
+                                    class="block w-full rounded-lg border-0 bg-white/10 dark:bg-zinc-800/50 py-3 pl-12 pr-3 text-white ring-1 ring-white/20 dark:ring-white/10 transition-all duration-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:bg-white/15 dark:focus:bg-zinc-800/80 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm group-hover:ring-[#02c9c2]/50"
+                                >
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {{-- Amenities Multi-Select --}}
+                    <div class="lg:col-span-4">
+                        <label class="block text-sm font-medium text-white/90 dark:text-white/80 mb-1.5">Amenities</label>
+                        <div class="flex flex-wrap gap-2">
+                            @foreach($amenities as $amenity)
+                                <button
+                                    type="button"
+                                    wire:click="$set('selectedAmenities', {{ 
+                                        in_array($amenity, $selectedAmenities) 
+                                            ? json_encode(array_values(array_diff($selectedAmenities, [$amenity]))) 
+                                            : json_encode(array_merge($selectedAmenities, [$amenity])) 
+                                    }})"
+                                    @class([
+                                        'rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-300',
+                                        'bg-[#02c9c2] text-zinc-900 shadow-lg shadow-[#02c9c2]/20' => in_array($amenity, $selectedAmenities),
+                                        'bg-white/10 text-white hover:bg-white/15' => !in_array($amenity, $selectedAmenities),
+                                    ])
+                                >
+                                    {{ $amenity }}
+                                </button>
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -183,7 +268,7 @@ new class extends Component {
                 {{-- Modern Search Button with animation --}}
                 <div class="mt-6">
                     <button
-                        wire:click="search"
+                        wire:click="takeToSearch"
                         class="group w-full rounded-lg bg-gradient-to-r from-[#02c9c2] to-[#02c9c2]/80 dark:from-[#02c9c2] dark:to-[#02c9c2]/90 px-4 py-3 font-medium text-zinc-900 dark:text-zinc-900 shadow-lg shadow-[#02c9c2]/20 transition-all duration-300 hover:shadow-xl hover:shadow-[#02c9c2]/30 focus:outline-none focus:ring-2 focus:ring-[#02c9c2] focus:ring-offset-2 focus:ring-offset-zinc-900"
                     >
                         <span class="flex items-center justify-center">
@@ -227,7 +312,7 @@ new class extends Component {
             {{-- Subtle call-to-action section --}}
             <div class="mt-10 text-center">
                 <p class="text-zinc-400 dark:text-zinc-400 mb-4">Can't find what you're looking for?</p>
-                <a href="{{ route('home') }}" class="inline-flex items-center text-[#02c9c2] hover:text-[#02c9c2]/80 transition-colors duration-200">
+                <a href="{{ route('contact') }}" class="inline-flex items-center text-[#02c9c2] hover:text-[#02c9c2]/80 transition-colors duration-200">
                     <span>Contact our property specialists</span>
                     <flux:icon name="arrow-right" class="ml-2 h-4 w-4 transform transition-transform duration-300 group-hover:translate-x-1" />
                 </a>

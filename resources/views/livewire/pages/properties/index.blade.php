@@ -6,12 +6,16 @@ use App\Models\Property;
 use App\Models\PropertyType;
 use App\Services\PropertySearchService;
 use Livewire\Attributes\Layout;
+use \Livewire\WithPagination;
 
 new #[Layout('components.layouts.guest')] class extends Component {
-    use \Livewire\WithPagination;
+    use WithPagination;
 
-    // Add this line to specify the pagination theme
+    // Use our custom pagination view
     protected $paginationTheme = 'tailwind';
+    
+    // Keep scroll position when paginating
+    protected $preserveScroll = true;
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -187,6 +191,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
         $this->resetPage();
     }
 
+    #[Computed]
     public function with(): array
     {
         $min_price = null;
@@ -725,11 +730,9 @@ new #[Layout('components.layouts.guest')] class extends Component {
         </div>
 
         <!-- Properties Grid with Modern Layout -->
-        <div x-data="{ show: false }" x-init="setTimeout(() => show = true, 100)" x-show="show"
-            x-transition:enter="transition ease-out duration-500" x-transition:enter-start="opacity-0"
-            x-transition:enter-end="opacity-100"
-            class="grid auto-rows-fr grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8"
-            wire:key="properties-grid">
+        <div wire:loading.class="opacity-50 pointer-events-none" 
+             class="grid auto-rows-fr grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8"
+             wire:key="properties-grid">
             @forelse($properties as $property)
                 <div wire:key="property-{{ $property->id }}" x-data="{ show: false }" x-init="setTimeout(() => show = true, 50)"
                     x-show="show" x-transition:enter="transition ease-out duration-300"
@@ -760,10 +763,8 @@ new #[Layout('components.layouts.guest')] class extends Component {
 
         <!-- Modern Pagination -->
         @if ($properties->hasPages())
-            <div class="mt-12 flex justify-center">
-                <div class="rounded-lg overflow-hidden w-full">
-                    {{ $properties->links() }}
-                </div>
+            <div class="mt-12">
+                {{ $properties->links('components.pagination') }}
             </div>
         @endif
     </div>
