@@ -8,82 +8,102 @@ use App\Models\Amenity;
 use App\Models\PropertyType;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class PropertySeeder extends Seeder
 {
     public function run(): void
     {
-        // Get the admin user
-        $admin = User::where('email', 'admin@pelekproperties.com')->firstOrFail();
+        // Get admin users with error checking
+        $admins = User::whereIn('email', [
+            'admin@pelekproperties.co.ke',
+            'pelekproperties2025@gmail.com'
+        ])->get();
 
-        // Get all property types (they should exist from PropertyTypeSeeder)
+        if ($admins->isEmpty()) {
+            throw new \RuntimeException('No admin users found for property creation');
+        }
+
+        // Cache property types
         $propertyTypes = PropertyType::all();
+        if ($propertyTypes->isEmpty()) {
+            throw new \RuntimeException('No property types found. Please run PropertyTypeSeeder first.');
+        }
 
-        // Create properties with different listing types
-        $createProperty = function ($count, $type) use ($propertyTypes, $admin) {
-            return collect(range(1, $count))->map(function () use ($type, $propertyTypes, $admin) {
-                // Calculate size and determine square range
+        // Cache amenities for reuse
+        $allAmenities = Amenity::all();
+        if ($allAmenities->isEmpty()) {
+            throw new \RuntimeException('No amenities found. Please run AmenitySeeder first.');
+        }
+
+        $createProperty = function ($count, $type) use ($propertyTypes, $admins) {
+            return collect(range(1, $count))->map(function () use ($type, $propertyTypes, $admins) {
                 $size = rand(30, 1000);
-                $squareRange = match(true) {
-                    $size <= 50 => '0-50',
-                    $size <= 100 => '50-100',
-                    $size <= 200 => '100-200',
-                    $size <= 300 => '200-300',
-                    $size <= 500 => '300-500',
-                    default => '500+'
-                };
+                $squareRange = $this->calculateSquareRange($size);
 
                 return Property::factory()
                     ->$type()
                     ->create([
-                        'user_id' => $admin->id,
+                        'user_id' => $admins->random()->id,
                         'property_type_id' => $propertyTypes->random()->id,
                         'size' => $size,
                         'square_range' => $squareRange,
-                        'floors' => rand(1, 20), // Random number of floors between 1 and 20
+                        'floors' => rand(1, 20),
                     ]);
             });
         };
 
-        $properties = collect([
-            // 20 properties for sale
-            $createProperty(20, 'forSale'),
-            // 20 properties for rent
-            $createProperty(20, 'forRent'),
-            // 20 properties for Airbnb
-            $createProperty(20, 'forAirbnb'),
-            // 20 commercial properties
-            $createProperty(20, 'forCommercial'),
-        ])->flatten();
+        DB::beginTransaction();
+        try {
+            // Create properties in chunks
+            $propertyTypes = ['forSale', 'forRent', 'forAirbnb', 'forCommercial'];
+            foreach ($propertyTypes as $type) {
+                $properties = $createProperty(20, $type);
+                $this->attachPropertiesData($properties, $allAmenities);
+            }
 
-        // For each property
-        $properties->each(function ($property) {
-            // Add 3-6 images per property
-            PropertyImage::factory(rand(3, 6))->create([
-                'property_id' => $property->id,
+            // Feature random properties
+            Property::inRandomOrder()
+                ->limit(5)
+                ->update(['is_featured' => true]);
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
+    private function calculateSquareRange(int $size): string
+    {
+        return match(true) {
+            $size <= 50 => '0-50',
+            $size <= 100 => '50-100',
+            $size <= 200 => '100-200',
+            $size <= 300 => '200-300',
+            $size <= 500 => '300-500',
+            default => '500+'
+        };
+    }
+
+    private function attachPropertiesData($properties, $amenities): void
+    {
+        $properties->each(function ($property) use ($amenities) {
+            // Batch create images
+            $images = collect([
+                ...PropertyImage::factory(rand(3, 6))->make([
+                    'property_id' => $property->id,
+                ]),
+                PropertyImage::factory()->featured()->make([
+                    'property_id' => $property->id,
+                ])
             ]);
+            PropertyImage::insert($images->toArray());
 
-            // Ensure one featured image
-            PropertyImage::factory()->featured()->create([
-                'property_id' => $property->id,
-            ]);
-
-            // Attach 3-6 random amenities
-            $propertyAmenities = Amenity::inRandomOrder()
-                ->limit(rand(3, 6))
-                ->get()
-                ->pluck('id')
-                ->toArray();
-            
-            // Using sync instead of attach and specifying the exact pivot table name
-            $property->amenities()
-                ->sync($propertyAmenities);
+            // Attach amenities
+            $property->amenities()->sync(
+                $amenities->random(rand(3, 6))->pluck('id')
+            );
         });
-
-        // Make some properties featured
-        Property::inRandomOrder()
-            ->limit(5)
-            ->get()
-            ->each(fn($property) => $property->update(['is_featured' => true]));
     }
 }

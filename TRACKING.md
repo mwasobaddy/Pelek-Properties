@@ -225,6 +225,29 @@
     - [ ] SearchPosts
 
 ### 8. Static Pages
+- [x] Legal Pages (Modern Volt Implementation)
+  - [x] Privacy Policy Page
+    - [x] Modern Volt component with state management
+    - [x] Comprehensive data protection sections
+    - [x] User rights and information usage details
+    - [x] Contact information for privacy concerns
+  - [x] Cookie Policy Page
+    - [x] Essential and performance cookies explanation
+    - [x] Cookie management guidelines
+    - [x] Third-party cookie details
+    - [x] User control options
+  - [x] Terms of Service Page
+    - [x] User responsibilities and obligations
+    - [x] Property viewing policies
+    - [x] Legal compliance details
+    - [x] Service usage guidelines
+  - [x] Shared Features
+    - [x] Parallax hero sections
+    - [x] Dark mode support
+    - [x] Responsive design
+    - [x] Consistent branding
+    - [x] Back to top functionality
+
 - [x] About Page (Modern Volt Implementation)
   - [x] Company Overview Section
     - [x] Mission Statement: Simplifying and enhancing real estate experiences in Kenya

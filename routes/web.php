@@ -8,6 +8,9 @@ use App\Livewire\PropertyBookingForm;
 Volt::route('/', 'pages.home')->name('home');
 Volt::route('/about', 'pages.about')->name('about');
 Volt::route('/contact', 'pages.contact')->name('contact');
+Volt::route('/cookie-policy', 'pages.legal.cookie-policy')->name('cookies');
+Volt::route('/privacy-policy', 'pages.legal.privacy-policy')->name('privacy');
+Volt::route('/terms-of-service', 'pages.legal.terms-of-service')->name('terms');
 
 // Property routes
 Route::prefix('properties')->group(function () {

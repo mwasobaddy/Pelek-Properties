@@ -79,7 +79,7 @@ new class extends Component {
 } ?>
 
 <div x-data="{ activeTab: 'sale' }" class="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-1">
         <!-- Section Header -->
         <div class="mb-16 max-w-3xl mx-auto text-center">
             <h2 class="text-4xl sm:text-5xl font-bold mb-6 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-[#02c9c2] to-[#012e2b] inline-block">
