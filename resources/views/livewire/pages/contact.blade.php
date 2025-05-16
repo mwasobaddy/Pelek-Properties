@@ -174,68 +174,65 @@ new #[Layout('components.layouts.guest')] class extends Component {
                             <!-- Name & Email Row -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
-                                    <input type="text" id="name" wire:model="name"
-                                        class="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white/50 dark:bg-gray-700/50 shadow-sm focus:border-[#02c9c2] focus:ring-[#02c9c2] dark:text-white">
-                                    @error('name')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
+                                    <flux:input 
+                                        label="Name"
+                                        wire:model="name"
+                                        error="{{ $errors->first('name') }}"
+                                    />
                                 </div>
 
                                 <div>
-                                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
-                                    <input type="email" id="email" wire:model="email"
-                                        class="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white/50 dark:bg-gray-700/50 shadow-sm focus:border-[#02c9c2] focus:ring-[#02c9c2] dark:text-white">
-                                    @error('email')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
+                                    <flux:input 
+                                        type="email"
+                                        label="Email"
+                                        wire:model="email"
+                                        error="{{ $errors->first('email') }}"
+                                    />
                                 </div>
                             </div>
 
                             <!-- Phone & Service Row -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
-                                    <input type="tel" id="phone" wire:model="phone"
-                                        class="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white/50 dark:bg-gray-700/50 shadow-sm focus:border-[#02c9c2] focus:ring-[#02c9c2] dark:text-white">
-                                    @error('phone')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
+                                    <flux:input 
+                                        type="tel"
+                                        label="Phone"
+                                        wire:model="phone"
+                                        error="{{ $errors->first('phone') }}"
+                                    />
                                 </div>
 
                                 <div>
-                                    <label for="service" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Service</label>
-                                    <select id="service" wire:model="selectedService"
-                                        class="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white/50 dark:bg-gray-700/50 shadow-sm focus:border-[#02c9c2] focus:ring-[#02c9c2] dark:text-white">
+                                    <flux:select
+                                        label="Service"
+                                        wire:model="selectedService"
+                                        error="{{ $errors->first('selectedService') }}"
+                                    >
                                         <option value="">Select a service</option>
                                         @foreach($services as $value => $label)
                                             <option value="{{ $value }}">{{ $label }}</option>
                                         @endforeach
-                                    </select>
-                                    @error('selectedService')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
+                                    </flux:select>
                                 </div>
                             </div>
 
                             <!-- Subject -->
                             <div>
-                                <label for="subject" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subject</label>
-                                <input type="text" id="subject" wire:model="subject"
-                                    class="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white/50 dark:bg-gray-700/50 shadow-sm focus:border-[#02c9c2] focus:ring-[#02c9c2] dark:text-white">
-                                @error('subject')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
+                                <flux:input 
+                                    label="Subject"
+                                    wire:model="subject"
+                                    error="{{ $errors->first('subject') }}"
+                                />
                             </div>
 
                             <!-- Message -->
                             <div>
-                                <label for="message" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Message</label>
-                                <textarea id="message" wire:model="message" rows="4"
-                                    class="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white/50 dark:bg-gray-700/50 shadow-sm focus:border-[#02c9c2] focus:ring-[#02c9c2] dark:text-white"></textarea>
-                                @error('message')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
+                                <flux:textarea
+                                    label="Message" 
+                                    wire:model="message"
+                                    rows="4"
+                                    error="{{ $errors->first('message') }}"
+                                />
                             </div>
 
                             <!-- Submit Button -->

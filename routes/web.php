@@ -68,7 +68,15 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
     
     // Admin routes
+    // Blog routes
+    Volt::route('/blog', 'pages.blog')->name('blog.index');
+
     Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+        // Blog management
+        Volt::route('/blog', 'pages.admin.blog.index')
+            ->name('blog.index')
+            ->middleware(['role:admin']);
+
         // Property management
         Route::prefix('properties')->name('properties.')->group(function () {
             // Property listing and management

@@ -12,6 +12,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // First run RolesAndPermissionsSeeder to create roles
+        $this->call(RolesAndPermissionsSeeder::class);
+
         // Admin users data
         $adminUsers = [
             [
@@ -41,9 +44,8 @@ class DatabaseSeeder extends Seeder
             $admin->assignRole('admin');
         }
 
-        // Define all seeders to run
+        // Define remaining seeders to run
         $seeders = [
-            RolesAndPermissionsSeeder::class,
             PropertyTypeSeeder::class,
             AmenitySeeder::class,
             PropertySeeder::class,
