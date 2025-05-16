@@ -198,13 +198,21 @@ class PropertySearchService
      */
     public function getPropertyCountsByType(): array
     {
-        return Cache::remember('property_counts_by_type', 3600, function () {
-            return Property::query()
-                ->selectRaw('listing_type, count(*) as count')
-                ->groupBy('listing_type')
-                ->pluck('count', 'listing_type')
-                ->toArray();
-        });
+        $counts = Property::query()
+            ->selectRaw('listing_type, count(*) as count')
+            ->groupBy('listing_type')
+            ->pluck('count', 'listing_type')
+            ->toArray();
+        
+        // Ensure all property types have a count, even if zero
+        $types = ['sale', 'rent', 'airbnb', 'commercial'];
+        foreach ($types as $type) {
+            if (!isset($counts[$type])) {
+                $counts[$type] = 0;
+            }
+        }
+        
+        return $counts;
     }
 
     /**

@@ -1,10 +1,34 @@
 <?php
 
+use App\Models\Property;
 use App\Services\PropertySearchService;
 use Livewire\Volt\Component;
-use function Livewire\Volt\{state, computed};
+use function Livewire\Volt\{state, computed, mount};
 
 new class extends Component {
+    public $propertyCounts = [];
+    
+    public function mount()
+    {
+        $this->loadCounts();
+    }
+
+    public function loadCounts()
+    {
+        $counts = Property::query()
+            ->where('status', 'available')  // Only count available properties
+            ->where('available', true)      // Double check the boolean flag
+            ->selectRaw('listing_type, count(*) as count')
+            ->groupBy('listing_type')
+            ->pluck('count', 'listing_type')
+            ->toArray();
+            
+        $types = ['sale', 'rent', 'airbnb', 'commercial'];
+        foreach ($types as $type) {
+            $this->propertyCounts[$type] = $counts[$type] ?? 0;
+        }
+    }
+
     public array $categories = [
         'sale' => [
             'title' => 'Houses and Plots for Sale',
@@ -68,13 +92,9 @@ new class extends Component {
         ]
     ];
 
-    public function with(): array 
+    public function refreshCounts()
     {
-        return [
-            'propertyCounts' => computed(function () {
-                return app(PropertySearchService::class)->getPropertyCountsByType();
-            }),
-        ];
+        $this->loadCounts();
     }
 } ?>
 
@@ -156,33 +176,30 @@ new class extends Component {
 
                                 <!-- Right Column: Stats & CTA -->
                                 <div class="flex flex-col justify-between">
-                                    @if(isset($this->propertyCounts[$type]) && $this->propertyCounts[$type] > 0)
-                                        <div class="mb-8">
-                                            <div class="flex items-center justify-center h-36 bg-gray-50 dark:bg-gray-700 rounded-xl mb-4 overflow-hidden relative group">
-                                                <!-- Subtle background pattern -->
-                                                <div class="absolute inset-0 opacity-5 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:16px_16px] dark:opacity-10"></div>
-                                                
-                                                <div class="text-center relative z-10 transform transition-transform duration-500 group-hover:scale-110">
+                                    <div class="mb-8">
+                                        <div class="flex items-center justify-center h-36 bg-gray-50 dark:bg-gray-700 rounded-xl mb-4 overflow-hidden relative group">
+                                            <!-- Subtle background pattern -->
+                                            <div class="absolute inset-0 opacity-5 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:16px_16px] dark:opacity-10"></div>
+                                            
+                                            <div class="text-center relative z-10 transform transition-transform duration-500 group-hover:scale-110">
+                                                @if(isset($this->propertyCounts[$type]))
                                                     <div class="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r {{ $categories[$type]['accent'] }} mb-2">
                                                         {{ $this->propertyCounts[$type] }}
                                                     </div>
                                                     <div class="text-gray-600 dark:text-gray-300">Available Properties</div>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="text-sm text-gray-500 dark:text-gray-400 text-center">
-                                                Updated properties in our database
-                                            </div>
-                                        </div>
-                                    @else
-                                        <!-- Empty State with Visual Enhancement -->
-                                        <div class="flex items-center justify-center h-36 bg-gray-50 dark:bg-gray-700 rounded-xl mb-4">
-                                            <div class="text-center">
-                                                <flux:icon name="calendar" class="h-8 w-8 mx-auto text-gray-400 dark:text-gray-500 mb-2" />
-                                                <div class="text-gray-500 dark:text-gray-400">No properties available</div>
+                                                @else
+                                                    <div class="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r {{ $categories[$type]['accent'] }} mb-2">
+                                                        0
+                                                    </div>
+                                                    <div class="text-gray-600 dark:text-gray-300">Available Properties</div>
+                                                @endif
                                             </div>
                                         </div>
-                                    @endif
+                                        
+                                        <div class="text-sm text-gray-500 dark:text-gray-400 text-center">
+                                            Updated properties in our database
+                                        </div>
+                                    </div>
 
                                     <!-- Enhanced CTA -->
                                     <div class="text-center">
