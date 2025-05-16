@@ -61,7 +61,7 @@ use function Livewire\Volt\{state};
     <div class="bg-[#012e2b] text-white rounded-lg p-8 text-center">
         <h2 class="text-2xl font-semibold mb-4">Ready to get started?</h2>
         <p class="text-gray-300 mb-6">Let us handle the day-to-day management of your property portfolio</p>
-        <a href="{{ route('contact') }}" class="inline-block bg-[#02c9c2] hover:bg-[#02a8a2] text-white font-medium px-6 py-3 rounded-md transition-colors duration-300">
+        <a href="{{ route('contact') }}" wire:navigate class="inline-block bg-[#02c9c2] hover:bg-[#02a8a2] text-white font-medium px-6 py-3 rounded-md transition-colors duration-300">
             Contact Our Team
         </a>
     </div>

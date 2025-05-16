@@ -785,7 +785,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                 </p>
             </div>
             <div class="flex-shrink-0">
-                <a href="{{ route('contact') }}"
+                <a href="{{ route('contact') }}" wire:navigate
                     class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-gradient-to-r from-[#02c9c2] to-[#012e2b] hover:from-[#012e2b] hover:to-[#02c9c2] transition-all duration-300 shadow-md hover:shadow-lg">
                     Contact Us
                     <flux:icon name="arrow-right" class="ml-2 -mr-1 h-5 w-5" />

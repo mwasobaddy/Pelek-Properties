@@ -22,7 +22,7 @@ new class extends Component {
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-semibold">Properties</h2>
                         <a 
-                            href="{{ route('admin.properties.manage') }}" 
+                            href="{{ route('admin.properties.manage') }}" wire:navigate
                             class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
                         >
                             Manage Properties
@@ -47,7 +47,7 @@ new class extends Component {
                                             KES {{ number_format($property->price) }}
                                         </span>
                                         <a 
-                                            href="{{ route('admin.properties.photos', $property) }}"
+                                            href="{{ route('admin.properties.photos', $property) }}" wire:navigate
                                             class="text-sm text-primary-600 hover:text-primary-700"
                                         >
                                             Manage Photos

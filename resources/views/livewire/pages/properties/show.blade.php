@@ -142,7 +142,7 @@ use function Livewire\Volt\{state, computed};
                                     ${{ number_format($similarProperty->rental_price_daily) }}
                                 </span>
                                 <a 
-                                    href="{{ route('properties.show', $similarProperty) }}" 
+                                    href="{{ route('properties.show', $similarProperty) }}" wire:navigate
                                     class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition"
                                 >
                                     View Details

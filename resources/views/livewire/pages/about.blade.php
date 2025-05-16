@@ -86,7 +86,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                         for delivering exceptional service in all aspects of real estate management.
                     </p>
                     <div class="pt-6">
-                        <a href="{{ route('contact') }}" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-gradient-to-r from-[#02c9c2] to-[#012e2b] hover:from-[#012e2b] hover:to-[#02c9c2] transition-all duration-300 shadow-md hover:shadow-lg">
+                        <a href="{{ route('contact') }}" wire:navigate class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-gradient-to-r from-[#02c9c2] to-[#012e2b] hover:from-[#012e2b] hover:to-[#02c9c2] transition-all duration-300 shadow-md hover:shadow-lg">
                             <span>Get in Touch</span>
                             <flux:icon name="arrow-right" class="ml-2 -mr-1 h-5 w-5" />
                         </a>
@@ -243,7 +243,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                             <span class="text-gray-600 dark:text-gray-300">Negotiation & closing support</span>
                         </li>
                     </ul>
-                    <a href="{{ route('properties.index') }}" class="inline-flex items-center text-[#02c9c2] group-hover:text-[#012e2b] transition-colors">
+                    <a href="{{ route('properties.index') }}" wire:navigate class="inline-flex items-center text-[#02c9c2] group-hover:text-[#012e2b] transition-colors">
                         <span>View properties</span>
                         <flux:icon name="arrow-right" class="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </a>
@@ -523,11 +523,11 @@ new #[Layout('components.layouts.guest')] class extends Component {
                 </p>
             </div>
             <div class="flex gap-4 md:flex-shrink-0">
-                <a href="{{ route('properties.index') }}"
+                <a href="{{ route('properties.index') }}" wire:navigate
                     class="inline-flex items-center px-6 py-3 border border-[#02c9c2] text-base font-medium rounded-lg text-[#02c9c2] hover:bg-[#02c9c2]/5 transition-all duration-300">
                     Browse Properties
                 </a>
-                <a href="{{ route('contact') }}"
+                <a href="{{ route('contact') }}" wire:navigate
                     class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-gradient-to-r from-[#02c9c2] to-[#012e2b] hover:from-[#012e2b] hover:to-[#02c9c2] transition-all duration-300 shadow-md hover:shadow-lg">
                     Contact Us
                     <flux:icon name="arrow-right" class="ml-2 -mr-1 h-5 w-5" />

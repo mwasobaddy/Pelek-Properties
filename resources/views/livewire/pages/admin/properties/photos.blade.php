@@ -59,7 +59,7 @@ new #[Layout('components.layouts.app')] class extends Component {
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-semibold">Manage Photos - {{ $property->title }}</h2>
                         <a 
-                            href="{{ route('admin.properties.index') }}" 
+                            href="{{ route('admin.properties.index') }}" wire:navigate
                             class="text-primary-600 hover:text-primary-700"
                         >
                             ← Back to Properties
