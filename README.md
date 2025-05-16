@@ -67,8 +67,19 @@ php artisan serve
 - Advanced Property Search & Filters
 - Booking System for Airbnb Properties
 - Property Management Services
+- Modern About Page with Company Information
+  - Company history and story
+  - Mission and vision statements
+  - Interactive statistics display
+  - Team member profiles
+  - Animated UI elements
+- Interactive Contact Page
+  - Contact form with real-time validation
+  - Office location information
+  - Business hours
+  - Google Maps integration
+  - WhatsApp Integration
 - Blog/News Section
-- WhatsApp Integration
 - Role-Based Access Control
 
 ### Property Management
@@ -116,7 +127,9 @@ resources/
 │       ├── pages/              # Full page components
 │       │   ├── properties/     # Property-related pages
 │       │   ├── admin/         # Admin pages
-│       │   └── settings/      # User settings pages
+│       │   ├── settings/      # User settings pages
+│       │   ├── about.blade.php # Company information page
+│       │   └── contact.blade.php # Contact form and information
 │       ├── components/        # Reusable components
 │       │   ├── property/      # Property-related components
 │       │   ├── forms/        # Form components

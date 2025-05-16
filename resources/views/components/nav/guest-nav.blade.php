@@ -42,9 +42,9 @@
                         <a href="{{ route('properties.commercial') }}" class="block px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">Commercial</a>
                     </div>
                 </div>
-                
-                <a href="/about" class="text-gray-700 dark:text-gray-200 hover:text-[#02c9c2] dark:hover:text-[#3fe8e2] transition duration-300 relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-[#02c9c2] dark:after:bg-[#3fe8e2] after:transition-all after:duration-300">About Us</a>
-                <a href="/contact" class="text-gray-700 dark:text-gray-200 hover:text-[#02c9c2] dark:hover:text-[#3fe8e2] transition duration-300 relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-[#02c9c2] dark:after:bg-[#3fe8e2] after:transition-all after:duration-300">Contact</a>
+
+                <a href="{{ route('about') }}" class="text-gray-700 dark:text-gray-200 hover:text-[#02c9c2] dark:hover:text-[#3fe8e2] transition duration-300 relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-[#02c9c2] dark:after:bg-[#3fe8e2] after:transition-all after:duration-300">About Us</a>
+                <a href="{{ route('contact') }}" class="text-gray-700 dark:text-gray-200 hover:text-[#02c9c2] dark:hover:text-[#3fe8e2] transition duration-300 relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-[#02c9c2] dark:after:bg-[#3fe8e2] after:transition-all after:duration-300">Contact</a>
             </div>
             
             <!-- Auth Links & Dark Mode - Hidden on mobile -->

@@ -164,6 +164,7 @@ class PropertyFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'listing_type' => 'commercial',
             'type' => $this->faker->randomElement(['office', 'retail', 'industrial', 'warehouse', 'mixed_use']),
+            'commercial_type' => $this->faker->randomElement(['office', 'retail', 'industrial', 'warehouse', 'mixed_use']),
             'rental_price_daily' => null,
             'rental_price_monthly' => null,
             'airbnb_price_nightly' => null,
