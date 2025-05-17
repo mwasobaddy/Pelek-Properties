@@ -77,6 +77,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('blog.index')
             ->middleware(['role:admin']);
 
+        // Analytics routes
+        Route::prefix('analytics')->name('analytics.')->group(function () {
+            Volt::route('/', 'pages.admin.analytics.dashboard')
+                ->name('dashboard');
+            Volt::route('/occupancy-reports', 'pages.admin.analytics.occupancy-reports')
+                ->name('occupancy-reports');
+        });
+
+        // Reports routes
+        Route::prefix('reports')->name('reports.')->group(function () {
+            Volt::route('/', 'pages.admin.reports.index')
+                ->name('index');
+        });
+
         // Property management
         Route::prefix('properties')->name('properties.')->group(function () {
             // Property listing and management
@@ -97,6 +111,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
             // Commercial properties management
             Volt::route('/commercial', 'pages.admin.properties.commercial')
                 ->name('commercial');
+
+            // Property sales management
+            Volt::route('/sales', 'pages.admin.properties.sales')
+                ->name('sales');
+
+            // Property offers route
+            Volt::route('/offers', 'pages.admin.properties.offers')
+                ->name('offers');
+
+            // Property development projects route
+            Volt::route('/developments', 'pages.admin.properties.developments')
+                ->name('developments');
         });
 
         // Management Contracts
@@ -108,6 +134,31 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Volt::route('/', 'pages.admin.bookings.index')
                 ->name('index');
         });
+    });
+
+    // Add new admin management routes with proper prefix
+    Route::prefix('admin/management')->name('admin.management.')->middleware(['auth', 'verified'])->group(function () {
+        Volt::route('/valuations', 'pages.admin.management.valuations')->name('valuations');
+        Volt::route('/valuations/create', 'pages.admin.management.valuation-create')->name('valuations.create');
+        Volt::route('/valuations/{valuation}', 'pages.admin.management.valuation-show')->name('valuations.show');
+        Volt::route('/market-analysis', 'pages.admin.management.market-analysis')->name('market-analysis');
+    });
+
+    // Add viewing management routes
+    Route::prefix('admin/viewings')->name('admin.viewings.')->middleware(['auth', 'verified'])->group(function () {
+        Volt::route('/schedule', 'pages.admin.viewings.schedule')->name('schedule');
+        Volt::route('/appointments', 'pages.admin.viewings.appointments')->name('appointments');
+    });
+
+    // Add tenant management routes
+    Route::prefix('admin/tenants')->name('admin.tenants.')->middleware(['auth', 'verified'])->group(function () {
+        Volt::route('/', 'pages.admin.tenants.index')->name('index');
+        Volt::route('/contracts', 'pages.admin.tenants.contracts')->name('contracts');
+    });
+
+    // Add document management routes
+    Route::prefix('admin/documents')->name('admin.documents.')->middleware(['auth', 'verified'])->group(function () {
+        Volt::route('/', 'pages.admin.documents.index')->name('index');
     });
 });
 
