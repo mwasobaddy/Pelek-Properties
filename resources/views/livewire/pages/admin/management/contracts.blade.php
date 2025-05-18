@@ -596,7 +596,6 @@ new class extends Component {
 
             <x-card.body>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Property Selection -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Property</label>
                         <div class="relative">
@@ -788,7 +787,7 @@ new class extends Component {
 
     <!-- Enhanced Delete Confirmation Modal -->
     <flux:modal wire:model="showDeleteModal" max-width="md">
-        <x-card class="overflow-hidden rounded-xl">
+        <x-card class="w-fulloverflow-hidden rounded-xl">
             <x-card.header>
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
                     <flux:icon name="exclamation-circle" class="w-6 h-6 text-red-600 mr-2" />

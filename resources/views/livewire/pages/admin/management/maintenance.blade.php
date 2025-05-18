@@ -454,7 +454,19 @@ new class extends Component {
                     @forelse($this->records as $record)
                         <tr class="bg-white dark:bg-gray-800/30 hover:bg-gray-50 dark:hover:bg-gray-800/50">
                             <td class="px-6 py-4">
-                                {{ $record->property->title }}
+                                <div class="flex items-center space-x-3">
+                                    <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                                        <flux:icon name="building-office" class="w-6 h-6 text-gray-500 dark:text-gray-400" />
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-gray-900 dark:text-white">
+                                            {{ $record->property->title }}
+                                        </div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                                            ID: {{ $record->id }}
+                                        </div>
+                                    </div>
+                                </div>
                             </td>
                             <td class="px-6 py-4">
                                 <div class="line-clamp-2">
@@ -496,16 +508,18 @@ new class extends Component {
                                         class="text-gray-200 dark:text-gray-300 hover:text-[#02c9c2] dark:hover:text-[#02c9c2] transition-colors duration-150 bg-indigo-500 dark:bg-indigo-700/50 rounded-lg p-2"
                                         title="View record"
                                     >
-                                        <flux:icon name="eye" class="w-5 h-5" />
+                                        <flux:icon wire:loading.remove wire:target="view({{ $record->id }})" name="eye" class="w-5 h-5" />
+                                        <flux:icon wire:loading wire:target="view({{ $record->id }})" name="arrow-path" class="w-5 h-5 animate-spin" />
                                     </button>
 
-                                    @can('update_maintenance_status')
+                                    @can('edit_maintenance_request')
                                     <button 
                                         wire:click="edit({{ $record->id }})"
                                         class="text-gray-200 dark:text-gray-300 hover:text-[#02c9c2] dark:hover:text-[#02c9c2] transition-colors duration-150 bg-green-500 dark:bg-green-700/50 rounded-lg p-2"
                                         title="Edit record"
                                     >
-                                        <flux:icon name="pencil-square" class="w-5 h-5" />
+                                            <flux:icon wire:loading.remove wire:target="edit({{ $record->id }})" name="pencil-square" class="w-5 h-5" />
+                                            <flux:icon wire:loading wire:target="edit({{ $record->id }})" name="arrow-path" class="w-5 h-5 animate-spin" />
                                     </button>
                                     @endcan
 
@@ -515,7 +529,8 @@ new class extends Component {
                                         class="text-gray-200 dark:text-gray-300 hover:text-[#02c9c2] dark:hover:text-[#02c9c2] transition-colors duration-150 bg-red-500 dark:bg-red-700/50 rounded-lg p-2"
                                         title="Delete record"
                                     >
-                                        <flux:icon name="trash" class="w-5 h-5" />
+                                        <flux:icon wire:loading.remove wire:target="confirmDelete({{ $record->id }})" name="trash" class="w-5 h-5" />
+                                        <flux:icon wire:loading wire:target="confirmDelete({{ $record->id }})" name="arrow-path" class="w-5 h-5 animate-spin" />
                                     </button>
                                     @endcan
                                 </div>
@@ -523,8 +538,14 @@ new class extends Component {
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
-                                No maintenance records found.
+                            <td colspan="6" class="px-6 py-12">
+                                <div class="text-center">
+                                    <flux:icon name="folder-open" class="mx-auto h-12 w-12 text-gray-400" />
+                                    <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No records found</h3>
+                                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                        {{ $search ? 'Try adjusting your search or filter criteria.' : 'Get started by creating a new record.' }}
+                                    </p>
+                                </div>
                             </td>
                         </tr>
                     @endforelse
@@ -540,38 +561,9 @@ new class extends Component {
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
-    <flux:modal wire:model.live="showDeleteModal" class="w-full max-w-4xl" @close="$wire.resetForm()">
-        <x-card>
-            <x-card.header>
-                <h3 class="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
-                    <flux:icon name="exclamation-circle" class="w-6 h-6 text-red-600 mr-2" />
-                    Confirm Deletion
-                </h3>
-            </x-card.header>
-            <x-card.body>
-                <div class="space-y-4">
-                    <p class="text-sm text-gray-500">Are you sure you want to delete this maintenance record? This action cannot be undone.</p>
-                </div>
-            </x-card.body>
-
-            <x-card.footer>
-                <div class="flex justify-end space-x-3">
-                    <flux:button wire:click="$set('showDeleteModal', false)">
-                        Cancel
-                    </flux:button>
-                    <flux:button wire:click="delete" variant="danger" class="bg-red-600 hover:bg-red-700">
-                        <flux:icon wire:loading wire:target="delete" name="arrow-path" class="w-4 h-4 mr-2 animate-spin" />
-                        Delete Contract
-                    </flux:button>
-                </div>
-            </x-card.footer>
-        </x-card>
-    </flux:modal>
-
     <!-- View/Edit Modal -->
-    <flux:modal wire:model.live="showModal" class="w-full max-w-4xl">
-        <x-card>
+    <flux:modal wire:model="showFormModal" class="w-full max-w-4xl" @close="$wire.resetForm()">
+        <x-card class="w-fulloverflow-hidden rounded-xl">
             <x-card.header>
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
                     {{ $modalMode === 'edit' ? 'Edit Maintenance Record' : 'View Maintenance Record' }}
@@ -713,6 +705,35 @@ new class extends Component {
                             Close
                         </x-button>
                     @endif
+                </div>
+            </x-card.footer>
+        </x-card>
+    </flux:modal>
+
+    <!-- Delete Confirmation Modal -->
+    <flux:modal wire:model.live="showDeleteModal" class="w-full max-w-4xl" @close="$wire.resetForm()">
+        <x-card class="w-fulloverflow-hidden rounded-xl">
+            <x-card.header>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
+                    <flux:icon name="exclamation-circle" class="w-6 h-6 text-red-600 mr-2" />
+                    Confirm Deletion
+                </h3>
+            </x-card.header>
+            <x-card.body>
+                <div class="space-y-4">
+                    <p class="text-sm text-gray-500">Are you sure you want to delete this maintenance record? This action cannot be undone.</p>
+                </div>
+            </x-card.body>
+
+            <x-card.footer>
+                <div class="flex justify-end space-x-3">
+                    <flux:button wire:click="$set('showDeleteModal', false)">
+                        Cancel
+                    </flux:button>
+                    <flux:button wire:click="delete" variant="danger" class="bg-red-600 hover:bg-red-700">
+                        <flux:icon wire:loading wire:target="delete" name="arrow-path" class="w-4 h-4 mr-2 animate-spin" />
+                        Delete record
+                    </flux:button>
                 </div>
             </x-card.footer>
         </x-card>

@@ -504,7 +504,7 @@ new class extends Component {
 
     <!-- Form Modal -->
     <flux:modal wire:model="showFormModal" class="w-full max-w-4xl" @close="$wire.resetForm()">
-        <x-card>
+        <x-card class="w-full overflow-hidden rounded-xl">
             <x-card.header>
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
                     {{ $modalMode === 'create' ? 'Create Maintenance Record' : ($modalMode === 'edit' ? 'Edit Maintenance Record' : 'View Maintenance Record') }}
@@ -626,14 +626,17 @@ new class extends Component {
                 @endif
             </x-card.body>
 
-            <div class="mt-4 flex justify-end space-x-3">
-                <flux:button wire:click="$set('showDeleteModal', false)">
-                    Cancel
-                </flux:button>
-                <flux:button wire:click="delete">
-                    Delete
-                </flux:button>
-            </div>
+            <x-card.footer>
+                <div class="flex justify-end space-x-3">
+                    <flux:button wire:click="$set('showDeleteModal', false)">
+                        Cancel
+                    </flux:button>
+                    <flux:button wire:click="delete" variant="danger" class="bg-red-600 hover:bg-red-700">
+                        <flux:icon wire:loading wire:target="delete" name="arrow-path" class="w-4 h-4 mr-2 animate-spin" />
+                        Delete Valuation
+                    </flux:button>
+                </div>
+            </x-card.footer>
         </x-card>
     </flux:modal>
 

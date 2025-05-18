@@ -508,7 +508,7 @@ new class extends Component {
 
     <!-- Record Details Modal -->
     <flux:modal wire:model="showModal">
-        <x-card>
+        <x-card class="w-fulloverflow-hidden rounded-xl">
             <x-card.header>
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
                     Record Details
