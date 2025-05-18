@@ -55,6 +55,8 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // Valuation Permissions
         $valuationPermissions = [
+            'manage_valuation_requests',
+            'view_valuation_requests',
             'create_valuation_request',
             'edit_valuation_request',
             'view_valuation_request',
