@@ -4,26 +4,219 @@ use Livewire\Volt\Component;
 use function Livewire\Volt\{state};
 use App\Models\MaintenanceRecord;
 use App\Services\MaintenanceService;
+use Livewire\WithPagination;
 
 new class extends Component {
-    public $records;
+    use WithPagination;
+    
+    #[State]
+    public $search = '';
+    
+    #[State]
+    public $sortField = 'created_at';
+    
+    #[State]
+    public $sortDirection = 'desc';
+    
+    #[State]
     public $statusFilter = 'all';
+    
+    #[State]
+    public $isLoading = false;
+
+    #[State]
+    public $showFormModal = false;
+
+    #[State]
+    public $showDeleteModal = false;
+
+    #[State]
+    public $selectedRecord = null;
+
+    #[State]
+    public $modalMode = 'view'; // view, edit
+    
+    #[State]
+    public $form = [
+        'status' => '',
+        'description' => '',
+        'issue_type' => '',
+        'priority' => '',
+        'requested_by' => '',
+        'completed_date' => null,
+    ];
+
+    protected $availableStatuses = [
+        'pending' => 'Pending',
+        'scheduled' => 'Scheduled',
+        'in_progress' => 'In Progress',
+        'completed' => 'Completed',
+        'cancelled' => 'Cancelled'
+    ];
 
     public function mount(MaintenanceService $maintenanceService): void 
     {
+        $this->authorize('manage_maintenance_records');
+    }
+
+    public function getRecordsProperty()
+    {
+        $query = MaintenanceRecord::with('property')
+            ->when($this->search, function($query) {
+                $query->where(function($q) {
+                    $q->whereHas('property', function($q) {
+                        $q->where('title', 'like', '%' . $this->search . '%');
+                    })
+                    ->orWhere('issue_type', 'like', '%' . $this->search . '%')
+                    ->orWhere('description', 'like', '%' . $this->search . '%')
+                    ->orWhere('requested_by', 'like', '%' . $this->search . '%');
+                });
+            })
+            ->when($this->statusFilter !== 'all', function($query) {
+                $query->where('status', $this->statusFilter);
+            });
+
+        $query->orderBy($this->sortField, $this->sortDirection);
+
+        return $query->paginate(10);
+    }
+
+    public function getAvailableStatusesProperty()
+    {
+        return $this->availableStatuses;
+    }
+
+    public function confirmStatusChange($recordId): void
+    {
+        $this->authorize('update_maintenance_status');
+        $this->selectedRecord = MaintenanceRecord::findOrFail($recordId);
+        $this->newStatus = $this->selectedRecord->status;
+    }
+
+    public function confirmDelete($recordId): void
+    {
+        $this->authorize('delete_maintenance_request');
+        $this->selectedRecord = MaintenanceRecord::findOrFail($recordId);
+        $this->showDeleteModal = true;
+    }
+
+    public function delete(): void
+    {
+        $this->authorize('delete_maintenance_request');
+        $this->selectedRecord->delete();
+        $this->showDeleteModal = false;
+        $this->selectedRecord = null;
+        $this->dispatch('notify', type: 'success', message: 'Maintenance record deleted successfully.');
         $this->loadRecords();
+    }
+
+    public function view($id): void
+    {
+        $this->selectedRecord = MaintenanceRecord::findOrFail($id);
+        $this->form = [
+            'status' => $this->selectedRecord->status,
+            'description' => $this->selectedRecord->description,
+            'issue_type' => $this->selectedRecord->issue_type,
+            'priority' => $this->selectedRecord->priority,
+            'requested_by' => $this->selectedRecord->requested_by,
+            'completed_date' => $this->selectedRecord->completed_date,
+        ];
+        $this->modalMode = 'view';
+        $this->showFormModal = true;
+    }
+
+    public function edit($id): void
+    {
+        $this->authorize('update_maintenance_status');
+        $this->selectedRecord = MaintenanceRecord::findOrFail($id);
+        $this->form = [
+            'status' => $this->selectedRecord->status,
+            'description' => $this->selectedRecord->description,
+            'issue_type' => $this->selectedRecord->issue_type,
+            'priority' => $this->selectedRecord->priority,
+            'requested_by' => $this->selectedRecord->requested_by,
+            'completed_date' => $this->selectedRecord->completed_date,
+        ];
+        $this->modalMode = 'edit';
+        $this->showFormModal = true;
+    }
+
+    public function updateStatus(): void
+    {
+        if (!$this->selectedRecord) {
+            return;
+        }
+
+        $this->authorize('update_maintenance_status');
+
+        $this->selectedRecord->update([
+            'status' => $this->form['status'],
+            'completed_date' => $this->form['status'] === 'completed' ? now() : null
+        ]);
+
+        $this->showFormModal = false;
+        $this->selectedRecord = null;
+        $this->resetForm();
+        
+        $this->dispatch('notify', 
+            type: 'success', 
+            message: 'Maintenance status updated successfully.'
+        );
+    }
+
+    public function resetForm(): void
+    {
+        $this->form = [
+            'status' => '',
+            'description' => '',
+            'issue_type' => '',
+            'priority' => '',
+            'requested_by' => '',
+            'completed_date' => null,
+        ];
+        $this->selectedRecord = null;
+        $this->modalMode = 'view';
     }
 
     public function loadRecords(): void
     {
-        $query = MaintenanceRecord::with(['property', 'reportedBy'])
-            ->latest();
-            
-        if ($this->statusFilter !== 'all') {
-            $query->where('status', $this->statusFilter);
-        }
+        $this->isLoading = true;
+        
+        try {
+            $query = MaintenanceRecord::with('property')
+                ->when($this->search, function($query) {
+                    $query->where(function($q) {
+                        $q->whereHas('property', function($q) {
+                            $q->where('title', 'like', '%' . $this->search . '%');
+                        })
+                        ->orWhere('issue_type', 'like', '%' . $this->search . '%')
+                        ->orWhere('description', 'like', '%' . $this->search . '%')
+                        ->orWhere('requested_by', 'like', '%' . $this->search . '%');
+                    });
+                })
+                ->when($this->statusFilter !== 'all', function($query) {
+                    $query->where('status', $this->statusFilter);
+                });
 
-        $this->records = $query->get();
+            // Handle sorting
+            $query->orderBy($this->sortField, $this->sortDirection);
+
+            $this->records = $query->paginate(10);
+        } finally {
+            $this->isLoading = false;
+        }
+    }
+
+    public function sort($field): void
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+        
+        $this->loadRecords();
     }
 
     public function filterByStatus(string $status): void
@@ -33,93 +226,390 @@ new class extends Component {
     }
 }; ?>
 
-<div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl">
-    <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Maintenance Management</h1>
-        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Track and manage property maintenance requests</p>
-    </div>
+<div class="bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-2xl shadow-xl overflow-hidden relative">
+    <!-- Header Section with Gradient -->
+    <div class="h-2 bg-gradient-to-r from-[#02c9c2] to-[#012e2b]"></div>
+    
+    <div class="p-8 border-b border-gray-200 dark:border-gray-700">
+        <!-- Animated Header -->
+        <div class="sm:flex sm:items-center sm:justify-between" 
+             x-data="{}"
+             x-intersect="$el.classList.add('animate-fade-in')">
+            <div class="space-y-2">
+                <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white flex items-center gap-2">
+                    <flux:icon name="wrench-screwdriver" class="w-8 h-8 text-[#02c9c2]" />
+                    Maintenance Management
+                </h2>
+                <p class="text-gray-600 dark:text-gray-300">
+                    Track and manage property maintenance requests
+                </p>
+            </div>
+            
+            <button 
+                wire:click="$refresh"
+                class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#02c9c2] to-[#012e2b] text-white font-medium rounded-lg text-sm hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02c9c2] dark:focus:ring-offset-gray-900 transition-all duration-150 shadow-lg"
+                wire:loading.attr="disabled"
+            >
+                <flux:icon wire:loading.remove wire:target="$refresh" name="arrow-path" class="w-5 h-5 mr-2" />
+                <flux:icon wire:loading wire:target="$refresh" name="arrow-path" class="w-5 h-5 mr-2 animate-spin" />
+                Refresh
+            </button>
+        </div>
 
-    <div class="p-6">
-        <!-- Status Filter -->
-        <div class="mb-6">
-            <div class="flex space-x-4">
+        <!-- Status Filter Tabs with Animation -->
+        <div class="mt-8 space-y-4" x-data="{}" x-intersect="$el.classList.add('animate-fade-in')">
+            <!-- Search Input -->
+            <div class="flex-1 relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <flux:icon wire:loading.remove wire:target="search" name="magnifying-glass" class="h-5 w-5 text-gray-400" />
+                    <flux:icon wire:loading wire:target="search" name="arrow-path" class="h-5 w-5 text-[#02c9c2] animate-spin" />
+                </div>
+                <div class="relative">
+                    <div class="pointer-events-none absolute inset-y-0 left-3 flex items-center">
+                        <flux:icon name="magnifying-glass"
+                            class="h-5 w-5 text-gray-400 group-focus-within:text-[#02c9c2] transition-colors duration-200" />
+                    </div>
+                    <input wire:model.live.debounce.300ms="search" type="text"
+                        placeholder="Search by property, issue type, or description..."
+                        class="block w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-3 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                        aria-label="Search maintenance records"
+                    >
+                </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
                 <button 
                     wire:click="filterByStatus('all')"
-                    class="{{ $statusFilter === 'all' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-700' }} px-4 py-2 rounded-md text-sm font-medium"
+                    wire:loading.attr="disabled"
+                    class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150
+                        {{ $statusFilter === 'all' 
+                            ? 'bg-gradient-to-r from-[#02c9c2] to-[#012e2b] text-white shadow-lg' 
+                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700' }}"
                 >
+                    <flux:icon wire:loading.remove name="list-bullet" class="w-5 h-5 mr-2" />
+                    <flux:icon wire:loading wire:target="filterByStatus" name="arrow-path" class="w-5 h-5 mr-2 animate-spin" />
                     All
                 </button>
+                
                 <button 
                     wire:click="filterByStatus('pending')"
-                    class="{{ $statusFilter === 'pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-700' }} px-4 py-2 rounded-md text-sm font-medium"
+                    wire:loading.attr="disabled"
+                    class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150
+                        {{ $statusFilter === 'pending' 
+                            ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white shadow-lg' 
+                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700' }}"
                 >
+                    <flux:icon wire:loading.remove name="clock" class="w-5 h-5 mr-2" />
+                    <flux:icon wire:loading wire:target="filterByStatus" name="arrow-path" class="w-5 h-5 mr-2 animate-spin" />
                     Pending
                 </button>
+                
                 <button 
                     wire:click="filterByStatus('in_progress')"
-                    class="{{ $statusFilter === 'in_progress' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700' }} px-4 py-2 rounded-md text-sm font-medium"
+                    wire:loading.attr="disabled"
+                    class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150
+                        {{ $statusFilter === 'in_progress' 
+                            ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg' 
+                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700' }}"
                 >
+                    <flux:icon wire:loading.remove name="arrow-path" class="w-5 h-5 mr-2" />
+                    <flux:icon wire:loading wire:target="filterByStatus" name="arrow-path" class="w-5 h-5 mr-2 animate-spin" />
                     In Progress
                 </button>
+                
                 <button 
                     wire:click="filterByStatus('completed')"
-                    class="{{ $statusFilter === 'completed' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700' }} px-4 py-2 rounded-md text-sm font-medium"
+                    wire:loading.attr="disabled"
+                    class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150
+                        {{ $statusFilter === 'completed' 
+                            ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg' 
+                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700' }}"
                 >
+                    <flux:icon wire:loading.remove name="check-circle" class="w-5 h-5 mr-2" />
+                    <flux:icon wire:loading wire:target="filterByStatus" name="arrow-path" class="w-5 h-5 mr-2 animate-spin" />
                     Completed
                 </button>
             </div>
         </div>
+    </div>
 
-        <!-- Maintenance Records Table -->
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-900">
+    <!-- Maintenance Records Table -->
+    <div class="p-8">
+        <div class="relative overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 backdrop-blur-xl">
+            <!-- Loading Overlay -->
+            <div wire:loading.delay wire:target="filterByStatus" 
+                 class="absolute inset-0 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm z-10 flex items-center justify-center">
+                <div class="flex items-center space-x-4">
+                    <flux:icon name="arrow-path" class="w-8 h-8 text-[#02c9c2] animate-spin" />
+                    <span class="text-gray-600 dark:text-gray-300 font-medium">Loading records...</span>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <table class="w-full text-left">
+                <thead class="bg-gray-50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-300 text-sm">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Property</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Issue</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Priority</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Reported On</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                        <th scope="col" class="px-6 py-4">Property</th>
+                        <th scope="col" class="px-6 py-4">Description</th>
+                        <th scope="col" class="px-6 py-4">Priority</th>
+                        <th scope="col" class="px-6 py-4">Status</th>
+                        <th scope="col" class="px-6 py-4">Scheduled</th>
+                        <th scope="col" class="px-6 py-4">Cost</th>
+                        <th scope="col" class="px-6 py-4">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    @foreach($records as $record)
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                    @forelse($this->records as $record)
+                        <tr class="bg-white dark:bg-gray-800/30 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                            <td class="px-6 py-4">
                                 {{ $record->property->title }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                {{ $record->issue_description }}
+                            <td class="px-6 py-4">
+                                <div class="line-clamp-2">
+                                    {{ $record->description }}
+                                </div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $record->priority === 'high' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300' }}">
+                            <td class="px-6 py-4">
+                                <span @class([
+                                    'px-3 py-1 rounded-full text-xs font-medium',
+                                    'bg-red-100 text-red-800' => $record->priority === 'urgent',
+                                    'bg-orange-100 text-orange-800' => $record->priority === 'high',
+                                    'bg-yellow-100 text-yellow-800' => $record->priority === 'medium',
+                                    'bg-green-100 text-green-800' => $record->priority === 'low',
+                                ])>
                                     {{ ucfirst($record->priority) }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                                    {{ $record->status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : '' }}
-                                    {{ $record->status === 'in_progress' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : '' }}
-                                    {{ $record->status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : '' }}">
-                                    {{ ucfirst(str_replace('_', ' ', $record->status)) }}
+                            <td class="px-6 py-4">
+                                <span @class([
+                                    'px-3 py-1 rounded-full text-xs font-medium',
+                                    'bg-yellow-100 text-yellow-800' => $record->status === 'pending',
+                                    'bg-blue-100 text-blue-800' => $record->status === 'in_progress',
+                                    'bg-green-100 text-green-800' => $record->status === 'completed',
+                                    'bg-gray-100 text-gray-800' => $record->status === 'cancelled',
+                                ])>
+                                    {{ ucfirst($record->status) }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                {{ $record->created_at->format('M d, Y') }}
+                            <td class="px-6 py-4">
+                                {{ $record->scheduled_date ? \Carbon\Carbon::parse($record->scheduled_date)->format('M d, Y') : 'Not scheduled' }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                <button 
-                                    class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
-                                    wire:click="viewRecord({{ $record->id }})"
-                                >
-                                    View Details
-                                </button>
+                            <td class="px-6 py-4">
+                                {{ $record->cost ? '$' . number_format($record->cost, 2) : 'N/A' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-no-wrap">
+                                <div class="flex items-center space-x-2">
+                                    <button 
+                                        wire:click="view({{ $record->id }})"
+                                        class="text-gray-200 dark:text-gray-300 hover:text-[#02c9c2] dark:hover:text-[#02c9c2] transition-colors duration-150 bg-indigo-500 dark:bg-indigo-700/50 rounded-lg p-2"
+                                        title="View record"
+                                    >
+                                        <flux:icon name="eye" class="w-5 h-5" />
+                                    </button>
+
+                                    @can('update_maintenance_status')
+                                    <button 
+                                        wire:click="edit({{ $record->id }})"
+                                        class="text-gray-200 dark:text-gray-300 hover:text-[#02c9c2] dark:hover:text-[#02c9c2] transition-colors duration-150 bg-green-500 dark:bg-green-700/50 rounded-lg p-2"
+                                        title="Edit record"
+                                    >
+                                        <flux:icon name="pencil-square" class="w-5 h-5" />
+                                    </button>
+                                    @endcan
+
+                                    @can('delete_maintenance_record')
+                                    <button 
+                                        wire:click="confirmDelete({{ $record->id }})"
+                                        class="text-gray-200 dark:text-gray-300 hover:text-[#02c9c2] dark:hover:text-[#02c9c2] transition-colors duration-150 bg-red-500 dark:bg-red-700/50 rounded-lg p-2"
+                                        title="Delete record"
+                                    >
+                                        <flux:icon name="trash" class="w-5 h-5" />
+                                    </button>
+                                    @endcan
+                                </div>
                             </td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                                No maintenance records found.
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
+
+            <!-- Pagination -->
+            @if($this->records->hasPages())
+                <div class="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700">
+                    {{ $this->records->links() }}
+                </div>
+            @endif
         </div>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    <flux:modal wire:model.live="showDeleteModal" class="w-full max-w-4xl" @close="$wire.resetForm()">
+        <x-card.header>Delete Maintenance Record</x-card.header>
+        <x-card.body>
+            <div class="space-y-4">
+                <p class="text-sm text-gray-500">Are you sure you want to delete this maintenance record? This action cannot be undone.</p>
+            </div>
+        </x-card.body>
+        <x-card.footer>
+            <div class="flex justify-end space-x-2">
+                <x-button type="button" wire:click="$set('showDeleteModal', false)" variant="primary">Cancel</x-button>
+                <x-button type="button" wire:click="delete" variant="danger">Delete</x-button>
+            </div>
+        </x-card.footer>
+    </flux:modal>
+
+    <!-- View/Edit Modal -->
+    <flux:modal wire:model.live="showFormModal" class="w-full max-w-4xl" @close="$wire.resetForm()">
+        <x-card class="w-full overflow-hidden rounded-xl">
+            <x-card.header>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                    {{ $modalMode === 'view' ? 'View' : 'Edit' }} Maintenance Record
+                </h3>
+            </x-card.header>
+
+            <x-card.body>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Property</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <flux:icon name="building-office" class="h-5 w-5 text-gray-400" />
+                            </div>
+                            <input
+                                type="text"
+                                value="{{ $selectedRecord?->property->title }}"
+                                disabled
+                                class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <flux:icon name="document-text" class="h-5 w-5 text-gray-400" />
+                            </div>
+                            <textarea
+                                wire:model="form.description"
+                                @disabled($modalMode === 'view')
+                                class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                rows="3"
+                            ></textarea>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <flux:icon name="flag" class="h-5 w-5 text-gray-400" />
+                            </div>
+                            <select
+                                wire:model="form.status"
+                                @disabled($modalMode === 'view')
+                                class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                            >
+                                @foreach($this->availableStatuses as $value => $label)
+                                    <option value="{{ $value }}">{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Issue Type</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <flux:icon name="exclamation-triangle" class="h-5 w-5 text-gray-400" />
+                            </div>
+                            <input
+                                type="text"
+                                wire:model="form.issue_type"
+                                @disabled($modalMode === 'view')
+                                class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                            >
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Priority</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <flux:icon name="bell" class="h-5 w-5 text-gray-400" />
+                            </div>
+                            <input
+                                type="text"
+                                wire:model="form.priority"
+                                @disabled($modalMode === 'view')
+                                class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                            >
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Requested By</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <flux:icon name="user" class="h-5 w-5 text-gray-400" />
+                            </div>
+                            <input
+                                type="text"
+                                wire:model="form.requested_by"
+                                @disabled($modalMode === 'view')
+                                class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                            >
+                        </div>
+                    </div>
+
+                    @if($form['completed_date'])
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Completed Date</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <flux:icon name="calendar" class="h-5 w-5 text-gray-400" />
+                            </div>
+                            <input
+                                type="text"
+                                value="{{ \Carbon\Carbon::parse($form['completed_date'])->format('M d, Y H:i') }}"
+                                disabled
+                                class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                            >
+                        </div>
+                    </div>
+                    @endif
+                </div>
+            </x-card.body>
+
+            <x-card.footer>
+                <div class="flex justify-end space-x-3">
+                    <x-button type="button" wire:click="$set('showFormModal', false)" variant="primary">
+                        {{ $modalMode === 'view' ? 'Close' : 'Cancel' }}
+                    </x-button>
+                    
+                    @if($modalMode === 'view')
+                        @can('update_maintenance_status')
+                            <x-button type="button" wire:click="edit({{ $selectedRecord?->id }})" variant="primary">
+                                Edit
+                            </x-button>
+                        @endcan
+                    @else
+                        <x-button type="button" wire:click="updateStatus" variant="primary">
+                            Save Changes
+                        </x-button>
+                    @endif
+                </div>
+            </x-card.footer>
+        </x-card>
+    </flux:modal>
+
+    <!-- Decorative Elements -->
+    <div class="absolute top-40 left-0 w-64 h-64 bg-gradient-to-br from-[#02c9c2]/10 to-transparent rounded-full blur-3xl -z-10 hidden lg:block"></div>
+    <div class="absolute bottom-20 right-0 w-96 h-96 bg-gradient-to-tl from-[#012e2b]/10 to-transparent rounded-full blur-3xl -z-10 hidden lg:block"></div>
 </div>

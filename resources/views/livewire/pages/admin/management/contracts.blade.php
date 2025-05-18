@@ -305,9 +305,11 @@ new class extends Component {
                             <flux:icon name="magnifying-glass"
                                 class="h-5 w-5 text-gray-400 group-focus-within:text-[#02c9c2] transition-colors duration-200" />
                         </div>
-                        <input wire:model.live.debounce.300ms="search" type="text"
-                        placeholder="Search contracts..."
-                            class="block w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-3 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm">
+                        <input wire:model.live.debounce.300ms="search" type="search"
+                            placeholder="Search contracts..."
+                            class="block w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-3 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                            aria-label="Search contracts"
+                        >
                     </div>
                 </div>
 
@@ -541,7 +543,7 @@ new class extends Component {
                                             class="text-gray-200 dark:text-gray-300 hover:text-[#02c9c2] dark:hover:text-[#02c9c2] transition-colors duration-150 bg-green-500 dark:bg-green-700/50 rounded-lg p-2"
                                             title="Edit Contract"
                                         >
-                                            <flux:icon wire:loading.remove wire:target="edit({{ $contract->id }})" name="pencil" class="w-5 h-5" />
+                                            <flux:icon wire:loading.remove wire:target="edit({{ $contract->id }})" name="pencil-square" class="w-5 h-5" />
                                             <flux:icon wire:loading wire:target="edit({{ $contract->id }})" name="arrow-path" class="w-5 h-5 animate-spin" />
                                         </button>
                                     @endcan

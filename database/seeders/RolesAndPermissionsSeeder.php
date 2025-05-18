@@ -30,6 +30,8 @@ class RolesAndPermissionsSeeder extends Seeder
             'record_financial_transaction',
             'view_financial_records',
             'manage_maintenance_records',
+            'edit_maintenance_record',
+            'delete_maintenance_record',
             'manage_property_images',
             'manage_property_amenities',
             'manage_property_facilities',

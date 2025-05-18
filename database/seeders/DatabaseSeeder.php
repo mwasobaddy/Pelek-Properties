@@ -51,6 +51,7 @@ class DatabaseSeeder extends Seeder
             PropertySeeder::class,
             AvailabilityCalendarSeeder::class,
             PropertyManagementSeeder::class,
+            MaintenanceRecordSeeder::class, // Added MaintenanceRecordSeeder
             BlogPostSeeder::class,
         ];
 
