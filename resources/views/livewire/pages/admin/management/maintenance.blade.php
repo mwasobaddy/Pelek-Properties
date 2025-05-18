@@ -399,79 +399,55 @@ new class extends Component {
             <table class="w-full text-left">
                 <thead class="bg-gray-50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-300 text-sm">
                     <tr>
-                        <th scope="col" class="px-6 py-4">
+                        <th scope="col" class="px-6 py-4 font-medium cursor-pointer hover:text-[#02c9c2] transition-colors duration-150">
                             <button wire:click="sort('property_name')" class="group inline-flex items-center space-x-1">
                                 <span>Property</span>
-                                <span class="flex-none rounded {{ $sortField === 'property_name' ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
-                                    @if($sortField === 'property_name')
-                                        <flux:icon name="{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-5 h-5 text-[#02c9c2]" />
-                                    @else
-                                        <flux:icon name="chevron-up-down" class="w-5 h-5 text-gray-400 group-hover:text-[#02c9c2]" />
-                                    @endif
-                                </span>
+                                @if($sortField === 'property_name')
+                                    <flux:icon name="{{ $sortDirection === 'asc' ? 'arrow-up' : 'arrow-down' }}" class="w-4 h-4" />
+                                @endif
                             </button>
                         </th>
-                        <th scope="col" class="px-6 py-4">
+                        <th scope="col" class="px-6 py-4 font-medium cursor-pointer hover:text-[#02c9c2] transition-colors duration-150">
                             <button wire:click="sort('description')" class="group inline-flex items-center space-x-1">
                                 <span>Description</span>
-                                <span class="flex-none rounded {{ $sortField === 'description' ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
-                                    @if($sortField === 'description')
-                                        <flux:icon name="{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-5 h-5 text-[#02c9c2]" />
-                                    @else
-                                        <flux:icon name="chevron-up-down" class="w-5 h-5 text-gray-400 group-hover:text-[#02c9c2]" />
-                                    @endif
-                                </span>
+                                @if($sortField === 'description')
+                                    <flux:icon name="{{ $sortDirection === 'asc' ? 'arrow-up' : 'arrow-down' }}" class="w-4 h-4" />
+                                @endif
                             </button>
                         </th>
-                        <th scope="col" class="px-6 py-4">
+                        <th scope="col" class="px-6 py-4 font-medium cursor-pointer hover:text-[#02c9c2] transition-colors duration-150">
                             <button wire:click="sort('priority')" class="group inline-flex items-center space-x-1">
                                 <span>Priority</span>
-                                <span class="flex-none rounded {{ $sortField === 'priority' ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
-                                    @if($sortField === 'priority')
-                                        <flux:icon name="{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-5 h-5 text-[#02c9c2]" />
-                                    @else
-                                        <flux:icon name="chevron-up-down" class="w-5 h-5 text-gray-400 group-hover:text-[#02c9c2]" />
-                                    @endif
-                                </span>
+                                @if($sortField === 'priority')
+                                    <flux:icon name="{{ $sortDirection === 'asc' ? 'arrow-up' : 'arrow-down' }}" class="w-4 h-4" />
+                                @endif
                             </button>
                         </th>
-                        <th scope="col" class="px-6 py-4">
+                        <th scope="col" class="px-6 py-4 font-medium cursor-pointer hover:text-[#02c9c2] transition-colors duration-150">
                             <button wire:click="sort('status')" class="group inline-flex items-center space-x-1">
                                 <span>Status</span>
-                                <span class="flex-none rounded {{ $sortField === 'status' ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
-                                    @if($sortField === 'status')
-                                        <flux:icon name="{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-5 h-5 text-[#02c9c2]" />
-                                    @else
-                                        <flux:icon name="chevron-up-down" class="w-5 h-5 text-gray-400 group-hover:text-[#02c9c2]" />
-                                    @endif
-                                </span>
+                                @if($sortField === 'status')
+                                    <flux:icon name="{{ $sortDirection === 'asc' ? 'arrow-up' : 'arrow-down' }}" class="w-4 h-4" />
+                                @endif
                             </button>
                         </th>
-                        <th scope="col" class="px-6 py-4">
+                        <th scope="col" class="px-6 py-4 font-medium cursor-pointer hover:text-[#02c9c2] transition-colors duration-150">
                             <button wire:click="sort('scheduled_date')" class="group inline-flex items-center space-x-1">
                                 <span>Scheduled</span>
-                                <span class="flex-none rounded {{ $sortField === 'scheduled_date' ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
-                                    @if($sortField === 'scheduled_date')
-                                        <flux:icon name="{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-5 h-5 text-[#02c9c2]" />
-                                    @else
-                                        <flux:icon name="chevron-up-down" class="w-5 h-5 text-gray-400 group-hover:text-[#02c9c2]" />
-                                    @endif
-                                </span>
+                                @if($sortField === 'scheduled_date')
+                                    <flux:icon name="{{ $sortDirection === 'asc' ? 'arrow-up' : 'arrow-down' }}" class="w-4 h-4" />
+                                @endif
                             </button>
                         </th>
-                        <th scope="col" class="px-6 py-4">
+                        <th scope="col" class="px-6 py-4 font-medium cursor-pointer hover:text-[#02c9c2] transition-colors duration-150">
                             <button wire:click="sort('cost')" class="group inline-flex items-center space-x-1">
                                 <span>Cost</span>
-                                <span class="flex-none rounded {{ $sortField === 'cost' ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
-                                    @if($sortField === 'cost')
-                                        <flux:icon name="{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-5 h-5 text-[#02c9c2]" />
-                                    @else
-                                        <flux:icon name="chevron-up-down" class="w-5 h-5 text-gray-400 group-hover:text-[#02c9c2]" />
-                                    @endif
-                                </span>
+                                @if($sortField === 'cost')
+                                    <flux:icon name="{{ $sortDirection === 'asc' ? 'arrow-up' : 'arrow-down' }}" class="w-4 h-4" />
+                                @endif
                             </button>
                         </th>
-                        <th scope="col" class="px-6 py-4">Actions</th>
+                        <th scope="col" class="px-6 py-4 font-medium cursor-pointer hover:text-[#02c9c2] transition-colors duration-150">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -558,7 +534,7 @@ new class extends Component {
             <!-- Pagination -->
             @if($this->records->hasPages())
                 <div class="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700">
-                    {{ $this->records->links() }}
+                    {{ $this->records->links('components.pagination') }}
                 </div>
             @endif
         </div>

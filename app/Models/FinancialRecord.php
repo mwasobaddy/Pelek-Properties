@@ -34,7 +34,7 @@ class FinancialRecord extends Model
         return $this->belongsTo(Property::class);
     }
 
-    public function recorder(): BelongsTo
+    public function recordedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'recorded_by');
     }
