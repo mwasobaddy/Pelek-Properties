@@ -3,6 +3,7 @@
 use Livewire\Volt\Component;
 use function Livewire\Volt\{state};
 use App\Models\MaintenanceRecord;
+use App\Models\Property;
 use App\Services\MaintenanceService;
 use Livewire\WithPagination;
 
@@ -25,7 +26,7 @@ new class extends Component {
     public $isLoading = false;
 
     #[State]
-    public $showFormModal = false;
+    public $showModal = false;
 
     #[State]
     public $showDeleteModal = false;
@@ -35,15 +36,24 @@ new class extends Component {
 
     #[State]
     public $modalMode = 'view'; // view, edit
+
+    #[State]
+    public $properties = [];
+
+    #[State]
+    public $newStatus = '';
     
     #[State]
     public $form = [
+        'property_id' => '',
         'status' => '',
         'description' => '',
         'issue_type' => '',
         'priority' => '',
         'requested_by' => '',
         'completed_date' => null,
+        'created_at' => null,
+        'updated_at' => null
     ];
 
     protected $availableStatuses = [
@@ -57,6 +67,9 @@ new class extends Component {
     public function mount(MaintenanceService $maintenanceService): void 
     {
         $this->authorize('manage_maintenance_records');
+        $this->properties = Property::select('id', 'name')
+            ->orderBy('name')
+            ->get();
     }
 
     public function getRecordsProperty()
@@ -79,6 +92,20 @@ new class extends Component {
         $query->orderBy($this->sortField, $this->sortDirection);
 
         return $query->paginate(10);
+    }
+
+    #[Computed]
+    public function properties()
+    {
+        // Ensure we're returning an associative array, not a collection
+        $props = Property::pluck('title', 'id')->toArray();
+        
+        // Safety check to ensure we have proper structure
+        if (empty($props)) {
+            return ['0' => 'No properties available'];
+        }
+        
+        return $props;
     }
 
     public function getAvailableStatusesProperty()
@@ -112,33 +139,41 @@ new class extends Component {
 
     public function view($id): void
     {
-        $this->selectedRecord = MaintenanceRecord::findOrFail($id);
+        $record = MaintenanceRecord::findOrFail($id);
+        $this->selectedRecord = $record;
         $this->form = [
-            'status' => $this->selectedRecord->status,
-            'description' => $this->selectedRecord->description,
-            'issue_type' => $this->selectedRecord->issue_type,
-            'priority' => $this->selectedRecord->priority,
-            'requested_by' => $this->selectedRecord->requested_by,
-            'completed_date' => $this->selectedRecord->completed_date,
+            'property_id' => $record->property_id,
+            'status' => $record->status,
+            'description' => $record->description,
+            'issue_type' => $record->issue_type,
+            'priority' => $record->priority,
+            'requested_by' => $record->requested_by,
+            'completed_date' => $record->completed_date,
+            'created_at' => $record->created_at,
+            'updated_at' => $record->updated_at
         ];
         $this->modalMode = 'view';
-        $this->showFormModal = true;
+        $this->showModal = true;
     }
 
     public function edit($id): void
     {
         $this->authorize('update_maintenance_status');
-        $this->selectedRecord = MaintenanceRecord::findOrFail($id);
+        $record = MaintenanceRecord::findOrFail($id);
+        $this->selectedRecord = $record;
         $this->form = [
-            'status' => $this->selectedRecord->status,
-            'description' => $this->selectedRecord->description,
-            'issue_type' => $this->selectedRecord->issue_type,
-            'priority' => $this->selectedRecord->priority,
-            'requested_by' => $this->selectedRecord->requested_by,
-            'completed_date' => $this->selectedRecord->completed_date,
+            'property_id' => $record->property_id,
+            'status' => $record->status,
+            'description' => $record->description,
+            'issue_type' => $record->issue_type,
+            'priority' => $record->priority,
+            'requested_by' => $record->requested_by,
+            'completed_date' => $record->completed_date,
+            'created_at' => $record->created_at,
+            'updated_at' => $record->updated_at
         ];
         $this->modalMode = 'edit';
-        $this->showFormModal = true;
+        $this->showModal = true;
     }
 
     public function updateStatus(): void
@@ -149,12 +184,24 @@ new class extends Component {
 
         $this->authorize('update_maintenance_status');
 
-        $this->selectedRecord->update([
-            'status' => $this->form['status'],
-            'completed_date' => $this->form['status'] === 'completed' ? now() : null
+        $this->validate([
+            'form.status' => 'required|string|in:' . implode(',', array_keys($this->availableStatuses)),
+            'form.property_id' => 'required|exists:properties,id',
         ]);
 
-        $this->showFormModal = false;
+        $updateData = [
+            'property_id' => $this->form['property_id'],
+            'status' => $this->form['status'],
+            'description' => $this->form['description'],
+            'issue_type' => $this->form['issue_type'],
+            'priority' => $this->form['priority'],
+            'requested_by' => $this->form['requested_by'],
+            'completed_date' => $this->form['status'] === 'completed' ? now() : null
+        ];
+
+        $this->selectedRecord->update($updateData);
+
+        $this->showModal = false;
         $this->selectedRecord = null;
         $this->resetForm();
         
@@ -167,12 +214,15 @@ new class extends Component {
     public function resetForm(): void
     {
         $this->form = [
+            'property_id' => '',
             'status' => '',
             'description' => '',
             'issue_type' => '',
             'priority' => '',
             'requested_by' => '',
             'completed_date' => null,
+            'created_at' => null,
+            'updated_at' => null
         ];
         $this->selectedRecord = null;
         $this->modalMode = 'view';
@@ -349,12 +399,78 @@ new class extends Component {
             <table class="w-full text-left">
                 <thead class="bg-gray-50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-300 text-sm">
                     <tr>
-                        <th scope="col" class="px-6 py-4">Property</th>
-                        <th scope="col" class="px-6 py-4">Description</th>
-                        <th scope="col" class="px-6 py-4">Priority</th>
-                        <th scope="col" class="px-6 py-4">Status</th>
-                        <th scope="col" class="px-6 py-4">Scheduled</th>
-                        <th scope="col" class="px-6 py-4">Cost</th>
+                        <th scope="col" class="px-6 py-4">
+                            <button wire:click="sort('property_name')" class="group inline-flex items-center space-x-1">
+                                <span>Property</span>
+                                <span class="flex-none rounded {{ $sortField === 'property_name' ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
+                                    @if($sortField === 'property_name')
+                                        <flux:icon name="{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-5 h-5 text-[#02c9c2]" />
+                                    @else
+                                        <flux:icon name="chevron-up-down" class="w-5 h-5 text-gray-400 group-hover:text-[#02c9c2]" />
+                                    @endif
+                                </span>
+                            </button>
+                        </th>
+                        <th scope="col" class="px-6 py-4">
+                            <button wire:click="sort('description')" class="group inline-flex items-center space-x-1">
+                                <span>Description</span>
+                                <span class="flex-none rounded {{ $sortField === 'description' ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
+                                    @if($sortField === 'description')
+                                        <flux:icon name="{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-5 h-5 text-[#02c9c2]" />
+                                    @else
+                                        <flux:icon name="chevron-up-down" class="w-5 h-5 text-gray-400 group-hover:text-[#02c9c2]" />
+                                    @endif
+                                </span>
+                            </button>
+                        </th>
+                        <th scope="col" class="px-6 py-4">
+                            <button wire:click="sort('priority')" class="group inline-flex items-center space-x-1">
+                                <span>Priority</span>
+                                <span class="flex-none rounded {{ $sortField === 'priority' ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
+                                    @if($sortField === 'priority')
+                                        <flux:icon name="{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-5 h-5 text-[#02c9c2]" />
+                                    @else
+                                        <flux:icon name="chevron-up-down" class="w-5 h-5 text-gray-400 group-hover:text-[#02c9c2]" />
+                                    @endif
+                                </span>
+                            </button>
+                        </th>
+                        <th scope="col" class="px-6 py-4">
+                            <button wire:click="sort('status')" class="group inline-flex items-center space-x-1">
+                                <span>Status</span>
+                                <span class="flex-none rounded {{ $sortField === 'status' ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
+                                    @if($sortField === 'status')
+                                        <flux:icon name="{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-5 h-5 text-[#02c9c2]" />
+                                    @else
+                                        <flux:icon name="chevron-up-down" class="w-5 h-5 text-gray-400 group-hover:text-[#02c9c2]" />
+                                    @endif
+                                </span>
+                            </button>
+                        </th>
+                        <th scope="col" class="px-6 py-4">
+                            <button wire:click="sort('scheduled_date')" class="group inline-flex items-center space-x-1">
+                                <span>Scheduled</span>
+                                <span class="flex-none rounded {{ $sortField === 'scheduled_date' ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
+                                    @if($sortField === 'scheduled_date')
+                                        <flux:icon name="{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-5 h-5 text-[#02c9c2]" />
+                                    @else
+                                        <flux:icon name="chevron-up-down" class="w-5 h-5 text-gray-400 group-hover:text-[#02c9c2]" />
+                                    @endif
+                                </span>
+                            </button>
+                        </th>
+                        <th scope="col" class="px-6 py-4">
+                            <button wire:click="sort('cost')" class="group inline-flex items-center space-x-1">
+                                <span>Cost</span>
+                                <span class="flex-none rounded {{ $sortField === 'cost' ? 'bg-gray-200 dark:bg-gray-700' : '' }}">
+                                    @if($sortField === 'cost')
+                                        <flux:icon name="{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-5 h-5 text-[#02c9c2]" />
+                                    @else
+                                        <flux:icon name="chevron-up-down" class="w-5 h-5 text-gray-400 group-hover:text-[#02c9c2]" />
+                                    @endif
+                                </span>
+                            </button>
+                        </th>
                         <th scope="col" class="px-6 py-4">Actions</th>
                     </tr>
                 </thead>
@@ -465,143 +581,147 @@ new class extends Component {
     </flux:modal>
 
     <!-- View/Edit Modal -->
-    <flux:modal wire:model.live="showFormModal" class="w-full max-w-4xl" @close="$wire.resetForm()">
-        <x-card class="w-full overflow-hidden rounded-xl">
+    <flux:modal wire:model.live="showModal" class="w-full max-w-4xl">
+        <x-card>
             <x-card.header>
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                    {{ $modalMode === 'view' ? 'View' : 'Edit' }} Maintenance Record
+                    {{ $modalMode === 'edit' ? 'Edit Maintenance Record' : 'View Maintenance Record' }}
                 </h3>
             </x-card.header>
 
             <x-card.body>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="md:col-span-2">
+                <div class="space-y-4">
+                    <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Property</label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <flux:icon name="building-office" class="h-5 w-5 text-gray-400" />
                             </div>
-                            <input
-                                type="text"
-                                value="{{ $selectedRecord?->property->title }}"
-                                disabled
+                            <select
                                 class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                wire:model="form.property_id"
+                                :disabled="$modalMode === 'view'"
                             >
+                                <option value="">Select a property</option>
+                                @foreach($this->properties as $property)
+                                    <option value="{{ $property->id }}">{{ $property->name }}</option>
+                                @endforeach
+                            </select>
                         </div>
+                        @error('form.property_id') 
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
                     </div>
 
-                    <div class="md:col-span-2">
+                    <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <flux:icon name="document-text" class="h-5 w-5 text-gray-400" />
                             </div>
                             <textarea
+                                id="description"
+                                class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
                                 wire:model="form.description"
-                                @disabled($modalMode === 'view')
-                                class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
-                                rows="3"
-                            ></textarea>
+                                :disabled="$modalMode === 'view'">
+                            </textarea>
+                        </div>
+                        @error('form.description') 
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <flux:icon name="check-circle" class="h-5 w-5 text-gray-400" />
+                                </div>
+                                <select
+                                    id="status"
+                                    class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                    wire:model="form.status"
+                                    :disabled="$modalMode === 'view'"
+                                >
+                                    <option value="">Select status</option>
+                                    @foreach($this->availableStatuses as $value => $label)
+                                        <option value="{{ $value }}">{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            @error('form.status') 
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label for="priority" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Priority</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <flux:icon name="flag" class="h-5 w-5 text-gray-400" />
+                                </div>
+                                <select id="priority" class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm" wire:model="form.priority" :disabled="$modalMode === 'view'">
+                                    <option value="">Select priority</option>
+                                    <option value="low">Low</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="high">High</option>
+                                    <option value="urgent">Urgent</option>
+                                </select>
+                            </div>
+                            @error('form.priority') 
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <flux:icon name="flag" class="h-5 w-5 text-gray-400" />
+                    @if($modalMode === 'view')
+                        <div class="grid grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Created At</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="calendar" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        @disabled($modalMode === 'view')
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                        value="{{ isset($form['created_at']) ? \Carbon\Carbon::parse($form['created_at'])->format('M d, Y H:i') : 'N/A' }}"
+                                    >
+                                </div>
                             </div>
-                            <select
-                                wire:model="form.status"
-                                @disabled($modalMode === 'view')
-                                class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
-                            >
-                                @foreach($this->availableStatuses as $value => $label)
-                                    <option value="{{ $value }}">{{ $label }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Issue Type</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <flux:icon name="exclamation-triangle" class="h-5 w-5 text-gray-400" />
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Updated At</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="calendar" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        @disabled($modalMode === 'view')
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                        value="{{ isset($form['updated_at']) ? \Carbon\Carbon::parse($form['updated_at'])->format('M d, Y H:i') : 'N/A' }}"
+                                    >
+                                </div>
                             </div>
-                            <input
-                                type="text"
-                                wire:model="form.issue_type"
-                                @disabled($modalMode === 'view')
-                                class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
-                            >
                         </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Priority</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <flux:icon name="bell" class="h-5 w-5 text-gray-400" />
-                            </div>
-                            <input
-                                type="text"
-                                wire:model="form.priority"
-                                @disabled($modalMode === 'view')
-                                class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
-                            >
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Requested By</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <flux:icon name="user" class="h-5 w-5 text-gray-400" />
-                            </div>
-                            <input
-                                type="text"
-                                wire:model="form.requested_by"
-                                @disabled($modalMode === 'view')
-                                class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
-                            >
-                        </div>
-                    </div>
-
-                    @if($form['completed_date'])
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Completed Date</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <flux:icon name="calendar" class="h-5 w-5 text-gray-400" />
-                            </div>
-                            <input
-                                type="text"
-                                value="{{ \Carbon\Carbon::parse($form['completed_date'])->format('M d, Y H:i') }}"
-                                disabled
-                                class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
-                            >
-                        </div>
-                    </div>
                     @endif
                 </div>
             </x-card.body>
 
             <x-card.footer>
-                <div class="flex justify-end space-x-3">
-                    <x-button type="button" wire:click="$set('showFormModal', false)" variant="primary">
-                        {{ $modalMode === 'view' ? 'Close' : 'Cancel' }}
-                    </x-button>
-                    
-                    @if($modalMode === 'view')
-                        @can('update_maintenance_status')
-                            <x-button type="button" wire:click="edit({{ $selectedRecord?->id }})" variant="primary">
-                                Edit
-                            </x-button>
-                        @endcan
-                    @else
+                <div class="flex justify-end space-x-2">
+                    @if($modalMode === 'edit')
+                        <x-button type="button" wire:click="$set('showModal', false)" variant="primary">
+                            Cancel
+                        </x-button>
                         <x-button type="button" wire:click="updateStatus" variant="primary">
-                            Save Changes
+                            Update
+                        </x-button>
+                    @else
+                        <x-button type="button" wire:click="$set('showModal', false)" variant="primary">
+                            Close
                         </x-button>
                     @endif
                 </div>
