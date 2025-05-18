@@ -230,8 +230,8 @@
 
                             <flux:navlist.item 
                                 icon="chart-bar" 
-                                :href="route('admin.occupancy-reports')" 
-                                :current="request()->routeIs('admin.occupancy-reports')" 
+                                :href="route('admin.analytics.occupancy-reports')" 
+                                :current="request()->routeIs('admin.analytics.occupancy-reports')" 
                                 class="transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2]"
                                 wire:navigate
                             >
@@ -263,15 +263,16 @@
 
                             <flux:navlist.item 
                                 icon="wrench-screwdriver" 
-                                :href="route('maintenance.requests')" 
-                                :current="request()->routeIs('maintenance.requests')" 
+                                :href="route('management.maintenance')" 
+                                :current="request()->routeIs('management.maintenance')" 
                                 class="transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2]"
                                 wire:navigate
                             >
                                 {{ __('maintenance_requests') }}
                             </flux:navlist.item>
 
-                            <flux:navlist.item 
+                            {{-- Temporarily disabled until service providers feature is implemented --}}
+                            {{-- <flux:navlist.item 
                                 icon="users" 
                                 :href="route('service-providers.index')" 
                                 :current="request()->routeIs('service-providers.index')" 
@@ -279,12 +280,13 @@
                                 wire:navigate
                             >
                                 {{ __('service_providers') }}
-                            </flux:navlist.item>
+                            </flux:navlist.item> --}}
                         </flux:navlist.group>
 
                         <!-- System Settings -->
                         <flux:navlist.group :heading="__('system')" class="grid gap-1 mt-4">
-                            <flux:navlist.item 
+                            {{-- Temporarily disabled until settings feature is implemented --}}
+                            {{-- <flux:navlist.item 
                                 icon="cog" 
                                 :href="route('admin.settings')" 
                                 :current="request()->routeIs('admin.settings')" 
@@ -292,9 +294,9 @@
                                 wire:navigate
                             >
                                 {{ __('system_settings') }}
-                            </flux:navlist.item>
+                            </flux:navlist.item> --}}
 
-                            <flux:navlist.item 
+                            {{-- <flux:navlist.item 
                                 icon="users" 
                                 :href="route('admin.users')" 
                                 :current="request()->routeIs('admin.users')" 
@@ -302,9 +304,9 @@
                                 wire:navigate
                             >
                                 {{ __('user_management') }}
-                            </flux:navlist.item>
+                            </flux:navlist.item> --}}
 
-                            <flux:navlist.item 
+                            {{-- <flux:navlist.item 
                                 icon="key" 
                                 :href="route('admin.roles')" 
                                 :current="request()->routeIs('admin.roles')" 
@@ -312,7 +314,7 @@
                                 wire:navigate
                             >
                                 {{ __('roles_permissions') }}
-                            </flux:navlist.item>
+                            </flux:navlist.item> --}}
                         </flux:navlist.group>
                 </flux:navlist.group>
             </flux:navlist>

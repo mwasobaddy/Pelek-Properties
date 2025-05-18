@@ -32,6 +32,34 @@ class ManagementContract extends Model
         'management_fee_percentage' => 'decimal:2',
         'base_fee' => 'decimal:2',
     ];
+    
+    /**
+     * Get the services included attribute.
+     *
+     * @param  mixed  $value
+     * @return array
+     */
+    public function getServicesIncludedAttribute($value)
+    {
+        // Always ensure this returns an array, even if null
+        if (is_null($value)) {
+            return [];
+        }
+        
+        // If it's already an array, return it
+        if (is_array($value)) {
+            return $value;
+        }
+        
+        // If it's a JSON string, decode it
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            return is_array($decoded) ? $decoded : [];
+        }
+        
+        // Default fallback
+        return [];
+    }
 
     public function property(): BelongsTo
     {

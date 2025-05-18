@@ -405,6 +405,16 @@
   - [x] Service Manager Role
 - [-] User Management Interface
 - [x] Role Assignment System
+- [ ] System Settings
+  - [ ] General Settings Management
+  - [ ] Email Configuration
+  - [ ] System Preferences
+  - [ ] Backup Management
+- [ ] Service Providers Management
+  - [ ] Service Provider CRUD
+  - [ ] Service Categories
+  - [ ] Provider Reviews System
+  - [ ] Provider Dashboard
 - [x] Granular Permissions:
   - [x] Property Management (8 permissions)
   - [x] Content Management (6 permissions)

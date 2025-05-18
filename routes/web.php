@@ -85,6 +85,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 ->name('occupancy-reports');
         });
 
+        // Audit logs route
+        Volt::route('/audit-logs', 'pages.admin.audit-logs')
+            ->name('audit-logs');
+
         // Reports routes
         Route::prefix('reports')->name('reports.')->group(function () {
             Volt::route('/', 'pages.admin.reports.index')

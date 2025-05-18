@@ -23,6 +23,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'manage_rental_properties',
             'manage_sale_properties',
             'manage_airbnb_properties',
+            'view_management_contract',
             'create_management_contract',
             'edit_management_contract',
             'terminate_management_contract',
