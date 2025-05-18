@@ -4,8 +4,8 @@
 
 @php
     $variantClasses = [
-        'default' => 'bg-white dark:bg-gray-800 rounded-lg shadow',
-        'shadowed' => 'bg-white dark:bg-gray-800 rounded-lg shadow-xl',
+        'default' => 'bg-white dark:bg-gray-800 rounded-lg',
+        'shadowed' => 'bg-white dark:bg-gray-800 rounded-lg',
         'outlined' => 'bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700'
     ][$variant];
 @endphp

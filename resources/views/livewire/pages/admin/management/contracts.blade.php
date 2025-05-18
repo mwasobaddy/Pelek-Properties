@@ -199,8 +199,6 @@ new class extends Component {
     }
     
     public function sort($field): void {
-        $this->isLoading = true;
-        
         if ($this->sortField === $field) {
             // Toggle direction if clicking on the same field
             $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
@@ -209,11 +207,6 @@ new class extends Component {
             $this->sortField = $field;
             $this->sortDirection = 'asc';
         }
-        
-        // Reset pagination when sorting changes
-        $this->resetPage();
-        
-        $this->isLoading = false;
     }
 
     public function toggleFilters(): void {
@@ -235,10 +228,6 @@ new class extends Component {
         ];
         $this->selectedContract = null;
     }
-
-    // public function toggleFilters(): void {
-    //     $this->showFilters = !$this->showFilters;
-    // }
 
     public function resetFilters(): void {
         $this->reset('filters');
@@ -268,133 +257,162 @@ new class extends Component {
     }
 }; ?>
 
-<div class="bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-2xl shadow-xl overflow-hidden">
+<div class="bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-2xl shadow-xl overflow-hidden relative">
     <!-- Header Section with Gradient -->
     <div class="h-2 bg-gradient-to-r from-[#02c9c2] to-[#012e2b]"></div>
     
     <div class="p-8 border-b border-gray-200 dark:border-gray-700">
-        <div class="sm:flex sm:items-center sm:justify-between">
+        <!-- Animated Header -->
+        <div class="sm:flex sm:items-center sm:justify-between" 
+             x-data="{}"
+             x-intersect="$el.classList.add('animate-fade-in')">
             <div class="space-y-2">
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Management Contracts</h1>
-                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">View and manage property management contracts</p>
+                <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white flex items-center gap-2">
+                    <flux:icon name="document-text" class="w-8 h-8 text-[#02c9c2]" />
+                    Management Contracts
+                </h2>
+                <p class="text-gray-600 dark:text-gray-300">
+                    Manage and track property management agreements
+                </p>
             </div>
             
             @can('create_management_contract')
                 <button 
-                    wire:click="create" 
+                    wire:click="create"
+                    class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#02c9c2] to-[#012e2b] text-white font-medium rounded-lg text-sm hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02c9c2] dark:focus:ring-offset-gray-900 transition-all duration-150 shadow-lg"
                     wire:loading.attr="disabled"
-                    class="inline-flex items-center px-4 py-2 bg-teal-600 border border-transparent rounded-lg font-semibold text-sm text-white tracking-wider hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition ease-in-out duration-150 shadow-sm"
                 >
-                    <svg wire:loading wire:target="create" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <svg class="w-5 h-5 mr-1.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" wire:loading.remove wire:target="create">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                    </svg>
-                    <span>Create Contract</span>
+                    <flux:icon wire:loading.remove name="plus" class="w-5 h-5 mr-2" />
+                    <flux:icon wire:loading name="arrow-path" class="w-5 h-5 mr-2 animate-spin" />
+                    New Contract
                 </button>
             @endcan
         </div>
 
-        <!-- Enhanced Search and Filters -->
-        <div class="mt-6">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <!-- Search with loading indicator -->
-                <div class="relative w-full md:w-96">
-                    <input 
-                        type="text" 
-                        wire:model.live.debounce.300ms="search" 
-                        placeholder="Search contracts..." 
-                        class="w-full px-4 py-2 pl-10 pr-10 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-500"
-                    >
-                    <!-- Search icon -->
-                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
+        <!-- Enhanced Search and Filters with Animation -->
+        <div class="mt-8 space-y-4" 
+             x-data="{}"
+             x-intersect="$el.classList.add('animate-fade-in')">
+            <div class="flex flex-col sm:flex-row gap-4">
+                <!-- Search Input -->
+                <div class="flex-1 relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <flux:icon wire:loading.remove wire:target="search" name="magnifying-glass" class="h-5 w-5 text-gray-400" />
+                        <flux:icon wire:loading wire:target="search" name="arrow-path" class="h-5 w-5 text-[#02c9c2] animate-spin" />
                     </div>
-                    <!-- Spinner when searching -->
-                    <div wire:loading wire:target="search" class="absolute inset-y-0 right-0 flex items-center pr-3">
-                        <svg class="animate-spin h-5 w-5 text-teal-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
+                    <div class="relative">
+                        <div class="pointer-events-none absolute inset-y-0 left-3 flex items-center">
+                            <flux:icon name="magnifying-glass"
+                                class="h-5 w-5 text-gray-400 group-focus-within:text-[#02c9c2] transition-colors duration-200" />
+                        </div>
+                        <input wire:model.live.debounce.300ms="search" type="text"
+                        placeholder="Search contracts..."
+                            class="block w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-3 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm">
                     </div>
                 </div>
-                
-                <!-- Filter Button with loading indicator -->
-                <button 
-                    wire:click="toggleFilters" 
-                    wire:loading.attr="disabled" 
-                    class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg font-medium text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition ease-in-out duration-150"
+
+                <!-- Filter Toggle Button -->
+                <button
+                    wire:click="toggleFilters"
+                    class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#02c9c2] to-[#012e2b] text-white rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02c9c2] dark:focus:ring-offset-gray-900 transition-all duration-150 shadow-sm backdrop-blur-xl"
                 >
-                    <svg wire:loading wire:target="toggleFilters" class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-gray-500 dark:text-gray-400" wire:loading.remove wire:target="toggleFilters" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                    </svg>
-                    <span>{{ $showFilters ? 'Hide Filters' : 'Show Filters' }}</span>
+                    <flux:icon name="funnel" class="w-5 h-5 mr-2" />
+                    Filters
+                    <span class="ml-2 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full px-2 py-0.5">
+                        {{ array_filter($filters) ? count(array_filter($filters)) : '0' }}
+                    </span>
                 </button>
             </div>
 
-            <!-- Animated Filters Panel -->
-            <div 
-                x-show="$wire.showFilters"
-                x-transition:enter="transition ease-out duration-300"
-                x-transition:enter-start="opacity-0 transform scale-95"
-                x-transition:enter-end="opacity-100 transform scale-100"
-                x-transition:leave="transition ease-in duration-200"
-                x-transition:leave-start="opacity-100 transform scale-100"
-                x-transition:leave-end="opacity-0 transform scale-95"
-                class="mt-4 p-6 rounded-xl bg-white/80 dark:bg-gray-800/50 backdrop-blur-xl shadow-lg ring-1 ring-black/5 dark:ring-white/10"
+            <!-- Filters Panel -->
+            <div x-show="$wire.showFilters"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 transform -translate-y-2"
+                 x-transition:enter-end="opacity-100 transform translate-y-0"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 transform translate-y-0"
+                 x-transition:leave-end="opacity-0 transform -translate-y-2"
+                 class="p-4 bg-white/50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 backdrop-blur-xl shadow-sm space-y-4"
             >
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <!-- Status Filter -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
-                        <select
-                            wire:model="filters.status"
-                            class="block w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:border-teal-500 focus:ring-teal-500"
-                        >
-                            <option value="">All Status</option>
-                            <option value="active">Active</option>
-                            <option value="pending">Pending</option>
-                            <option value="expired">Expired</option>
-                            <option value="terminated">Terminated</option>
-                        </select>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <flux:icon name="check-circle" class="h-5 w-5 text-gray-400" />
+                            </div>
+                            <select
+                                wire:model.live="filters.status"
+                                class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                            >
+                                <option value="">All Status</option>
+                                <option value="active">Active</option>
+                                <option value="pending">Pending</option>
+                                <option value="expired">Expired</option>
+                                <option value="terminated">Terminated</option>
+                            </select>
+                        </div>
                     </div>
 
                     <!-- Contract Type Filter -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contract Type</label>
-                        <select
-                            wire:model="filters.contract_type"
-                            class="block w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:border-teal-500 focus:ring-teal-500"
-                        >
-                            <option value="">All Types</option>
-                            <option value="full_service">Full Service</option>
-                            <option value="maintenance_only">Maintenance Only</option>
-                            <option value="financial_only">Financial Only</option>
-                        </select>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <flux:icon name="document-text" class="h-5 w-5 text-gray-400" />
+                            </div>
+                            <select
+                                wire:model.live="filters.contract_type"
+                                class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                            >
+                                <option value="">All Types</option>
+                                <option value="full_service">Full Service</option>
+                                <option value="maintenance_only">Maintenance Only</option>
+                                <option value="financial_only">Financial Only</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <!-- Reset Filters -->
-                    <div class="flex items-end">
-                        <button
-                            wire:click="resetFilters"
-                            wire:loading.attr="disabled"
-                            class="inline-flex items-center px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border border-transparent rounded-lg text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition ease-in-out duration-150"
-                        >
-                            <svg wire:loading wire:target="resetFilters" class="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            <span>Reset Filters</span>
-                        </button>
+                    <!-- Date Range Filter -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date Range</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <flux:icon name="calendar" class="h-5 w-5 text-gray-400" />
+                                </div>
+                                <select
+                                    wire:model.live="filters.date_range"
+                                    class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                >
+                                    <option value="">All Time</option>
+                                    <option value="today">Today</option>
+                                    <option value="this_week">This Week</option>
+                                    <option value="this_month">This Month</option>
+                                    <option value="this_year">This Year</option>
+                                </select>
+                        </div>
+
                     </div>
+                </div>
+                
+
+                <!-- Filter Actions -->
+                <div class="flex flex-col md:flex-row items-center justify-center gap-4 col-span-2 mt-2">
+
+                    <!-- Reset Filters Button -->
+                    <button wire:click="resetFilters"
+                        class="group relative overflow-hidden rounded-lg bg-gradient-to-r from-[#02c9c2] to-[#02a8a2] px-5 py-2.5 text-sm font-medium text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]">
+                        <!-- Background animation on hover -->
+                        <span
+                            class="absolute inset-0 translate-y-full bg-gradient-to-r from-[#012e2b] to-[#014e4a] group-hover:translate-y-0 transition-transform duration-300 ease-out"></span>
+                        <!-- Content remains visible -->
+                        <span class="relative flex items-center gap-2">
+                            <flux:icon name="arrow-path"
+                                class="h-4 w-4 transition-transform group-hover:rotate-180 duration-500" />
+                            <span>Clear All Filters</span>
+                        </span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -402,197 +420,165 @@ new class extends Component {
 
     <!-- Contract Table with Modern Styling -->
     <div class="p-8">
-        <div class="overflow-x-auto">
-            <!-- Empty state handling -->
-            @if($this->contracts->isEmpty())
-                <div class="flex flex-col items-center justify-center py-12 text-center">
-                    <svg class="h-16 w-16 text-gray-400 dark:text-gray-600 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                    </svg>
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200">No contracts found</h3>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        {{ $search || $filters['status'] || $filters['contract_type'] ? 'Try adjusting your search or filters.' : 'Get started by creating your first contract.' }}
-                    </p>
-                    @can('create_management_contract')
-                        @if(!$search && !$filters['status'] && !$filters['contract_type'])
-                            <button 
-                                wire:click="create"
-                                wire:loading.attr="disabled"
-                                class="mt-4 inline-flex items-center px-4 py-2 bg-teal-600 border border-transparent rounded-lg font-semibold text-sm text-white tracking-wider hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition ease-in-out duration-150 shadow-sm"
-                            >
-                                <svg wire:loading wire:target="create" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                <svg class="w-5 h-5 mr-1.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" wire:loading.remove wire:target="create">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                                </svg>
-                                <span>Create Contract</span>
-                            </button>
-                        @endif
-                    @endcan
+        <div class="relative overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 backdrop-blur-xl">
+            <!-- Loading Overlay -->
+            <div wire:loading.delay class="absolute inset-0 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm z-10 flex items-center justify-center">
+                <div class="flex items-center space-x-4">
+                    <flux:icon name="arrow-path" class="w-8 h-8 text-[#02c9c2] animate-spin" />
+                    <span class="text-gray-600 dark:text-gray-300 font-medium">Loading contracts...</span>
                 </div>
-            @else
-                <!-- Global loading indicator for the entire table -->
-                <div wire:loading wire:target="sort, contracts" class="absolute inset-0 bg-white/50 dark:bg-gray-800/50 flex items-center justify-center rounded-lg z-10 backdrop-blur-sm">
-                    <div class="flex flex-col items-center">
-                        <svg class="animate-spin h-10 w-10 text-teal-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        <span class="mt-2 text-sm font-medium text-gray-700 dark:text-gray-300">Loading contracts...</span>
-                    </div>
-                </div>
-                
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 relative">
-                    <thead class="bg-gray-50 dark:bg-gray-800">
-                        <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer select-none" wire:click="sort('property.title')">
-                                <div class="flex items-center space-x-1">
-                                    <span>Property</span>
-                                    <span class="flex flex-col">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 {{ $sortField === 'property.title' && $sortDirection === 'asc' ? 'text-teal-500' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-                                        </svg>
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 -mt-1 {{ $sortField === 'property.title' && $sortDirection === 'desc' ? 'text-teal-500' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                        </svg>
-                                    </span>
+            </div>
+
+            <!-- Table -->
+            <table class="w-full text-left">
+                <thead class="bg-gray-50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-300 text-sm">
+                    <tr>
+                        <th wire:click="sort('property_name')" class="px-6 py-4 font-medium cursor-pointer hover:text-[#02c9c2] transition-colors duration-150">
+                            <div class="flex items-center space-x-1">
+                                <span>Property</span>
+                                @if($sortField === 'property_name')
+                                    <flux:icon name="{{ $sortDirection === 'asc' ? 'arrow-up' : 'arrow-down' }}" class="w-4 h-4" />
+                                @endif
+                            </div>
+                        </th>
+                        <th wire:click="sort('contract_type')" class="px-6 py-4 font-medium cursor-pointer hover:text-[#02c9c2] transition-colors duration-150">
+                            <div class="flex items-center space-x-1">
+                                <span>Type</span>
+                                @if($sortField === 'contract_type')
+                                    <flux:icon name="{{ $sortDirection === 'asc' ? 'arrow-up' : 'arrow-down' }}" class="w-4 h-4" />
+                                @endif
+                            </div>
+                        </th>
+                        <th wire:click="sort('start_date')" class="px-6 py-4 font-medium cursor-pointer hover:text-[#02c9c2] transition-colors duration-150">
+                            <div class="flex items-center space-x-1">
+                                <span>Start Date</span>
+                                @if($sortField === 'start_date')
+                                    <flux:icon name="{{ $sortDirection === 'asc' ? 'arrow-up' : 'arrow-down' }}" class="w-4 h-4" />
+                                @endif
+                            </div>
+                        </th>
+                        <th wire:click="sort('end_date')" class="px-6 py-4 font-medium cursor-pointer hover:text-[#02c9c2] transition-colors duration-150">
+                            <div class="flex items-center space-x-1">
+                                <span>End Date</span>
+                                @if($sortField === 'end_date')
+                                    <flux:icon name="{{ $sortDirection === 'asc' ? 'arrow-up' : 'arrow-down' }}" class="w-4 h-4" />
+                                @endif
+                            </div>
+                        </th>
+                        <th wire:click="sort('status')" class="px-6 py-4 font-medium cursor-pointer hover:text-[#02c9c2] transition-colors duration-150">
+                            <div class="flex items-center space-x-1">
+                                <span>Status</span>
+                                @if($sortField === 'status')
+                                    <flux:icon name="{{ $sortDirection === 'asc' ? 'arrow-up' : 'arrow-down' }}" class="w-4 h-4" />
+                                @endif
+                            </div>
+                        </th>
+                        <th class="px-6 py-4 font-medium text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                    @forelse($this->contracts as $contract)
+                        <tr class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                                        <flux:icon name="building-office" class="w-6 h-6 text-gray-500 dark:text-gray-400" />
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-gray-900 dark:text-white">
+                                            {{ $contract->property->title }}
+                                        </div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                                            ID: {{ $contract->id }}
+                                        </div>
+                                    </div>
                                 </div>
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer select-none" wire:click="sort('contract_type')">
-                                <div class="flex items-center space-x-1">
-                                    <span>Contract Type</span>
-                                    <span class="flex flex-col">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 {{ $sortField === 'contract_type' && $sortDirection === 'asc' ? 'text-teal-500' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-                                        </svg>
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 -mt-1 {{ $sortField === 'contract_type' && $sortDirection === 'desc' ? 'text-teal-500' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                        </svg>
-                                    </span>
-                                </div>
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer select-none" wire:click="sort('start_date')">
-                                <div class="flex items-center space-x-1">
-                                    <span>Start Date</span>
-                                    <span class="flex flex-col">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 {{ $sortField === 'start_date' && $sortDirection === 'asc' ? 'text-teal-500' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-                                        </svg>
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 -mt-1 {{ $sortField === 'start_date' && $sortDirection === 'desc' ? 'text-teal-500' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                        </svg>
-                                    </span>
-                                </div>
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer select-none" wire:click="sort('end_date')">
-                                <div class="flex items-center space-x-1">
-                                    <span>End Date</span>
-                                    <span class="flex flex-col">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 {{ $sortField === 'end_date' && $sortDirection === 'asc' ? 'text-teal-500' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-                                        </svg>
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 -mt-1 {{ $sortField === 'end_date' && $sortDirection === 'desc' ? 'text-teal-500' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                        </svg>
-                                    </span>
-                                </div>
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer select-none" wire:click="sort('status')">
-                                <div class="flex items-center space-x-1">
-                                    <span>Status</span>
-                                    <span class="flex flex-col">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 {{ $sortField === 'status' && $sortDirection === 'asc' ? 'text-teal-500' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke-width="2" d="M5 15l7-7 7 7" />
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 -mt-1 {{ $sortField === 'status' && $sortDirection === 'desc' ? 'text-teal-500' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                    </span>
-                                </div>
-                            </th>
-                            <th scope="col" class="relative px-6 py-3">
-                                <span class="sr-only">Actions</span>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                        @foreach($this->contracts as $contract)
-                            <tr wire:key="{{ $contract->id }}" class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-200">
-                                    {{ $contract->property->title }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
-                                    {{ ucfirst(str_replace('_', ' ', $contract->contract_type)) }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
-                                    {{ $contract->start_date->format('M d, Y') }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
-                                    {{ $contract->end_date->format('M d, Y') }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                                        {{ $contract->status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : '' }}
-                                        {{ $contract->status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : '' }}
-                                        {{ $contract->status === 'expired' ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' : '' }}
-                                        {{ $contract->status === 'terminated' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : '' }}
-                                    ">
-                                        {{ ucfirst($contract->status) }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                    {{ match($contract->contract_type) {
+                                        'full_service' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
+                                        'maintenance_only' => 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300',
+                                        'financial_only' => 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300',
+                                        default => 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300'
+                                    }
+                                    }}">
+                                    {{ str_replace('_', ' ', ucfirst($contract->contract_type)) }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600 dark:text-gray-300">
+                                {{ date('M d, Y', strtotime($contract->start_date)) }}
+                            </td>
+                            <td class="px-6 py-4 text-gray-600 dark:text-gray-300">
+                                {{ date('M d, Y', strtotime($contract->end_date)) }}
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                    {{ match($contract->status) {
+                                        'active' => 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
+                                        'pending' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300',
+                                        'expired' => 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300',
+                                        'terminated' => 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300'
+                                    };
+                                    }}">
+                                    {{ ucfirst($contract->status) }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center justify-end space-x-3">
                                     <button 
                                         wire:click="view({{ $contract->id }})"
-                                        wire:loading.attr="disabled"
-                                        class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 dark:border-gray-700 text-xs font-medium rounded text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition ease-in-out duration-150"
+                                        class="text-gray-200 dark:text-gray-300 hover:text-[#02c9c2] dark:hover:text-[#02c9c2] transition-colors duration-150 bg-indigo-500 dark:bg-indigo-700/50 rounded-lg p-2"
+                                        title="View Contract"
                                     >
-                                        <svg wire:loading wire:target="view({{ $contract->id }})" class="animate-spin -ml-1 mr-1 h-3 w-3 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        <svg wire:loading.remove wire:target="view({{ $contract->id }})" class="h-4 w-4 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
+                                        <flux:icon wire:loading.remove wire:target="view({{ $contract->id }})" name="eye" class="w-5 h-5" />
+                                        <flux:icon wire:loading wire:target="view({{ $contract->id }})" name="arrow-path" class="w-5 h-5 animate-spin" />
                                     </button>
-
+                                    
                                     @can('edit_management_contract')
                                         <button 
                                             wire:click="edit({{ $contract->id }})"
-                                            wire:loading.attr="disabled" 
-                                            class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 dark:border-gray-700 text-xs font-medium rounded text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition ease-in-out duration-150"
+                                            class="text-gray-200 dark:text-gray-300 hover:text-[#02c9c2] dark:hover:text-[#02c9c2] transition-colors duration-150 bg-green-500 dark:bg-green-700/50 rounded-lg p-2"
+                                            title="Edit Contract"
                                         >
-                                            <svg wire:loading wire:target="edit({{ $contract->id }})" class="animate-spin -ml-1 mr-1 h-3 w-3 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                            </svg>
-                                            <svg wire:loading.remove wire:target="edit({{ $contract->id }})" class="h-4 w-4 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                                            </svg>
+                                            <flux:icon wire:loading.remove wire:target="edit({{ $contract->id }})" name="pencil" class="w-5 h-5" />
+                                            <flux:icon wire:loading wire:target="edit({{ $contract->id }})" name="arrow-path" class="w-5 h-5 animate-spin" />
                                         </button>
                                     @endcan
-
+                                    
                                     @can('terminate_management_contract')
                                         <button 
                                             wire:click="confirmDelete({{ $contract->id }})"
-                                            wire:loading.attr="disabled"
-                                            class="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition ease-in-out duration-150"
+                                            class="text-gray-200 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-500 transition-colors duration-150 bg-red-500 dark:bg-red-700/50 rounded-lg p-2"
+                                            title="Delete Contract"
                                         >
-                                            <svg wire:loading wire:target="confirmDelete({{ $contract->id }})" class="animate-spin -ml-1 mr-1 h-3 w-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                            </svg>
-                                            <svg wire:loading.remove wire:target="confirmDelete({{ $contract->id }})" class="h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                                            </svg>
+                                            <flux:icon wire:loading.remove wire:target="confirmDelete({{ $contract->id }})" name="trash" class="w-5 h-5" />
+                                            <flux:icon wire:loading wire:target="confirmDelete({{ $contract->id }})" name="arrow-path" class="w-5 h-5 animate-spin" />
                                         </button>
                                     @endcan
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="px-6 py-12">
+                                <div class="text-center">
+                                    <flux:icon name="folder-open" class="mx-auto h-12 w-12 text-gray-400" />
+                                    <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No contracts found</h3>
+                                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                        {{ $search ? 'Try adjusting your search or filter criteria.' : 'Get started by creating a new contract.' }}
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
 
-                <div class="mt-4">
-                    {{ $this->contracts->links() }}
+            <!-- Pagination -->
+            @if($this->contracts->hasPages())
+                <div class="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700">
+                    {{ $this->contracts->links('components.pagination') }}
                 </div>
             @endif
         </div>
@@ -601,283 +587,251 @@ new class extends Component {
     <!-- Enhanced Contract Form Modal -->
     <flux:modal wire:model="showFormModal" class="w-full max-w-4xl" @close="$wire.resetForm()">
         <x-card class="w-full overflow-hidden rounded-xl">
-            <!-- Modal Header with Gradient -->
-            <div class="h-1.5 w-full bg-gradient-to-r from-[#02c9c2] to-[#012e2b]"></div>
-            
-            <x-card.header class="bg-gray-50 dark:bg-gray-800 py-6">
-                <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">
-                    {{ $modalMode === 'create' ? 'Create Contract' : ($modalMode === 'edit' ? 'Edit Contract' : 'View Contract') }}
+            <x-card.header>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                    {{ $modalMode === 'create' ? 'New Contract' : ($modalMode === 'edit' ? 'Edit Contract' : 'View Contract') }}
                 </h3>
             </x-card.header>
 
-            <x-card.body class="p-6">
-                <form wire:submit="save" class="space-y-6">
-                    <!-- Loading Overlay -->
-                    <div wire:loading wire:target="save" class="absolute inset-0 bg-white/50 dark:bg-gray-800/50 flex items-center justify-center rounded-lg z-10 backdrop-blur-sm">
-                        <div class="flex flex-col items-center">
-                            <svg class="animate-spin h-10 w-10 text-teal-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            <span class="mt-2 text-sm font-medium text-gray-700 dark:text-gray-300">{{ $modalMode === 'create' ? 'Creating' : 'Updating' }} contract...</span>
-                        </div>
-                    </div>
-                
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Property</label>
+            <x-card.body>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Property Selection -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Property</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <flux:icon name="building-office" class="h-5 w-5 text-gray-400" />
+                            </div>
                             <select
                                 wire:model="form.property_id"
-                                class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:border-teal-500 focus:ring-teal-500"
-                                {{ $modalMode === 'view' ? 'disabled' : '' }}
+                                @disabled($modalMode === 'view')
+                                class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
                             >
-                                <option value="">Select a property</option>
+                                <option value="">Select Property</option>
                                 @foreach($this->properties as $id => $name)
                                     <option value="{{ $id }}">{{ $name }}</option>
                                 @endforeach
                             </select>
-                            @error('form.property_id') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
                         </div>
+                        @error('form.property_id') 
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Contract Type</label>
+                    <!-- Contract Type -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contract Type</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <flux:icon name="document-text" class="h-5 w-5 text-gray-400" />
+                            </div>
                             <select
                                 wire:model="form.contract_type"
-                                class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:border-teal-500 focus:ring-teal-500"
-                                {{ $modalMode === 'view' ? 'disabled' : '' }}
+                                @disabled($modalMode === 'view')
+                                class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
                             >
-                                <option value="">Select type</option>
+                                <option value="">Select Type</option>
                                 <option value="full_service">Full Service</option>
                                 <option value="maintenance_only">Maintenance Only</option>
                                 <option value="financial_only">Financial Only</option>
                             </select>
-                            @error('form.contract_type') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
                         </div>
+                        @error('form.contract_type')
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Management Fee (%)</label>
-                            <input 
-                                type="number" 
-                                wire:model="form.management_fee_percentage"
-                                min="0"
-                                max="100"
-                                step="0.01"
-                                class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:border-teal-500 focus:ring-teal-500"
-                                {{ $modalMode === 'view' ? 'disabled' : '' }}
-                            >
-                            @error('form.management_fee_percentage') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
-                        </div>
+                    <!-- Management Fee -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Management Fee (%)</label>
+                        <input
+                            type="number"
+                            wire:model="form.management_fee_percentage"
+                            @disabled($modalMode === 'view')
+                            class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                            min="0"
+                            max="100"
+                            step="0.01"
+                        >
+                        @error('form.management_fee_percentage')
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Base Fee</label>
-                            <div class="mt-1 relative rounded-md shadow-sm">
-                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                    <span class="text-gray-500 sm:text-sm">$</span>
-                                </div>
-                                <input
-                                    type="number" 
-                                    wire:model="form.base_fee"
-                                    min="0"
-                                    step="0.01"
-                                    class="pl-7 block w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:border-teal-500 focus:ring-teal-500"
-                                    {{ $modalMode === 'view' ? 'disabled' : '' }}
-                                >
+                    <!-- Base Fee -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Base Fee</label>
+                        <input
+                            type="number"
+                            wire:model="form.base_fee"
+                            @disabled($modalMode === 'view')
+                            class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                            min="0"
+                            step="0.01"
+                        >
+                        @error('form.base_fee')
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Start Date -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Date</label>
+                        <input
+                            type="date"
+                            wire:model="form.start_date"
+                            @disabled($modalMode === 'view')
+                            class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                        >
+                        @error('form.start_date')
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- End Date -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End Date</label>
+                        <input
+                            type="date"
+                            wire:model="form.end_date"
+                            @disabled($modalMode === 'view')
+                            class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                        >
+                        @error('form.end_date')
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Payment Schedule -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Payment Schedule</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <flux:icon name="calendar" class="h-5 w-5 text-gray-400" />
                             </div>
-                            @error('form.base_fee') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Start Date</label>
-                            <input 
-                                type="date" 
-                                wire:model="form.start_date"
-                                class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:border-teal-500 focus:ring-teal-500"
-                                {{ $modalMode === 'view' ? 'disabled' : '' }}
-                            >
-                            @error('form.start_date') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">End Date</label>
-                            <input 
-                                type="date" 
-                                wire:model="form.end_date"
-                                class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:border-teal-500 focus:ring-teal-500"
-                                {{ $modalMode === 'view' ? 'disabled' : '' }}
-                            >
-                            @error('form.end_date') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Payment Schedule</label>
                             <select
                                 wire:model="form.payment_schedule"
-                                class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:border-teal-500 focus:ring-teal-500"
-                                {{ $modalMode === 'view' ? 'disabled' : '' }}
+                                @disabled($modalMode === 'view')
+                                class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
                             >
-                                <option value="">Select schedule</option>
+                                <option value="">Select Schedule</option>
                                 <option value="monthly">Monthly</option>
                                 <option value="quarterly">Quarterly</option>
                                 <option value="yearly">Yearly</option>
                             </select>
-                            @error('form.payment_schedule') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
                         </div>
+                        @error('form.payment_schedule')
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                    <!-- Status -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <flux:icon name="check-circle" class="h-5 w-5 text-gray-400" />
+                            </div>
                             <select
                                 wire:model="form.status"
-                                class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:border-teal-500 focus:ring-teal-500"
-                                {{ $modalMode === 'view' ? 'disabled' : '' }}
+                                @disabled($modalMode === 'view')
+                                class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
                             >
                                 <option value="active">Active</option>
                                 <option value="pending">Pending</option>
                                 <option value="expired">Expired</option>
                                 <option value="terminated">Terminated</option>
                             </select>
-                            @error('form.status') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
                         </div>
+                        @error('form.status')
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
                     </div>
 
-                    <div class="col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Services Included</label>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            @php
-                                $serviceOptions = [
-                                    'tenant_management' => 'Tenant Management',
-                                    'maintenance' => 'Maintenance',
-                                    'financial_reporting' => 'Financial Reporting', 
-                                    'marketing' => 'Marketing',
-                                    'legal_compliance' => 'Legal Compliance'
-                                ];
-                            @endphp
-                            @foreach($serviceOptions as $value => $label)
-                                <label class="inline-flex items-center">
-                                    <input 
-                                        type="checkbox" 
-                                        wire:model="form.services_included" 
-                                        value="{{ $value }}" 
-                                        class="rounded border-gray-300 text-teal-600 shadow-sm focus:border-teal-300 focus:ring focus:ring-teal-200 focus:ring-opacity-50 dark:border-gray-700 dark:bg-gray-900"
-                                        {{ $modalMode === 'view' ? 'disabled' : '' }}
-                                    >
-                                    <span class="ml-2 text-gray-700 dark:text-gray-300 text-sm">{{ $label }}</span>
-                                </label>
-                            @endforeach
-                        </div>
-                        @error('form.services_included') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Special Terms</label>
-                        <textarea 
+                    <!-- Special Terms -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Special Terms</label>
+                        <textarea
                             wire:model="form.special_terms"
-                            rows="3"
-                            class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:border-teal-500 focus:ring-teal-500"
-                            {{ $modalMode === 'view' ? 'disabled' : '' }}
+                            @disabled($modalMode === 'view')
+                            rows="4"
+                            class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                            placeholder="Enter any special terms or conditions..."
                         ></textarea>
-                        @error('form.special_terms') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
+                        @error('form.special_terms')
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
                     </div>
-
-                    @if($modalMode !== 'view')
-                        <div class="flex justify-end space-x-3">
-                            <button
-                                type="button"
-                                wire:click="$set('showFormModal', false)"
-                                class="inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-700 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                            >
-                                Cancel
-                            </button>
-                            
-                            <button
-                                type="submit"
-                                wire:loading.attr="disabled"
-                                class="inline-flex items-center justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                <svg wire:loading wire:target="save" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                <span>{{ $modalMode === 'create' ? 'Create Contract' : 'Update Contract' }}</span>
-                            </button>
-                        </div>
-                    @else
-                        <div class="flex justify-end">
-                            <button
-                                type="button"
-                                wire:click="$set('showFormModal', false)"
-                                class="inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-700 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                            >
-                                Close
-                            </button>
-                        </div>
-                    @endif
-                </form>
+                </div>
             </x-card.body>
+
+            <x-card.footer>
+                <div class="flex justify-end space-x-3">
+                    @if($modalMode !== 'view')
+                        <flux:button wire:click="$set('showFormModal', false)">
+                            Cancel
+                        </flux:button>
+                        <flux:button wire:click="save" variant="primary" class="bg-[#02c9c2] hover:bg-[#02c9c2]/90">
+                            <flux:icon wire:loading wire:target="save" name="arrow-path" class="w-4 h-4 mr-2 animate-spin" />
+                            {{ $modalMode === 'create' ? 'Create Contract' : 'Update Contract' }}
+                        </flux:button>
+                    @else
+                        <flux:button wire:click="$set('showFormModal', false)">
+                            Close
+                        </flux:button>
+                    @endif
+                </div>
+            </x-card.footer>
         </x-card>
     </flux:modal>
 
     <!-- Enhanced Delete Confirmation Modal -->
     <flux:modal wire:model="showDeleteModal" max-width="md">
         <x-card class="overflow-hidden rounded-xl">
-            <div class="h-1.5 w-full bg-gradient-to-r from-red-500 to-red-700"></div>
-            
-            <x-card.header class="bg-red-50 dark:bg-red-900/20">
-                <h3 class="text-lg leading-6 font-medium text-red-800 dark:text-red-200">
-                    Delete Contract
+            <x-card.header>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
+                    <flux:icon name="exclamation-circle" class="w-6 h-6 text-red-600 mr-2" />
+                    Confirm Deletion
                 </h3>
             </x-card.header>
 
-            <x-card.body class="p-6">
-                <!-- Loading overlay -->
-                <div wire:loading wire:target="delete" class="absolute inset-0 bg-white/50 dark:bg-gray-800/50 flex items-center justify-center z-10 backdrop-blur-sm">
-                    <svg class="animate-spin h-10 w-10 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                </div>
-                
-                <div class="sm:flex sm:items-start">
-                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/30 sm:mx-0 sm:h-10 sm:w-10">
-                        <svg class="h-6 w-6 text-red-600 dark:text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-                        </svg>
+            <x-card.body>
+                <p class="text-gray-600 dark:text-gray-300">
+                    Are you sure you want to delete this contract? This action cannot be undone.
+                </p>
+                @if($selectedContract)
+                    <div class="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <dl class="space-y-2">
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Property</dt>
+                                <dd class="text-sm text-gray-900 dark:text-white">{{ $selectedContract->property->title }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Contract Type</dt>
+                                <dd class="text-sm text-gray-900 dark:text-white">{{ str_replace('_', ' ', ucfirst($selectedContract->contract_type)) }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Duration</dt>
+                                <dd class="text-sm text-gray-900 dark:text-white">
+                                    {{ date('M d, Y', strtotime($selectedContract->start_date)) }} - 
+                                    {{ date('M d, Y', strtotime($selectedContract->end_date)) }}
+                                </dd>
+                            </div>
+                        </dl>
                     </div>
-                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
-                            Confirm Deletion
-                        </h3>
-                        <div class="mt-2">
-                            <p class="text-sm text-gray-500 dark:text-gray-400">
-                                Are you sure you want to delete the contract for 
-                                <span class="font-semibold text-gray-900 dark:text-gray-200">{{ $selectedContract?->property?->title }}</span>? 
-                                This action cannot be undone.
-                            </p>
-                        </div>
-                    </div>
-                </div>
+                @endif
             </x-card.body>
 
-            <x-card.footer class="flex justify-end space-x-3">
-                <button 
-                    type="button"
-                    wire:click="$set('showDeleteModal', false)"
-                    wire:loading.attr="disabled"
-                    class="inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-700 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition"
-                >
-                    Cancel
-                </button>
-                <button 
-                    type="button" 
-                    wire:click="delete"
-                    wire:loading.attr="disabled"
-                    class="inline-flex items-center justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    <svg wire:loading wire:target="delete" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <span>Delete Contract</span>
-                </button>
+            <x-card.footer>
+                <div class="flex justify-end space-x-3">
+                    <flux:button wire:click="$set('showDeleteModal', false)">
+                        Cancel
+                    </flux:button>
+                    <flux:button wire:click="delete" variant="danger" class="bg-red-600 hover:bg-red-700">
+                        <flux:icon wire:loading wire:target="delete" name="arrow-path" class="w-4 h-4 mr-2 animate-spin" />
+                        Delete Contract
+                    </flux:button>
+                </div>
             </x-card.footer>
         </x-card>
     </flux:modal>
