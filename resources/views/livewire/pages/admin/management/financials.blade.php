@@ -12,9 +12,6 @@ new class extends Component {
     use WithPagination;
 
     #[State]
-    public $records;
-
-    #[State]
     public $currentMonthRevenue;
 
     #[State]
@@ -41,13 +38,24 @@ new class extends Component {
     #[State]
     public $sortDirection = 'desc';
 
+    #[State]
+    public $showFilters = false;
+
+    #[State]
+    public $filters = [
+        'status' => '',
+        'payment_method' => '',
+        'transaction_type' => '',
+        'date_range' => '',
+    ];
+
     public function mount(FinancialService $financialService): void 
     {
         $this->currentMonthRevenue = $financialService->getCurrentMonthRevenue();
-        $this->loadRecords();
     }
 
-    public function loadRecords(): void
+    #[Computed]
+    public function records()
     {
         $query = FinancialRecord::with(['property', 'recordedBy'])
             ->where('status', 'completed');
@@ -57,6 +65,44 @@ new class extends Component {
             $query->whereHas('property', function($q) {
                 $q->where('title', 'like', '%' . $this->search . '%');
             })->orWhere('category', 'like', '%' . $this->search . '%');
+        }
+
+        // Apply status filter
+        if ($this->filters['status']) {
+            $query->where('status', $this->filters['status']);
+        }
+
+        // Apply payment method filter
+        if ($this->filters['payment_method']) {
+            $query->where('payment_method', $this->filters['payment_method']);
+        }
+
+        // Apply transaction type filter
+        if ($this->filters['transaction_type']) {
+            $query->where('transaction_type', $this->filters['transaction_type']);
+        }
+
+        // Apply date range filter
+        if ($this->filters['date_range']) {
+            switch ($this->filters['date_range']) {
+                case 'today':
+                    $query->whereDate('transaction_date', Carbon::today());
+                    break;
+                case 'this_week':
+                    $query->whereBetween('transaction_date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
+                    break;
+                case 'this_month':
+                    $query->whereMonth('transaction_date', Carbon::now()->month)
+                          ->whereYear('transaction_date', Carbon::now()->year);
+                    break;
+                case 'last_month':
+                    $query->whereMonth('transaction_date', Carbon::now()->subMonth()->month)
+                          ->whereYear('transaction_date', Carbon::now()->subMonth()->year);
+                    break;
+                case 'this_year':
+                    $query->whereYear('transaction_date', Carbon::now()->year);
+                    break;
+            }
         }
 
         // Apply date filter
@@ -73,7 +119,85 @@ new class extends Component {
             $query->where('transaction_type', $this->typeFilter);
         }
 
-        $this->records = $query->orderBy($this->sortField, $this->sortDirection)->get();
+        return $query->orderBy($this->sortField, $this->sortDirection)->paginate(10);
+    }
+
+    public function toggleFilters(): void
+    {
+        $this->showFilters = !$this->showFilters;
+    }
+
+    public function resetFilters(): void
+    {
+        $this->reset('filters');
+        $this->loadRecords();
+    }
+
+    public function loadRecords(): void
+    {
+        $query = FinancialRecord::with(['property', 'recordedBy'])
+            ->where('status', 'completed');
+
+        // Apply search filter
+        if ($this->search) {
+            $query->whereHas('property', function($q) {
+                $q->where('title', 'like', '%' . $this->search . '%');
+            })->orWhere('category', 'like', '%' . $this->search . '%');
+        }
+
+        // Apply status filter
+        if ($this->filters['status']) {
+            $query->where('status', $this->filters['status']);
+        }
+
+        // Apply payment method filter
+        if ($this->filters['payment_method']) {
+            $query->where('payment_method', $this->filters['payment_method']);
+        }
+
+        // Apply transaction type filter
+        if ($this->filters['transaction_type']) {
+            $query->where('transaction_type', $this->filters['transaction_type']);
+        }
+
+        // Apply date range filter
+        if ($this->filters['date_range']) {
+            switch ($this->filters['date_range']) {
+                case 'today':
+                    $query->whereDate('transaction_date', Carbon::today());
+                    break;
+                case 'this_week':
+                    $query->whereBetween('transaction_date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
+                    break;
+                case 'this_month':
+                    $query->whereMonth('transaction_date', Carbon::now()->month)
+                          ->whereYear('transaction_date', Carbon::now()->year);
+                    break;
+                case 'last_month':
+                    $query->whereMonth('transaction_date', Carbon::now()->subMonth()->month)
+                          ->whereYear('transaction_date', Carbon::now()->subMonth()->year);
+                    break;
+                case 'this_year':
+                    $query->whereYear('transaction_date', Carbon::now()->year);
+                    break;
+            }
+        }
+
+        // Apply date filter
+        if ($this->dateFilter === 'current_month') {
+            $query->whereMonth('transaction_date', Carbon::now()->month)
+                  ->whereYear('transaction_date', Carbon::now()->year);
+        } elseif ($this->dateFilter === 'last_month') {
+            $query->whereMonth('transaction_date', Carbon::now()->subMonth()->month)
+                  ->whereYear('transaction_date', Carbon::now()->subMonth()->year);
+        }
+
+        // Apply type filter
+        if ($this->typeFilter !== 'all') {
+            $query->where('transaction_type', $this->typeFilter);
+        }
+
+        $this->records = $query->orderBy($this->sortField, $this->sortDirection)->paginate(10);
     }
 
     public function filterByDate($filter): void
@@ -148,104 +272,138 @@ new class extends Component {
             <div class="bg-white/50 dark:bg-gray-800/50 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 backdrop-blur-xl">
                 <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Revenue</h3>
                 <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
-                    KES {{ number_format($records->sum('amount'), 2) }}
+                    KES {{ number_format($this->records->sum('amount'), 2) }}
                 </p>
             </div>
             <div class="bg-white/50 dark:bg-gray-800/50 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 backdrop-blur-xl">
                 <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Expenses</h3>
                 <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
-                    KES {{ number_format($records->where('transaction_type', 'expense')->sum('amount'), 2) }}
+                    KES {{ number_format($this->records->where('transaction_type', 'expense')->sum('amount'), 2) }}
                 </p>
             </div>
         </div>
 
         <!-- Search and Filter Section -->
         <div class="mt-8 space-y-4" x-data="{}" x-intersect="$el.classList.add('animate-fade-in')">
-            <!-- Search Input -->
-            <div class="flex-1 relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <flux:icon wire:loading.remove wire:target="search" name="magnifying-glass" class="h-5 w-5 text-gray-400" />
-                    <flux:icon wire:loading wire:target="search" name="arrow-path" class="h-5 w-5 text-[#02c9c2] animate-spin" />
-                </div>
-                <div class="relative">
+            <div class="flex flex-col sm:flex-row gap-4">
+                <!-- Search Input -->
+                <div class="flex-1 relative">
                     <div class="pointer-events-none absolute inset-y-0 left-3 flex items-center">
-                        <flux:icon name="magnifying-glass"
-                            class="h-5 w-5 text-gray-400 group-focus-within:text-[#02c9c2] transition-colors duration-200" />
+                        <flux:icon wire:loading.remove wire:target="search" name="magnifying-glass" class="h-5 w-5 text-gray-400 group-focus-within:text-[#02c9c2] transition-colors duration-200" />
+                        <flux:icon wire:loading wire:target="search" name="arrow-path" class="h-5 h-5 text-[#02c9c2] animate-spin" />
                     </div>
                     <input wire:model.live.debounce.300ms="search" type="text"
-                        placeholder="Search by property, category, or type..."
+                        placeholder="Search by property, category, or reference..."
                         class="block w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-3 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
                         aria-label="Search financial records"
                     >
                 </div>
+
+                <!-- Filter Toggle Button -->
+                <button
+                    wire:click="toggleFilters"
+                    class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#02c9c2] to-[#012e2b] text-white rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02c9c2] dark:focus:ring-offset-gray-900 transition-all duration-150 shadow-sm backdrop-blur-xl"
+                >
+                    <flux:icon name="funnel" class="w-5 h-5 mr-2" />
+                    Filters
+                    <span class="ml-2 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full px-2 py-0.5">
+                        {{ array_filter($filters) ? count(array_filter($filters)) : '0' }}
+                    </span>
+                </button>
             </div>
 
-            <!-- Filter Buttons -->
-            <div class="flex flex-wrap gap-2">
-                <button 
-                    wire:click="filterByDate('current_month')"
-                    wire:loading.attr="disabled"
-                    class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150
-                        {{ $dateFilter === 'current_month' 
-                            ? 'bg-gradient-to-r from-[#02c9c2] to-[#012e2b] text-white shadow-lg' 
-                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700' }}"
-                >
-                    <flux:icon wire:loading.remove name="calendar" class="w-5 h-5 mr-2" />
-                    <flux:icon wire:loading wire:target="filterByDate" name="arrow-path" class="w-5 h-5 mr-2 animate-spin" />
-                    Current Month
-                </button>
+            <!-- Filters Panel -->
+            <div x-show="$wire.showFilters"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 transform -translate-y-2"
+                 x-transition:enter-end="opacity-100 transform translate-y-0"
+                 class="p-4 bg-white/50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 backdrop-blur-xl shadow-sm space-y-4"
+            >
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Status Filter -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <flux:icon name="check-circle" class="h-5 w-5 text-gray-400" />
+                            </div>
+                            <select wire:model.live="filters.status" class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm">
+                                <option value="">All Statuses</option>
+                                <option value="pending">Pending</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
 
-                <button 
-                    wire:click="filterByDate('last_month')"
-                    wire:loading.attr="disabled"
-                    class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150
-                        {{ $dateFilter === 'last_month' 
-                            ? 'bg-gradient-to-r from-[#02c9c2] to-[#012e2b] text-white shadow-lg' 
-                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700' }}"
-                >
-                    <flux:icon wire:loading.remove name="calendar" class="w-5 h-5 mr-2" />
-                    <flux:icon wire:loading wire:target="filterByDate" name="arrow-path" class="w-5 h-5 mr-2 animate-spin" />
-                    Last Month
-                </button>
+                    <!-- Payment Method Filter -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Payment Method</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <flux:icon name="credit-card" class="h-5 w-5 text-gray-400" />
+                            </div>
+                            <select wire:model.live="filters.payment_method" class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm">
+                                <option value="">All Methods</option>
+                                <option value="cash">Cash</option>
+                                <option value="bank_transfer">Bank Transfer</option>
+                                <option value="mpesa">M-Pesa</option>
+                                <option value="cheque">Cheque</option>
+                            </select>
+                        </div>
+                    </div>
 
-                <button 
-                    wire:click="filterByType('all')"
-                    wire:loading.attr="disabled"
-                    class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150
-                        {{ $typeFilter === 'all' 
-                            ? 'bg-gradient-to-r from-[#02c9c2] to-[#012e2b] text-white shadow-lg' 
-                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700' }}"
-                >
-                    <flux:icon wire:loading.remove name="list-bullet" class="w-5 h-5 mr-2" />
-                    <flux:icon wire:loading wire:target="filterByType" name="arrow-path" class="w-5 h-5 mr-2 animate-spin" />
-                    All Records
-                </button>
+                    <!-- Transaction Type Filter -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Transaction Type</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <flux:icon name="arrow-trending-up" class="h-5 w-5 text-gray-400" />
+                            </div>
+                            <select wire:model.live="filters.transaction_type" class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm">
+                                <option value="">All Types</option>
+                                <option value="income">Income</option>
+                                <option value="expense">Expense</option>
+                            </select>
+                        </div>
+                    </div>
 
-                <button 
-                    wire:click="filterByType('income')"
-                    wire:loading.attr="disabled"
-                    class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150
-                        {{ $typeFilter === 'income' 
-                            ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg' 
-                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700' }}"
-                >
-                    <flux:icon wire:loading.remove name="arrow-trending-up" class="w-5 h-5 mr-2" />
-                    <flux:icon wire:loading wire:target="filterByType" name="arrow-path" class="w-5 h-5 mr-2 animate-spin" />
-                    Income Only
-                </button>
+                    <!-- Date Range Filter -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date Range</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <flux:icon name="calendar" class="h-5 w-5 text-gray-400" />
+                            </div>
+                            <select wire:model.live="filters.date_range" class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm">
+                                <option value="">All Time</option>
+                                <option value="today">Today</option>
+                                <option value="this_week">This Week</option>
+                                <option value="this_month">This Month</option>
+                                <option value="last_month">Last Month</option>
+                                <option value="this_year">This Year</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
 
-                <button 
-                    wire:click="filterByType('expense')"
-                    wire:loading.attr="disabled"
-                    class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150
-                        {{ $typeFilter === 'expense' 
-                            ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg' 
-                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700' }}"
-                >
-                    <flux:icon wire:loading.remove name="arrow-trending-down" class="w-5 h-5 mr-2" />
-                    <flux:icon wire:loading wire:target="filterByType" name="arrow-path" class="w-5 h-5 mr-2 animate-spin" />
-                    Expenses Only
-                </button>
+                <!-- Filter Actions -->
+                <div class="flex flex-col md:flex-row items-center justify-center gap-4 col-span-2 mt-2">
+
+                    <!-- Reset Filters Button -->
+                    <button wire:click="resetFilters"
+                        class="group relative overflow-hidden rounded-lg bg-gradient-to-r from-[#02c9c2] to-[#02a8a2] px-5 py-2.5 text-sm font-medium text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]">
+                        <!-- Background animation on hover -->
+                        <span
+                            class="absolute inset-0 translate-y-full bg-gradient-to-r from-[#012e2b] to-[#014e4a] group-hover:translate-y-0 transition-transform duration-300 ease-out"></span>
+                        <!-- Content remains visible -->
+                        <span class="relative flex items-center gap-2">
+                            <flux:icon name="arrow-path"
+                                class="h-4 w-4 transition-transform group-hover:rotate-180 duration-500" />
+                            <span>Clear All Filters</span>
+                        </span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -296,7 +454,7 @@ new class extends Component {
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                    @forelse($records as $record)
+                    @forelse($this->records as $record)
                         <tr class="bg-white/50 dark:bg-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                                 {{ $record->property->title }}
@@ -340,9 +498,9 @@ new class extends Component {
             </table>
 
             <!-- Pagination -->
-            @if($records && count($records) > 0 && method_exists($records, 'links'))
+            @if($this->records->hasPages())
                 <div class="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700">
-                    {{ $records->links('components.pagination') }}
+                    {{ $this->records->links('components.pagination') }}
                 </div>
             @endif
         </div>

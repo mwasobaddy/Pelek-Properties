@@ -15,32 +15,24 @@ new class extends Component {
     public $properties;
     public int $activeContracts = 0;
     public int $pendingMaintenance = 0;
-    public float $monthlyRevenue = 0.00;
+    public float $monthlyRevenue = 0.0;
     public ?Property $selectedProperty = null;
-    public string $tab = 'overview';
     public bool $loading = false;
 
-    public function mount(
-        PropertyManagementService $propertyService,
-        MaintenanceService $maintenanceService,
-        FinancialService $financialService
-    ): void {
-        // abort_if(!auth()->user()->can('manage_properties'), 403);
-        
+    public function mount(PropertyManagementService $propertyService, MaintenanceService $maintenanceService, FinancialService $financialService): void
+    {
+        abort_if(!auth()->user()->can('manage_all_properties'), 403);
         $this->properties = $propertyService->getManagedProperties();
+        $this->maintenanceRequests = MaintenanceRecord::where('status', '!=', 'completed')->with('property')->latest()->get();
+        $this->recentTransactions = $financialService->getRecentTransactions();
         $this->activeContracts = ManagementContract::where('status', 'active')->count();
         $this->pendingMaintenance = MaintenanceRecord::where('status', 'pending')->count();
         $this->monthlyRevenue = $financialService->getCurrentMonthRevenue();
     }
 
-    public function selectProperty(Property $property): void 
+    public function selectProperty(Property $property): void
     {
         $this->selectedProperty = $property;
-    }
-
-    public function changeTab(string $tab): void
-    {
-        $this->tab = $tab;
     }
 
     #[Computed]
@@ -50,7 +42,7 @@ new class extends Component {
     }
 
     #[Computed]
-    public function propertiesCount(): int 
+    public function propertiesCount(): int
     {
         return count($this->properties);
     }
@@ -58,150 +50,312 @@ new class extends Component {
     #[Computed]
     public function urgentMaintenanceCount(): int
     {
-        return MaintenanceRecord::where('priority', 'high')
-            ->where('status', 'pending')
-            ->count();
+        return MaintenanceRecord::where('priority', 'high')->where('status', 'pending')->count();
+    }
+    
+    #[Computed]
+    public function occupancyRate(): int
+    {
+        // Calculate the occupancy rate based on your properties
+        $totalProperties = $this->properties->count();
+        if ($totalProperties === 0) {
+            return 0;
+        }
+        $occupiedProperties = $this->properties->where('status', 'occupied')->count();
+        return (int) round(($occupiedProperties / $totalProperties) * 100);
     }
 };
 
 ?>
 
-<div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl">
-    <!-- Dashboard Header -->
-    <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Property Management Dashboard</h1>
-        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Manage your properties, maintenance requests, and financial reports</p>
-    </div>
-
-    <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-6">
-        <!-- Properties Card -->
-        <div class="bg-white dark:bg-gray-700 rounded-lg shadow p-4">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Managed Properties</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $this->propertiesCount }}</p>
-                </div>
-                <div class="p-3 bg-blue-100 dark:bg-blue-900 rounded-full">
-                    <svg class="w-6 h-6 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                    </svg>
-                </div>
+<div
+    class="bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-2xl shadow-xl overflow-hidden relative">
+    <!-- Header Section with Gradient -->
+    <div class="h-2 bg-gradient-to-r from-[#02c9c2] to-[#012e2b]"></div>
+    <div class="p-8 border-b border-gray-200 dark:border-gray-700">
+        <!-- Animated Header -->
+        <div class="sm:flex sm:items-center sm:justify-between">
+            <div class="space-y-2">
+                <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white flex items-center gap-2">
+                    Property Management Dashboard
+                </h2>
+                <p class="text-gray-600 dark:text-gray-300">
+                    Manage your properties, maintenance requests, and financial reports
+                </p>
             </div>
-        </div>
-
-        <!-- Active Contracts Card -->
-        <div class="bg-white dark:bg-gray-700 rounded-lg shadow p-4">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Active Contracts</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $activeContracts }}</p>
-                </div>
-                <div class="p-3 bg-green-100 dark:bg-green-900 rounded-full">
-                    <svg class="w-6 h-6 text-green-600 dark:text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pending Maintenance Card -->
-        <div class="bg-white dark:bg-gray-700 rounded-lg shadow p-4">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Pending Maintenance</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $pendingMaintenance }}</p>
-                    @if($this->urgentMaintenanceCount > 0)
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
-                            {{ $this->urgentMaintenanceCount }} Urgent
-                        </span>
-                    @endif
-                </div>
-                <div class="p-3 bg-yellow-100 dark:bg-yellow-900 rounded-full">
-                    <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
-                    </svg>
-                </div>
-            </div>
-        </div>
-
-        <!-- Monthly Revenue Card -->
-        <div class="bg-white dark:bg-gray-700 rounded-lg shadow p-4">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Monthly Revenue</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">KES {{ $this->formattedRevenue }}</p>
-                </div>
-                <div class="p-3 bg-indigo-100 dark:bg-indigo-900 rounded-full">
-                    <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-            </div>
+            <button wire:click="$refresh"
+                class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#02c9c2] to-[#012e2b] text-white font-medium rounded-lg text-sm hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02c9c2] dark:focus:ring-offset-gray-900 transition-all duration-150 shadow-lg"
+                wire:loading.attr="disabled">
+                <flux:icon wire:loading.remove wire:target="$refresh" name="arrow-path" class="w-5 h-5 mr-2" />
+                <flux:icon wire:loading wire:target="$refresh" name="arrow-path" class="w-5 h-5 mr-2 animate-spin" />
+                Refresh
+            </button>
         </div>
     </div>
 
-    <!-- Tab Navigation -->
-    <div class="border-b border-gray-200 dark:border-gray-700">
-        <nav class="flex -mb-px px-6" aria-label="Tabs">
-            <button
-                wire:click="changeTab('overview')"
-                class="{{ $tab === 'overview' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 dark:text-gray-400' }} flex-1 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 focus:outline-none"
-            >
-                Overview
-            </button>
-            <button
-                wire:click="changeTab('maintenance')"
-                class="{{ $tab === 'maintenance' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 dark:text-gray-400' }} flex-1 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 focus:outline-none"
-            >
-                Maintenance
-            </button>
-            <button
-                wire:click="changeTab('financials')"
-                class="{{ $tab === 'financials' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 dark:text-gray-400' }} flex-1 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm hover:text-gray-700 hover:border-gray-300 focus:outline-none"
-            >
-                Financials
-            </button>
-        </nav>
+    <!-- Statistics Grid -->
+    <div class="p-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
+            <!-- Properties Card -->
+            <div
+                class="bg-white/50 dark:bg-gray-800/50 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 backdrop-blur-xl p-4 transition-all duration-200 hover:shadow-md">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Properties</p>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mt-1">{{ $this->propertiesCount }}
+                        </h3>
+                    </div>
+                    <div class="p-3 bg-gradient-to-br from-[#02c9c2] to-[#012e2b] rounded-lg">
+                        <flux:icon name="building-office-2" class="w-6 h-6 text-white" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Revenue Card -->
+            <div
+                class="bg-white/50 dark:bg-gray-800/50 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 backdrop-blur-xl p-4 transition-all duration-200 hover:shadow-md">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Monthly Revenue</p>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mt-1">KES
+                            {{ number_format($monthlyRevenue, 2) }}</h3>
+                    </div>
+                    <div class="p-3 bg-gradient-to-br from-[#02c9c2] to-[#012e2b] rounded-lg">
+                        <flux:icon name="banknotes" class="w-6 h-6 text-white" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Maintenance Card -->
+            <div
+                class="bg-white/50 dark:bg-gray-800/50 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 backdrop-blur-xl p-4 transition-all duration-200 hover:shadow-md">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Pending Maintenance</p>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mt-1">{{ $pendingMaintenance }}</h3>
+                    </div>
+                    <div class="p-3 bg-gradient-to-br from-[#02c9c2] to-[#012e2b] rounded-lg">
+                        <flux:icon name="wrench-screwdriver" class="w-6 h-6 text-white" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Occupancy Card -->
+            <div
+                class="bg-white/50 dark:bg-gray-800/50 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 backdrop-blur-xl p-4 transition-all duration-200 hover:shadow-md">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Occupancy Rate</p>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mt-1">{{ $this->occupancyRate }}%
+                        </h3>
+                    </div>
+                    <div class="p-3 bg-gradient-to-br from-[#02c9c2] to-[#012e2b] rounded-lg">
+                        <flux:icon name="chart-bar" class="w-6 h-6 text-white" />
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Tab Content -->
-    <div class="p-6">
-        @if($tab === 'overview')
-            <div class="space-y-6">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Managed Properties</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    @foreach($properties as $property)
-                        <div 
-                            wire:key="property-{{ $property->id }}"
-                            class="bg-white dark:bg-gray-700 rounded-lg shadow hover:shadow-md transition-shadow duration-200 cursor-pointer"
-                            wire:click="selectProperty({{ $property->id }})"
-                        >
-                            <img 
-                                src="{{ $property->featured_image_url }}" 
-                                alt="{{ $property->title }}"
-                                class="w-full h-48 object-cover rounded-t-lg"
-                            >
-                            <div class="p-4">
-                                <h4 class="text-lg font-medium text-gray-900 dark:text-white">{{ $property->title }}</h4>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">{{ $property->location }}</p>
-                                <div class="mt-2 flex items-center justify-between">
-                                    <span class="text-sm font-medium text-gray-900 dark:text-white">
-                                        Contract Status: 
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $property->management_contract?->status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' }}">
-                                            {{ ucfirst($property->management_contract?->status ?? 'No Contract') }}
-                                        </span>
-                                    </span>
+    <!-- Quick Links Section -->
+    <div class="px-8 mb-8">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Links</h3>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <!-- Add Property -->
+            <a href="{{ route('management.properties') }}" 
+                class="flex flex-col items-center justify-center p-4 bg-white/50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 hover:shadow-md hover:border-[#02c9c2] group">
+                <div class="p-3 bg-[#02c9c2]/10 rounded-full mb-2 group-hover:bg-[#02c9c2]/20 transition-colors">
+                    <flux:icon name="plus" class="w-5 h-5 text-[#02c9c2]" />
+                </div>
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Add Property</span>
+            </a>
+            
+            <!-- New Maintenance -->
+            <a href="{{ route('management.maintenance') }}" 
+                class="flex flex-col items-center justify-center p-4 bg-white/50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 hover:shadow-md hover:border-[#02c9c2] group">
+                <div class="p-3 bg-[#02c9c2]/10 rounded-full mb-2 group-hover:bg-[#02c9c2]/20 transition-colors">
+                    <flux:icon name="wrench-screwdriver" class="w-5 h-5 text-[#02c9c2]" />
+                </div>
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Maintenance</span>
+            </a>
+            
+            <!-- New Contract -->
+            <a href="{{ route('management.contracts') }}" 
+                class="flex flex-col items-center justify-center p-4 bg-white/50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 hover:shadow-md hover:border-[#02c9c2] group">
+                <div class="p-3 bg-[#02c9c2]/10 rounded-full mb-2 group-hover:bg-[#02c9c2]/20 transition-colors">
+                    <flux:icon name="document-text" class="w-5 h-5 text-[#02c9c2]" />
+                </div>
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">New Contract</span>
+            </a>
+            
+            <!-- Record Payment -->
+            <a href="{{ route('management.financials') }}" 
+                class="flex flex-col items-center justify-center p-4 bg-white/50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 hover:shadow-md hover:border-[#02c9c2] group">
+                <div class="p-3 bg-[#02c9c2]/10 rounded-full mb-2 group-hover:bg-[#02c9c2]/20 transition-colors">
+                    <flux:icon name="banknotes" class="w-5 h-5 text-[#02c9c2]" />
+                </div>
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Record Payment</span>
+            </a>
+            
+            <!-- Reports -->
+            <a href="{{ route('management.reports') }}" 
+                class="flex flex-col items-center justify-center p-4 bg-white/50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 hover:shadow-md hover:border-[#02c9c2] group">
+                <div class="p-3 bg-[#02c9c2]/10 rounded-full mb-2 group-hover:bg-[#02c9c2]/20 transition-colors">
+                    <flux:icon name="chart-bar" class="w-5 h-5 text-[#02c9c2]" />
+                </div>
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Reports</span>
+            </a>
+            
+            <!-- Settings -->
+            <a href="{{ route('settings.profile') }}" 
+                class="flex flex-col items-center justify-center p-4 bg-white/50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 hover:shadow-md hover:border-[#02c9c2] group">
+                <div class="p-3 bg-[#02c9c2]/10 rounded-full mb-2 group-hover:bg-[#02c9c2]/20 transition-colors">
+                    <flux:icon name="cog-6-tooth" class="w-5 h-5 text-[#02c9c2]" />
+                </div>
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Settings</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Dashboard Overview Section -->
+    <div class="px-8 pb-4">
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Dashboard Overview</h3>
+    </div>
+
+    <!-- Content Section -->
+    <div class="p-8 pt-0">
+        <div wire:loading.flex class="items-center justify-center p-8">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#02c9c2]"></div>
+        </div>
+
+        <div wire:loading.remove>
+            <!-- Overview Content -->
+            <div class="grid gap-6 grid-cols-1 lg:grid-cols-2">
+                <!-- Quick Stats -->
+                <div
+                    class="bg-white/50 dark:bg-gray-800/50 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 backdrop-blur-xl p-4">
+                    <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Stats</h4>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="p-2 rounded-lg bg-green-100 dark:bg-green-800/30 mr-3">
+                                    <flux:icon name="currency-dollar"
+                                        class="w-5 h-5 text-green-600 dark:text-green-400" />
                                 </div>
+                                <span class="text-sm text-gray-700 dark:text-gray-300">Total Revenue YTD</span>
+                            </div>
+                            <span class="font-semibold text-gray-900 dark:text-white">KES
+                                {{ number_format($monthlyRevenue * 12 * 0.85, 2) }}</span>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="p-2 rounded-lg bg-red-100 dark:bg-red-800/30 mr-3">
+                                    <flux:icon name="exclamation-triangle"
+                                        class="w-5 h-5 text-red-600 dark:text-red-400" />
+                                </div>
+                                <span class="text-sm text-gray-700 dark:text-gray-300">Urgent Maintenance</span>
+                            </div>
+                            <span
+                                class="font-semibold text-gray-900 dark:text-white">{{ $this->urgentMaintenanceCount }}</span>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="p-2 rounded-lg bg-blue-100 dark:bg-blue-800/30 mr-3">
+                                    <flux:icon name="document-text"
+                                        class="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                                </div>
+                                <span class="text-sm text-gray-700 dark:text-gray-300">Active Contracts</span>
+                            </div>
+                            <span
+                                class="font-semibold text-gray-900 dark:text-white">{{ $activeContracts }}</span>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="p-2 rounded-lg bg-yellow-100 dark:bg-yellow-800/30 mr-3">
+                                    <flux:icon name="home"
+                                        class="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+                                </div>
+                                <span class="text-sm text-gray-700 dark:text-gray-300">Vacant Properties</span>
+                            </div>
+                            <span class="font-semibold text-gray-900 dark:text-white">
+                                {{ $this->properties->where('status', '!=', 'occupied')->count() }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div
+                    class="bg-white/50 dark:bg-gray-800/50 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 backdrop-blur-xl p-4">
+                    <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Activity</h4>
+                    <div class="space-y-4 max-h-80 overflow-y-auto pr-2">
+                        <div class="flex items-start gap-3 pb-3 border-b border-gray-200 dark:border-gray-700">
+                            <div class="p-1.5 rounded-full bg-green-100 dark:bg-green-800/30">
+                                <flux:icon name="banknotes" class="w-4 h-4 text-green-600 dark:text-green-400" />
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900 dark:text-white">Payment Received</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Oak Apartments - KES 45,000</p>
+                                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Today at 10:23 AM</p>
                             </div>
                         </div>
-                    @endforeach
+
+                        <div class="flex items-start gap-3 pb-3 border-b border-gray-200 dark:border-gray-700">
+                            <div class="p-1.5 rounded-full bg-blue-100 dark:bg-blue-800/30">
+                                <flux:icon name="document-check"
+                                    class="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900 dark:text-white">Contract Renewed</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Sunset View Apartments - Unit
+                                    3B</p>
+                                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Yesterday at 2:45 PM</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3 pb-3 border-b border-gray-200 dark:border-gray-700">
+                            <div class="p-1.5 rounded-full bg-amber-100 dark:bg-amber-800/30">
+                                <flux:icon name="wrench" class="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900 dark:text-white">Maintenance Completed
+                                </p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Pine Ridge Homes - Plumbing
+                                    Issue</p>
+                                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Yesterday at 11:20 AM</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3 pb-3 border-b border-gray-200 dark:border-gray-700">
+                            <div class="p-1.5 rounded-full bg-red-100 dark:bg-red-800/30">
+                                <flux:icon name="exclamation-circle"
+                                    class="w-4 h-4 text-red-600 dark:text-red-400" />
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900 dark:text-white">New Maintenance
+                                    Request</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Maple Court - Electrical Issue
+                                    (High Priority)</p>
+                                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">2 days ago at 9:15 AM</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3 pb-3 border-b border-gray-200 dark:border-gray-700">
+                            <div class="p-1.5 rounded-full bg-purple-100 dark:bg-purple-800/30">
+                                <flux:icon name="user" class="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900 dark:text-white">New Tenant</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Cedar Heights - Unit 12A</p>
+                                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">3 days ago at 4:30 PM</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        @elseif($tab === 'maintenance')
-            <livewire:maintenance-request-form />
-        @else
-            <livewire:financial-reports />
-        @endif
+        </div>
     </div>
 </div>

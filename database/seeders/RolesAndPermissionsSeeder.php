@@ -20,6 +20,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'edit_property',
             'delete_property',
             'feature_property',
+            'manage_all_properties',
             'manage_rental_properties',
             'manage_sale_properties',
             'manage_airbnb_properties',

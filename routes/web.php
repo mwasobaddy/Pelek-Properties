@@ -62,6 +62,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Volt::route('/contracts', 'pages.admin.management.contracts')->name('contracts');
         Volt::route('/maintenance', 'pages.admin.management.maintenance')->name('maintenance');
         Volt::route('/financials', 'pages.admin.management.financials')->name('financials');
+        Volt::route('/properties', 'pages.admin.management.manage-properties')->name('properties');
     });
 
     Route::redirect('settings', 'settings/profile');

@@ -115,6 +115,17 @@ class FinancialService
         ];
     }
 
+    /**
+     * Get recent financial transactions with related property
+     */
+    public function getRecentTransactions(int $limit = 10): Collection
+    {
+        return FinancialRecord::with(['property', 'recordedBy'])
+            ->latest('transaction_date')
+            ->limit($limit)
+            ->get();
+    }
+
     private function getMonthlyRentAmount(Property $property): float
     {
         if ($property->listing_type === 'rent') {

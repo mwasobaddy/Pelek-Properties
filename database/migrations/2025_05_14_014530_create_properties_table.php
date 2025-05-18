@@ -35,6 +35,9 @@ return new class extends Migration
 
             // Commercial-specific fields
             $table->enum('commercial_type', ['office', 'retail', 'industrial', 'warehouse', 'mixed_use'])->nullable();
+            $table->string('commercial_size')->nullable();
+            $table->string('commercial_price_monthly')->nullable();
+            $table->string('commercial_price_annually')->nullable();
             $table->integer('floors')->nullable();
             $table->string('maintenance_status')->nullable();
             $table->date('last_renovation')->nullable();
