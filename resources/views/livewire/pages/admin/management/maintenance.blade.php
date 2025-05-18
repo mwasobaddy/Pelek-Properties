@@ -67,8 +67,8 @@ new class extends Component {
     public function mount(MaintenanceService $maintenanceService): void 
     {
         $this->authorize('manage_maintenance_records');
-        $this->properties = Property::select('id', 'name')
-            ->orderBy('name')
+        $this->properties = Property::select('id', 'title')
+            ->orderBy('title')
             ->get();
     }
 
@@ -338,9 +338,9 @@ new class extends Component {
                 >
                     <flux:icon wire:loading.remove name="list-bullet" class="w-5 h-5 mr-2" />
                     <flux:icon wire:loading wire:target="filterByStatus" name="arrow-path" class="w-5 h-5 mr-2 animate-spin" />
-                    All
+                    All <span class="ml-2 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full px-2 py-0.5">{{ $this->records->total() }}</span>
                 </button>
-                
+
                 <button 
                     wire:click="filterByStatus('pending')"
                     wire:loading.attr="disabled"
@@ -351,7 +351,7 @@ new class extends Component {
                 >
                     <flux:icon wire:loading.remove name="clock" class="w-5 h-5 mr-2" />
                     <flux:icon wire:loading wire:target="filterByStatus" name="arrow-path" class="w-5 h-5 mr-2 animate-spin" />
-                    Pending
+                    Pending <span class="ml-2 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full px-2 py-0.5">{{ MaintenanceRecord::where('status', 'pending')->count() }}</span>
                 </button>
                 
                 <button 
@@ -364,7 +364,7 @@ new class extends Component {
                 >
                     <flux:icon wire:loading.remove name="arrow-path" class="w-5 h-5 mr-2" />
                     <flux:icon wire:loading wire:target="filterByStatus" name="arrow-path" class="w-5 h-5 mr-2 animate-spin" />
-                    In Progress
+                    In Progress <span class="ml-2 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full px-2 py-0.5">{{ MaintenanceRecord::where('status', 'in_progress')->count() }}</span>
                 </button>
                 
                 <button 
@@ -377,7 +377,7 @@ new class extends Component {
                 >
                     <flux:icon wire:loading.remove name="check-circle" class="w-5 h-5 mr-2" />
                     <flux:icon wire:loading wire:target="filterByStatus" name="arrow-path" class="w-5 h-5 mr-2 animate-spin" />
-                    Completed
+                    Completed <span class="ml-2 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full px-2 py-0.5">{{ MaintenanceRecord::where('status', 'completed')->count() }}</span>
                 </button>
             </div>
         </div>
@@ -604,7 +604,7 @@ new class extends Component {
                             >
                                 <option value="">Select a property</option>
                                 @foreach($this->properties as $property)
-                                    <option value="{{ $property->id }}">{{ $property->name }}</option>
+                                    <option value="{{ $property->id }}">{{ $property->title }}</option>
                                 @endforeach
                             </select>
                         </div>
