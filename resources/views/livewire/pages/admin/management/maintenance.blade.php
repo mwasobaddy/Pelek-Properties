@@ -542,18 +542,31 @@ new class extends Component {
 
     <!-- Delete Confirmation Modal -->
     <flux:modal wire:model.live="showDeleteModal" class="w-full max-w-4xl" @close="$wire.resetForm()">
-        <x-card.header>Delete Maintenance Record</x-card.header>
-        <x-card.body>
-            <div class="space-y-4">
-                <p class="text-sm text-gray-500">Are you sure you want to delete this maintenance record? This action cannot be undone.</p>
-            </div>
-        </x-card.body>
-        <x-card.footer>
-            <div class="flex justify-end space-x-2">
-                <x-button type="button" wire:click="$set('showDeleteModal', false)" variant="primary">Cancel</x-button>
-                <x-button type="button" wire:click="delete" variant="danger">Delete</x-button>
-            </div>
-        </x-card.footer>
+        <x-card>
+            <x-card.header>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
+                    <flux:icon name="exclamation-circle" class="w-6 h-6 text-red-600 mr-2" />
+                    Confirm Deletion
+                </h3>
+            </x-card.header>
+            <x-card.body>
+                <div class="space-y-4">
+                    <p class="text-sm text-gray-500">Are you sure you want to delete this maintenance record? This action cannot be undone.</p>
+                </div>
+            </x-card.body>
+
+            <x-card.footer>
+                <div class="flex justify-end space-x-3">
+                    <flux:button wire:click="$set('showDeleteModal', false)">
+                        Cancel
+                    </flux:button>
+                    <flux:button wire:click="delete" variant="danger" class="bg-red-600 hover:bg-red-700">
+                        <flux:icon wire:loading wire:target="delete" name="arrow-path" class="w-4 h-4 mr-2 animate-spin" />
+                        Delete Contract
+                    </flux:button>
+                </div>
+            </x-card.footer>
+        </x-card>
     </flux:modal>
 
     <!-- View/Edit Modal -->

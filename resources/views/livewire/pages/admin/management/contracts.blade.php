@@ -185,13 +185,13 @@ new class extends Component {
     }
 
     public function confirmDelete($id): void {
-        $this->authorize('terminate_management_contract');
+        $this->authorize('delete_management_contract');
         $this->selectedContract = ManagementContract::findOrFail($id);
         $this->showDeleteModal = true;
     }
 
     public function delete(): void {
-        $this->authorize('terminate_management_contract');
+        $this->authorize('delete_management_contract');
         $this->selectedContract->delete();
         $this->showDeleteModal = false;
         $this->selectedContract = null;
@@ -398,7 +398,6 @@ new class extends Component {
                     </div>
                 </div>
                 
-
                 <!-- Filter Actions -->
                 <div class="flex flex-col md:flex-row items-center justify-center gap-4 col-span-2 mt-2">
 
@@ -548,7 +547,7 @@ new class extends Component {
                                         </button>
                                     @endcan
                                     
-                                    @can('terminate_management_contract')
+                                    @can('delete_management_contract')
                                         <button 
                                             wire:click="confirmDelete({{ $contract->id }})"
                                             class="text-gray-200 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-500 transition-colors duration-150 bg-red-500 dark:bg-red-700/50 rounded-lg p-2"

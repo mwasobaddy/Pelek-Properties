@@ -198,7 +198,8 @@ new class extends Component {
             </a>
             
             <!-- Reports -->
-            <a href="{{ route('management.reports') }}" 
+            <a
+                {{-- href="{{ route('management.reports') }}"  --}}
                 class="flex flex-col items-center justify-center p-4 bg-white/50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 hover:shadow-md hover:border-[#02c9c2] group">
                 <div class="p-3 bg-[#02c9c2]/10 rounded-full mb-2 group-hover:bg-[#02c9c2]/20 transition-colors">
                     <flux:icon name="chart-bar" class="w-5 h-5 text-[#02c9c2]" />

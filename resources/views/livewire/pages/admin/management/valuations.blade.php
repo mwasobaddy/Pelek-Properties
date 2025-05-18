@@ -610,10 +610,15 @@ new class extends Component {
                                 <dd class="text-sm text-gray-900 dark:text-white">{{ str_replace('_', ' ', ucfirst($selectedRequest->location)) }}</dd>
                             </div>
                             <div>
-                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Duration</dt>
+                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Details</dt>
                                 <dd class="text-sm text-gray-900 dark:text-white">
-                                    {{ date('M d, Y', strtotime($selectedRequest->start_date)) }} - 
-                                    {{ date('M d, Y', strtotime($selectedRequest->end_date)) }}
+                                    @if($selectedRequest->land_size)
+                                        <span>{{ number_format($selectedRequest->land_size, 2) }} sqft</span>
+                                    @endif
+                                    @if($selectedRequest->bedrooms || $selectedRequest->bathrooms)
+                                        <span class="ml-2">{{ $selectedRequest->bedrooms }} bed{{ $selectedRequest->bedrooms !== 1 ? 's' : '' }} · 
+                                            {{ $selectedRequest->bathrooms }} bath{{ $selectedRequest->bathrooms !== 1 ? 's' : '' }}</span>
+                                    @endif
                                 </dd>
                             </div>
                         </dl>
