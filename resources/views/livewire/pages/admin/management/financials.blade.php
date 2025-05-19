@@ -51,6 +51,7 @@ new class extends Component {
 
     public function mount(FinancialService $financialService): void 
     {
+        $this->authorize('manage_financial_records');
         $this->currentMonthRevenue = $financialService->getCurrentMonthRevenue();
     }
 
@@ -507,7 +508,7 @@ new class extends Component {
     </div>
 
     <!-- Record Details Modal -->
-    <flux:modal wire:model="showModal">
+    <flux:modal wire:model="showModal" class="w-full max-w-4xl" @close="$wire.resetForm()">
         <x-card class="w-fulloverflow-hidden rounded-xl">
             <x-card.header>
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white">

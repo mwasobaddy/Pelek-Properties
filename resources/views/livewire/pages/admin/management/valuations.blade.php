@@ -57,7 +57,7 @@ new class extends Component {
 
     public function mount(): void
     {
-        $this->authorize('view_valuation_requests');
+        $this->authorize('manage_valuation_requests');
     }
 
     #[Computed]
@@ -97,8 +97,8 @@ new class extends Component {
         }
     }
 
-    public function create()
-    {
+    public function create(): void {
+        $this->authorize('create_valuation_request');
         $this->resetForm();
         $this->modalMode = 'create';
         $this->showFormModal = true;
@@ -106,6 +106,7 @@ new class extends Component {
 
     public function edit($id)
     {
+        $this->authorize('edit_valuation_request');
         $valuation = ValuationRequest::findOrFail($id);
         $this->form = $valuation->only(['property_type', 'location', 'purpose', 'description', 'status']);
         $this->modalMode = 'edit';
@@ -133,12 +134,14 @@ new class extends Component {
 
     public function confirmDelete($id)
     {
+        $this->authorize('delete_valuation_request');
         $this->selectedRequest = ValuationRequest::findOrFail($id);
         $this->showDeleteModal = true;
     }
 
     public function delete()
     {
+        $this->authorize('delete_valuation_request');
         $this->selectedRequest->delete();
         $this->showDeleteModal = false;
         $this->dispatch('notify', ['type' => 'success', 'message' => 'Valuation request deleted successfully.']);
@@ -155,9 +158,11 @@ new class extends Component {
         ]);
 
         if ($this->modalMode === 'create') {
+            $this->authorize('create_valuation_request');
             ValuationRequest::create($this->form);
             $this->dispatch('notify', ['type' => 'success', 'message' => 'Valuation request created successfully.']);
         } else {
+            $this->authorize('edit_valuation_request');
             $this->selectedRequest->update($this->form);
             $this->dispatch('notify', ['type' => 'success', 'message' => 'Valuation request updated successfully.']);
         }
@@ -507,7 +512,7 @@ new class extends Component {
         <x-card class="w-full overflow-hidden rounded-xl">
             <x-card.header>
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                    {{ $modalMode === 'create' ? 'Create Maintenance Record' : ($modalMode === 'edit' ? 'Edit Maintenance Record' : 'View Maintenance Record') }}
+                    {{ $modalMode === 'create' ? 'Create Valuation Record' : ($modalMode === 'edit' ? 'Edit Valuation Record' : 'View Valuation Record') }}
                 </h3>
             </x-card.header>
 
@@ -585,7 +590,7 @@ new class extends Component {
     </flux:modal>
 
     <!-- Delete Confirmation Modal -->
-    <flux:modal wire:model="showDeleteModal" class="w-full max-w-4xl">
+    <flux:modal wire:model="showDeleteModal" max-width="md">
         <x-card class="overflow-hidden rounded-xl">
             <x-card.header>
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white flex items-center">

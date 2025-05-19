@@ -80,8 +80,8 @@
                         <flux:navlist.group :heading="__('viewing_management')" class="grid gap-1 mt-4">
                             <flux:navlist.item 
                                 icon="calendar" 
-                                :href="route('admin.viewings.schedule')" 
-                                :current="request()->routeIs('admin.viewings.schedule')" 
+                                :href="route('admin.schedule.index')" 
+                                :current="request()->routeIs('admin.schedule.index')" 
                                 class="transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2]"
                                 wire:navigate
                             >
@@ -90,8 +90,8 @@
 
                             <flux:navlist.item 
                                 icon="calendar-days" 
-                                :href="route('admin.viewings.appointments')" 
-                                :current="request()->routeIs('admin.viewings.appointments')" 
+                                :href="route('admin.schedule.appointments')" 
+                                :current="request()->routeIs('admin.schedule.appointments')" 
                                 class="transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2]"
                                 wire:navigate
                             >

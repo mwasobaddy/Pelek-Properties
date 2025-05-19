@@ -26,7 +26,7 @@ new class extends Component {
     public $isLoading = false;
 
     #[State]
-    public $showModal = false;
+    public $showFormModal = false;
 
     #[State]
     public $showDeleteModal = false;
@@ -115,21 +115,21 @@ new class extends Component {
 
     public function confirmStatusChange($recordId): void
     {
-        $this->authorize('update_maintenance_status');
+        $this->authorize('edit_maintenance_record');
         $this->selectedRecord = MaintenanceRecord::findOrFail($recordId);
         $this->newStatus = $this->selectedRecord->status;
     }
 
     public function confirmDelete($recordId): void
     {
-        $this->authorize('delete_maintenance_request');
+        $this->authorize('delete_maintenance_record');
         $this->selectedRecord = MaintenanceRecord::findOrFail($recordId);
         $this->showDeleteModal = true;
     }
 
     public function delete(): void
     {
-        $this->authorize('delete_maintenance_request');
+        $this->authorize('delete_maintenance_record');
         $this->selectedRecord->delete();
         $this->showDeleteModal = false;
         $this->selectedRecord = null;
@@ -153,12 +153,12 @@ new class extends Component {
             'updated_at' => $record->updated_at
         ];
         $this->modalMode = 'view';
-        $this->showModal = true;
+        $this->showFormModal = true;
     }
 
     public function edit($id): void
     {
-        $this->authorize('update_maintenance_status');
+        $this->authorize('edit_maintenance_request');
         $record = MaintenanceRecord::findOrFail($id);
         $this->selectedRecord = $record;
         $this->form = [
@@ -173,7 +173,7 @@ new class extends Component {
             'updated_at' => $record->updated_at
         ];
         $this->modalMode = 'edit';
-        $this->showModal = true;
+        $this->showFormModal = true;
     }
 
     public function updateStatus(): void
@@ -182,7 +182,7 @@ new class extends Component {
             return;
         }
 
-        $this->authorize('update_maintenance_status');
+        $this->authorize('edit_maintenance_request');
 
         $this->validate([
             'form.status' => 'required|string|in:' . implode(',', array_keys($this->availableStatuses)),
@@ -201,7 +201,7 @@ new class extends Component {
 
         $this->selectedRecord->update($updateData);
 
-        $this->showModal = false;
+        $this->showFormModal = false;
         $this->selectedRecord = null;
         $this->resetForm();
         
@@ -563,7 +563,7 @@ new class extends Component {
 
     <!-- View/Edit Modal -->
     <flux:modal wire:model="showFormModal" class="w-full max-w-4xl" @close="$wire.resetForm()">
-        <x-card class="w-fulloverflow-hidden rounded-xl">
+        <x-card class="w-full overflow-hidden rounded-xl">
             <x-card.header>
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
                     {{ $modalMode === 'edit' ? 'Edit Maintenance Record' : 'View Maintenance Record' }}
@@ -694,14 +694,14 @@ new class extends Component {
             <x-card.footer>
                 <div class="flex justify-end space-x-2">
                     @if($modalMode === 'edit')
-                        <x-button type="button" wire:click="$set('showModal', false)" variant="primary">
+                        <x-button type="button" wire:click="$set('showFormModal', false)" variant="primary">
                             Cancel
                         </x-button>
                         <x-button type="button" wire:click="updateStatus" variant="primary">
                             Update
                         </x-button>
                     @else
-                        <x-button type="button" wire:click="$set('showModal', false)" variant="primary">
+                        <x-button type="button" wire:click="$set('showFormModal', false)" variant="primary">
                             Close
                         </x-button>
                     @endif
@@ -711,7 +711,7 @@ new class extends Component {
     </flux:modal>
 
     <!-- Delete Confirmation Modal -->
-    <flux:modal wire:model.live="showDeleteModal" class="w-full max-w-4xl" @close="$wire.resetForm()">
+    <flux:modal wire:model.live="showDeleteModal" max-width="md">
         <x-card class="w-fulloverflow-hidden rounded-xl">
             <x-card.header>
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
