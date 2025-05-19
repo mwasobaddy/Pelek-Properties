@@ -447,7 +447,7 @@ new class extends Component {
     </div>
 
     <!-- Enhanced Appointment Details Modal -->
-    <flux:modal wire:model="showAppointmentModal" class="w-full max-w-4xl" @close="$wire.resetForm()">
+    <flux:modal wire:model="showAppointmentModal" class="w-full max-w-4xl !p-0" @close="$wire.resetForm()">
         @if($selectedAppointment)
             <div class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden">
                 <!-- Modal Header with Status-Based Gradient -->

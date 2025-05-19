@@ -586,7 +586,7 @@ new class extends Component {
     </div>
 
     <!-- Enhanced Contract Form Modal -->
-    <flux:modal wire:model="showFormModal" class="w-full max-w-4xl" @close="$wire.resetForm()">
+    <flux:modal wire:model="showFormModal" class="w-full max-w-4xl !p-0" @close="$wire.resetForm()">
         <x-card class="w-full overflow-hidden rounded-xl">
             <x-card.header>
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
@@ -786,7 +786,7 @@ new class extends Component {
     </flux:modal>
 
     <!-- Enhanced Delete Confirmation Modal -->
-    <flux:modal wire:model="showDeleteModal" max-width="md">
+    <flux:modal wire:model="showDeleteModal" max-width="md" class="!p-0">
         <x-card class="w-fulloverflow-hidden rounded-xl">
             <x-card.header>
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white flex items-center">

@@ -178,7 +178,7 @@ state([
         </div>
 
         {{-- WhatsApp Modal --}}
-        <flux:modal name="whatsapp-modal-{{ $property->id }}" dismissible class="max-w-md self-center justify-self-center">
+        <flux:modal name="whatsapp-modal-{{ $property->id }}" dismissible class="max-w-md self-center justify-self-center !p-0">
             <div class="p-1">
                 {{-- Modal Header with Property Image --}}
                 <div class="mb-4 flex items-center space-x-4">

@@ -1,15 +1,136 @@
 <?php
 use App\Models\Property;
+use App\Models\PropertyType;
 use Livewire\Volt\Component;
+use Livewire\WithPagination;
 
 new class extends Component {
+    use WithPagination;
+
+    #[State]
+    public $showFilters = false;
+    
+    #[State]
+    public $showFormModal = false;
+    
+    #[State]
+    public $showDeleteModal = false;
+    
+    #[State]
+    public $modalMode = 'create'; // create, edit, view
+    
+    #[State]
+    public $search = '';
+    
+    #[State]
+    public $filters = [
+        'status' => '',
+        'property_type' => '',
+        'price_range' => '',
+    ];
+    
+    #[State]
+    public $selectedProperty = null;
+    
+    #[State]
+    public $sortField = 'created_at';
+    
+    #[State]
+    public $sortDirection = 'desc';
+    
+    #[State]
+    public $isLoading = false;
+    
+    protected $queryString = [
+        'search' => ['except' => ''],
+        'filters' => ['except' => ['status' => '', 'property_type' => '', 'price_range' => '']]
+    ];
+
+    #[State]
+    public $form = [
+        'title' => '',
+        'property_type_id' => '',
+        'price' => '',
+        'description' => '',
+        'status' => 'active'
+    ];
+
     public function with(): array
     {
         return [
             'properties' => Property::with(['propertyType', 'images'])
                 ->latest()
-                ->get()
+                ->get(),
+            'propertyTypes' => PropertyType::pluck('name', 'id')
         ];
+    }
+
+    public function rules()
+    {
+        return [
+            'form.title' => 'required|string|max:255',
+            'form.property_type_id' => 'required|exists:property_types,id',
+            'form.price' => 'required|numeric|min:0',
+            'form.description' => 'required|string',
+            'form.status' => 'required|in:active,inactive'
+        ];
+    }
+
+    public function create()
+    {
+        $this->resetForm();
+        $this->modalMode = 'create';
+        $this->showFormModal = true;
+    }
+
+    public function edit($id)
+    {
+        $this->selectedProperty = Property::findOrFail($id);
+        $this->form = $this->selectedProperty->only(['title', 'property_type_id', 'price', 'description', 'status']);
+        $this->modalMode = 'edit';
+        $this->showFormModal = true;
+    }
+
+    public function save()
+    {
+        $this->validate();
+
+        if ($this->modalMode === 'create') {
+            Property::create($this->form);
+            $this->dispatch('notify', type: 'success', message: 'Property created successfully.');
+        } else {
+            $this->selectedProperty->update($this->form);
+            $this->dispatch('notify', type: 'success', message: 'Property updated successfully.');
+        }
+
+        $this->showFormModal = false;
+        $this->resetForm();
+    }
+
+    public function confirmDelete($id)
+    {
+        $this->selectedProperty = Property::findOrFail($id);
+        $this->showDeleteModal = true;
+    }
+
+    public function delete()
+    {
+        $this->selectedProperty->delete();
+        $this->showDeleteModal = false;
+        $this->selectedProperty = null;
+        $this->dispatch('notify', type: 'success', message: 'Property deleted successfully.');
+    }
+
+    private function resetForm()
+    {
+        $this->form = [
+            'title' => '',
+            'property_type_id' => '',
+            'price' => '',
+            'description' => '',
+            'status' => 'active'
+        ];
+        $this->selectedProperty = null;
     }
 } ?>
 
@@ -106,11 +227,11 @@ new class extends Component {
                                         x-transition
                                         class="absolute right-0 mt-2 w-48 rounded-lg bg-white dark:bg-gray-800 shadow-lg ring-1 ring-gray-200 dark:ring-gray-700 py-1 z-10"
                                     >
-                                        <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                        <a href="#" wire:click.prevent="edit({{ $property->id }})" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                                             <flux:icon name="pencil" class="w-4 h-4 mr-2" />
                                             Edit Details
                                         </a>
-                                        <a href="#" class="flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                        <a href="#" wire:click.prevent="confirmDelete({{ $property->id }})" class="flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700">
                                             <flux:icon name="trash" class="w-4 h-4 mr-2" />
                                             Delete
                                         </a>
@@ -154,6 +275,121 @@ new class extends Component {
             @endforelse
         </div>
     </div>
+
+    <!-- Property Form Modal -->
+    <flux:modal wire:model="showFormModal" class="w-full max-w-4xl !p-0" @close="$wire.resetForm()">
+        <div class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden">
+            <div class="bg-gradient-to-r from-[#02c9c2]/20 to-[#012e2b]/20 dark:from-[#02c9c2]/30 dark:to-[#012e2b]/30 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                        <flux:icon name="{{ $modalMode === 'create' ? 'plus' : 'pencil' }}" class="w-5 h-5 text-[#02c9c2]" />
+                        {{ $modalMode === 'create' ? 'New Property' : ($modalMode === 'edit' ? 'Edit Property' : 'View Property') }}
+                    </h3>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <form wire:submit="save" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Title -->
+                        <div class="md:col-span-2">
+                            <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Property Title</label>
+                            <input type="text" wire:model="form.title" id="title" 
+                                   class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 shadow-sm focus:border-[#02c9c2] focus:ring-[#02c9c2]">
+                            @error('form.title') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <!-- Property Type -->
+                        <div>
+                            <label for="property_type_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Property Type</label>
+                            <select wire:model="form.property_type_id" id="property_type_id"
+                                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 shadow-sm focus:border-[#02c9c2] focus:ring-[#02c9c2]">
+                                <option value="">Select Type</option>
+                                @foreach($propertyTypes as $id => $type)
+                                    <option value="{{ $id }}">{{ $type }}</option>
+                                @endforeach
+                            </select>
+                            @error('form.property_type_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <!-- Price -->
+                        <div>
+                            <label for="price" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Price (KES)</label>
+                            <div class="mt-1 relative rounded-md shadow-sm">
+                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                    <span class="text-gray-500 dark:text-gray-400 sm:text-sm">KES</span>
+                                </div>
+                                <input type="number" wire:model="form.price" id="price"
+                                       class="pl-12 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 shadow-sm focus:border-[#02c9c2] focus:ring-[#02c9c2]">
+                            </div>
+                            @error('form.price') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <!-- Description -->
+                        <div class="md:col-span-2">
+                            <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+                            <textarea wire:model="form.description" id="description" rows="4"
+                                      class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 shadow-sm focus:border-[#02c9c2] focus:ring-[#02c9c2]"></textarea>
+                            @error('form.description') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <button type="button" wire:click="$set('showFormModal', false)"
+                                class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02c9c2] dark:focus:ring-offset-gray-900">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                                class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#02c9c2] to-[#012e2b] text-white font-medium rounded-md text-sm hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02c9c2] dark:focus:ring-offset-gray-900 transition-all duration-150">
+                            {{ $modalMode === 'create' ? 'Create Property' : 'Update Property' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </flux:modal>
+
+    <!-- Delete Confirmation Modal -->
+    <flux:modal wire:model="showDeleteModal" max-width="md" class="!p-0">
+        <div class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden">
+            <div class="bg-gradient-to-r from-red-500/20 to-red-600/20 dark:from-red-900/30 dark:to-red-700/30 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center gap-2">
+                    <flux:icon name="exclamation-circle" class="w-6 h-6 text-red-600" />
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        Confirm Deletion
+                    </h3>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <p class="text-gray-600 dark:text-gray-300">
+                    Are you sure you want to delete this property? This action cannot be undone.
+                </p>
+                @if($selectedProperty)
+                    <div class="mt-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <p class="font-semibold text-gray-900 dark:text-white">{{ $selectedProperty->title }}</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Price: KES {{ number_format($selectedProperty->price) }}</p>
+                        @if($selectedProperty->propertyType)
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Type: {{ $selectedProperty->propertyType->name }}</p>
+                        @endif
+                    </div>
+                @endif
+
+                <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <button type="button" wire:click="$set('showDeleteModal', false)"
+                            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-gray-900">
+                        Cancel
+                    </button>
+                    <button type="button" wire:click="delete"
+                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-gray-900">
+                        <flux:icon name="trash" class="w-4 h-4 mr-1.5" />
+                        Delete Property
+                    </button>
+                </div>
+            </div>
+        </div>
+    </flux:modal>
 
     <!-- Enhanced Decorative Elements -->
     <div class="absolute top-40 left-0 w-64 h-64 bg-gradient-to-br from-[#02c9c2]/10 to-transparent rounded-full blur-3xl -z-10"></div>

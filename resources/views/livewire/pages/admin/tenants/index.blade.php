@@ -588,7 +588,7 @@ new class extends Component {
     </div>
 
     <!-- Tenant Form Modal -->
-    <flux:modal wire:model="showTenantModal" class="w-full max-w-4xl" @close="$wire.resetForm()">
+    <flux:modal wire:model="showTenantModal" class="w-full max-w-4xl !p-0" @close="$wire.resetForm()">
         <div class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden">
             <div
                 class="bg-gradient-to-r from-[#02c9c2]/20 to-[#012e2b]/20 dark:from-[#02c9c2]/30 dark:to-[#012e2b]/30 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
@@ -888,7 +888,7 @@ new class extends Component {
     </flux:modal>
 
     <!-- Tenant Details Modal -->
-    <flux:modal wire:model="showTenantDetailsModal" class="w-full max-w-4xl">
+    <flux:modal wire:model="showTenantDetailsModal" class="w-full max-w-4xl !p-0" @close="$wire.resetForm()">
         <div class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden">
             @if ($selectedTenant)
                 <div @class([

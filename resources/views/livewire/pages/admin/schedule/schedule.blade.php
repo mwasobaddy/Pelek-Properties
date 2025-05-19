@@ -475,7 +475,7 @@ new class extends Component {
     </div>
 
     <!-- Enhanced Schedule Modal -->
-    <flux:modal wire:model="showScheduleModal" class="w-full max-w-4xl" @close="$wire.resetForm()">
+    <flux:modal wire:model="showScheduleModal" class="w-full max-w-4xl !p-0" @close="$wire.resetForm()">
         <div class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden">
             <div class="bg-gradient-to-r from-[#02c9c2]/20 to-[#012e2b]/20 dark:from-[#02c9c2]/30 dark:to-[#012e2b]/30 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <div class="flex justify-between items-center">
@@ -614,7 +614,7 @@ new class extends Component {
     </flux:modal>
     
     <!-- Appointment Details Modal -->
-    <flux:modal wire:model="showAppointmentDetailsModal" class="w-full max-w-4xl" @close="$wire.resetForm()">
+    <flux:modal wire:model="showAppointmentDetailsModal" class="w-full max-w-4xl !p-0" @close="$wire.resetForm()">
         <div class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden">
             <div @class([
                 'bg-gradient-to-r px-6 py-4 border-b border-gray-200 dark:border-gray-700',
