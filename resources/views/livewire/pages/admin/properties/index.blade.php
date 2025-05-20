@@ -50,9 +50,56 @@ new class extends Component {
     public $form = [
         'title' => '',
         'property_type_id' => '',
-        'price' => '',
         'description' => '',
-        'status' => 'active'
+        'type' => '',
+        'listing_type' => 'sale',
+        'price' => '',
+        'size' => '',
+        'square_range' => '',
+        'location' => '',
+        'city' => '',
+        'address' => '',
+        'neighborhood' => '',
+        'bedrooms' => '',
+        'bathrooms' => '',
+        'available' => true,
+        'whatsapp_number' => '',
+        'status' => 'available',
+        
+        // Commercial fields
+        'commercial_type' => '',
+        'commercial_size' => '',
+        'commercial_price_monthly' => '',
+        'commercial_price_annually' => '',
+        'floors' => '',
+        'maintenance_status' => '',
+        'last_renovation' => '',
+        'has_parking' => false,
+        'parking_spaces' => '',
+        'commercial_amenities' => [],
+        'zoning_info' => [],
+        'price_per_square_foot' => '',
+        
+        // Rental fields
+        'is_furnished' => false,
+        'rental_price_daily' => '',
+        'rental_price_monthly' => '',
+        'security_deposit' => '',
+        'lease_terms' => '',
+        'utilities_included' => [],
+        'available_from' => '',
+        'minimum_lease_period' => '',
+        'rental_requirements' => [],
+        'amenities_condition' => [],
+        
+        // Airbnb fields
+        'airbnb_price_nightly' => '',
+        'airbnb_price_weekly' => '',
+        'airbnb_price_monthly' => '',
+        'availability_calendar' => [],
+        
+        'is_featured' => false,
+        'additional_features' => [],
     ];
 
     public function with(): array
@@ -126,9 +173,56 @@ new class extends Component {
         return [
             'form.title' => 'required|string|max:255',
             'form.property_type_id' => 'required|exists:property_types,id',
-            'form.price' => 'required|numeric|min:0',
             'form.description' => 'required|string',
-            'form.status' => 'required|in:active,inactive'
+            'form.type' => 'required|string',
+            'form.listing_type' => 'required|in:sale,rent,airbnb,commercial',
+            'form.price' => 'required|numeric|min:0',
+            'form.size' => 'nullable|numeric',
+            'form.square_range' => 'nullable|string',
+            'form.location' => 'required|string',
+            'form.city' => 'required|string',
+            'form.address' => 'nullable|string',
+            'form.neighborhood' => 'nullable|string',
+            'form.bedrooms' => 'nullable|integer|min:0',
+            'form.bathrooms' => 'nullable|integer|min:0',
+            'form.available' => 'boolean',
+            'form.whatsapp_number' => 'required|string',
+            'form.status' => 'required|in:available,under_contract,sold,rented',
+            
+            // Commercial fields
+            'form.commercial_type' => 'nullable|in:office,retail,industrial,warehouse,mixed_use',
+            'form.commercial_size' => 'nullable|string',
+            'form.commercial_price_monthly' => 'nullable|string',
+            'form.commercial_price_annually' => 'nullable|string',
+            'form.floors' => 'nullable|integer|min:0',
+            'form.maintenance_status' => 'nullable|string',
+            'form.last_renovation' => 'nullable|date',
+            'form.has_parking' => 'boolean',
+            'form.parking_spaces' => 'nullable|integer|min:0',
+            'form.commercial_amenities' => 'nullable|array',
+            'form.zoning_info' => 'nullable|array',
+            'form.price_per_square_foot' => 'nullable|numeric|min:0',
+            
+            // Rental fields
+            'form.is_furnished' => 'boolean',
+            'form.rental_price_daily' => 'nullable|numeric|min:0',
+            'form.rental_price_monthly' => 'nullable|numeric|min:0',
+            'form.security_deposit' => 'nullable|numeric|min:0',
+            'form.lease_terms' => 'nullable|string',
+            'form.utilities_included' => 'nullable|array',
+            'form.available_from' => 'nullable|date',
+            'form.minimum_lease_period' => 'nullable|integer|min:0',
+            'form.rental_requirements' => 'nullable|array',
+            'form.amenities_condition' => 'nullable|array',
+            
+            // Airbnb fields
+            'form.airbnb_price_nightly' => 'nullable|numeric|min:0',
+            'form.airbnb_price_weekly' => 'nullable|numeric|min:0',
+            'form.airbnb_price_monthly' => 'nullable|numeric|min:0',
+            'form.availability_calendar' => 'nullable|array',
+            
+            'form.is_featured' => 'boolean',
+            'form.additional_features' => 'nullable|array',
         ];
     }
 
@@ -141,8 +235,28 @@ new class extends Component {
 
     public function edit($id)
     {
-        $this->selectedProperty = Property::findOrFail($id);
-        $this->form = $this->selectedProperty->only(['title', 'property_type_id', 'price', 'description', 'status']);
+        $property = Property::findOrFail($id);
+        $this->selectedProperty = $property;
+        
+        // Extract property data before resetting the form
+        $propertyData = $property->only([
+            'title', 'property_type_id', 'description', 'type', 'listing_type',
+            'price', 'size', 'square_range', 'location', 'city', 'address',
+            'neighborhood', 'bedrooms', 'bathrooms', 'available', 'whatsapp_number',
+            'status', 'commercial_type', 'commercial_size', 'commercial_price_monthly',
+            'commercial_price_annually', 'floors', 'maintenance_status', 'last_renovation',
+            'has_parking', 'parking_spaces', 'commercial_amenities', 'zoning_info',
+            'price_per_square_foot', 'is_furnished', 'rental_price_daily',
+            'rental_price_monthly', 'security_deposit', 'lease_terms', 'utilities_included',
+            'available_from', 'minimum_lease_period', 'rental_requirements',
+            'amenities_condition', 'airbnb_price_nightly', 'airbnb_price_weekly',
+            'airbnb_price_monthly', 'availability_calendar', 'is_featured',
+            'additional_features'
+        ]);
+        
+        $this->resetForm();
+        $this->selectedProperty = $property; // Restore selected property after form reset
+        $this->form = array_merge($this->form, $propertyData);
         $this->modalMode = 'edit';
         $this->showFormModal = true;
     }
@@ -176,17 +290,64 @@ new class extends Component {
         $this->selectedProperty = null;
         $this->dispatch('notify', type: 'success', message: 'Property deleted successfully.');
     }
-
     private function resetForm()
     {
         $this->form = [
             'title' => '',
             'property_type_id' => '',
-            'price' => '',
             'description' => '',
-            'status' => 'active'
+            'type' => '',
+            'listing_type' => 'sale',
+            'price' => '',
+            'size' => '',
+            'square_range' => '',
+            'location' => '',
+            'city' => '',
+            'address' => '',
+            'neighborhood' => '',
+            'bedrooms' => '',
+            'bathrooms' => '',
+            'available' => true,
+            'whatsapp_number' => '',
+            'status' => 'available',
+            
+            // Commercial fields
+            'commercial_type' => '',
+            'commercial_size' => '',
+            'commercial_price_monthly' => '',
+            'commercial_price_annually' => '',
+            'floors' => '',
+            'maintenance_status' => '',
+            'last_renovation' => '',
+            'has_parking' => false,
+            'parking_spaces' => '',
+            'commercial_amenities' => [],
+            'zoning_info' => [],
+            'price_per_square_foot' => '',
+            
+            // Rental fields
+            'is_furnished' => false,
+            'rental_price_daily' => '',
+            'rental_price_monthly' => '',
+            'security_deposit' => '',
+            'lease_terms' => '',
+            'utilities_included' => [],
+            'available_from' => '',
+            'minimum_lease_period' => '',
+            'rental_requirements' => [],
+            'amenities_condition' => [],
+            
+            // Airbnb fields
+            'airbnb_price_nightly' => '',
+            'airbnb_price_weekly' => '',
+            'airbnb_price_monthly' => '',
+            'availability_calendar' => [],
+            
+            'is_featured' => false,
+            'additional_features' => [],
         ];
         $this->selectedProperty = null;
+        return $this->form;
     }
 } ?>
 
@@ -445,83 +606,578 @@ new class extends Component {
             </div>
 
             <div class="p-6">
-                <form wire:submit="save" class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Title -->
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Property Title</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <flux:icon name="building-office" class="h-5 w-5 text-gray-400" />
+                <!-- Replace the current form in the modal with this expanded form -->
+                <form wire:submit="save" class="space-y-8">
+                    <!-- Basic Information Section -->
+                    <div>
+                        <h4 class="text-md font-medium text-gray-700 dark:text-gray-300 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                            Basic Information
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Title -->
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Property Title</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="building-office" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        wire:model="form.title"
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                        placeholder="Enter property title"
+                                    >
+                                    @error('form.title') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
-                                <input
-                                    type="text"
-                                    wire:model="form.title"
-                                    class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
-                                    placeholder="Enter property title"
-                                >
-                                @error('form.title')
-                                    <span class="text-red-500 text-sm">{{ $message }}</span>
-                                @enderror
                             </div>
-                        </div>
 
-                        <!-- Property Type -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Property Type</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <flux:icon name="home" class="h-5 w-5 text-gray-400" />
+                            <!-- Property Type -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Property Type</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="home" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <select
+                                        wire:model="form.property_type_id"
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                    >
+                                        <option value="">Select Type</option>
+                                        @foreach($propertyTypes as $id => $type)
+                                            <option value="{{ $id }}">{{ $type }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('form.property_type_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
-                                <select
-                                    wire:model="form.property_type_id"
-                                    id="property_type_id"
-                                    class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
-                                >
-                                    <option value="">Select Type</option>
-                                    @foreach($propertyTypes as $id => $type)
-                                        <option value="{{ $id }}">{{ $type }}</option>
-                                    @endforeach
-                                </select>
-                                @error('form.property_type_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                             </div>
-                        </div>
 
-                        <!-- Price -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Price (KES)</label>
-                            <div class="mt-1 relative rounded-md shadow-sm">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <flux:icon name="currency-dollar" class="h-5 w-5 text-gray-400" />
+                            <!-- Type -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Property Category</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="squares-2x2" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        wire:model="form.type"
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                        placeholder="E.g. Apartment, House, Land"
+                                    >
+                                    @error('form.type') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
-                                <input
-                                    type="number"
-                                    wire:model="form.price"
-                                    id="price"
-                                    class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
-                                    placeholder="Enter property price (KES)"
-                                    min="0"
-                                >
-                                @error('form.price') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                             </div>
-                        </div>
 
-                        <!-- Description -->
-                        <div class="md:col-span-2">
-                            <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
-                            <div class="relative">
+                            <!-- Listing Type -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Listing Type</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="tag" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <select
+                                        wire:model="form.listing_type"
+                                        x-data="{}"
+                                        x-init="$watch('$wire.form.listing_type', () => $wire.$refresh())"
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                    >
+                                        <option value="sale">For Sale</option>
+                                        <option value="rent">For Rent</option>
+                                        <option value="airbnb">Airbnb</option>
+                                        <option value="commercial">Commercial</option>
+                                    </select>
+                                    @error('form.listing_type') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <!-- Price -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Price (KES)</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="currency-dollar" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="number"
+                                        wire:model="form.price"
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                        placeholder="Enter property price (KES)"
+                                        min="0"
+                                    >
+                                    @error('form.price') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <!-- Size -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Size (sqm)</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="square-2-stack" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="number"
+                                        wire:model="form.size"
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                        placeholder="Property size"
+                                        min="0"
+                                    >
+                                    @error('form.size') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <!-- Square Range -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Square Range</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="arrows-pointing-out" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        wire:model="form.square_range"
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                        placeholder="E.g. 100-150 sqm"
+                                    >
+                                    @error('form.square_range') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                                <div class="relative">
                                     <div class="absolute top-3 left-3 flex items-start pointer-events-none">
-                                    <flux:icon name="document-text" class="h-5 w-5 text-gray-400" />
+                                        <flux:icon name="document-text" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <textarea
+                                        wire:model="form.description"
+                                        rows="4"
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                        placeholder="Describe the property"
+                                    ></textarea>
+                                    @error('form.description') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
-                                <textarea
-                                    wire:model="form.description"
-                                    id="description"
-                                    rows="4"
-                                rows="4"
-                                class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm">
-                                </textarea>
-                                @error('form.description') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Location Section -->
+                    <div>
+                        <h4 class="text-md font-medium text-gray-700 dark:text-gray-300 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                            Location Details
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Location -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Location</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="map-pin" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        wire:model="form.location"
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                        placeholder="General location"
+                                    >
+                                    @error('form.location') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <!-- City -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">City</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="building-office-2" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        wire:model="form.city"
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                        placeholder="City name"
+                                    >
+                                    @error('form.city') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <!-- Address -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Address</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="home-modern" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        wire:model="form.address"
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                        placeholder="Street address"
+                                    >
+                                    @error('form.address') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <!-- Neighborhood -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Neighborhood</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="map" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        wire:model="form.neighborhood"
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                        placeholder="Neighborhood or area"
+                                    >
+                                    @error('form.neighborhood') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Property Features -->
+                    <div>
+                        <h4 class="text-md font-medium text-gray-700 dark:text-gray-300 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                            Property Features
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <!-- Bedrooms -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bedrooms</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="moon" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="number"
+                                        wire:model="form.bedrooms"
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                        placeholder="Number of bedrooms"
+                                        min="0"
+                                    >
+                                    @error('form.bedrooms') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <!-- Bathrooms -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bathrooms</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="beaker" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="number"
+                                        wire:model="form.bathrooms"
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                        placeholder="Number of bathrooms"
+                                        min="0"
+                                    >
+                                    @error('form.bathrooms') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <!-- WhatsApp Number -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">WhatsApp Number</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="phone" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        wire:model="form.whatsapp_number"
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                        placeholder="Contact WhatsApp number"
+                                    >
+                                    @error('form.whatsapp_number') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <!-- Status -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="check-circle" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <select
+                                        wire:model="form.status"
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                    >
+                                        <option value="available">Available</option>
+                                        <option value="under_contract">Under Contract</option>
+                                        <option value="sold">Sold</option>
+                                        <option value="rented">Rented</option>
+                                    </select>
+                                    @error('form.status') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <!-- Available -->
+                            <div class="flex items-center">
+                                <div class="relative flex items-start pt-6">
+                                    <div class="flex items-center h-5">
+                                        <input 
+                                            type="checkbox" 
+                                            wire:model="form.available"
+                                            class="h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-[#02c9c2] focus:ring-[#02c9c2]"
+                                        >
+                                    </div>
+                                    <div class="ml-3 text-sm">
+                                        <label class="font-medium text-gray-700 dark:text-gray-300">Available for viewing</label>
+                                    </div>
+                                </div>
+                                @error('form.available') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            </div>
+
+                            <!-- Featured -->
+                            <div class="flex items-center">
+                                <div class="relative flex items-start pt-6">
+                                    <div class="flex items-center h-5">
+                                        <input 
+                                            type="checkbox" 
+                                            wire:model="form.is_featured"
+                                            class="h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-[#02c9c2] focus:ring-[#02c9c2]"
+                                        >
+                                    </div>
+                                    <div class="ml-3 text-sm">
+                                        <label class="font-medium text-gray-700 dark:text-gray-300">Featured property</label>
+                                    </div>
+                                </div>
+                                @error('form.is_featured') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Commercial Fields Section (conditional) -->
+                    <div x-show="$wire.form.listing_type === 'commercial'">
+                        <h4 class="text-md font-medium text-gray-700 dark:text-gray-300 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                            Commercial Property Details
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Commercial Type -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Commercial Type</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="building-storefront" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <select
+                                        wire:model="form.commercial_type"
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                    >
+                                        <option value="">Select Type</option>
+                                        <option value="office">Office</option>
+                                        <option value="retail">Retail</option>
+                                        <option value="industrial">Industrial</option>
+                                        <option value="warehouse">Warehouse</option>
+                                        <option value="mixed_use">Mixed Use</option>
+                                    </select>
+                                    @error('form.commercial_type') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <!-- Commercial Size -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Commercial Size</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="arrows-pointing-out" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        wire:model="form.commercial_size"
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                        placeholder="Size description"
+                                    >
+                                    @error('form.commercial_size') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <!-- Monthly Price -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Monthly Price</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="currency-dollar" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        wire:model="form.commercial_price_monthly"
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                        placeholder="Monthly price"
+                                    >
+                                    @error('form.commercial_price_monthly') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <!-- Annual Price -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Annual Price</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="currency-dollar" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        wire:model="form.commercial_price_annually"
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                        placeholder="Annual price"
+                                    >
+                                    @error('form.commercial_price_annually') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <!-- More Commercial fields can be added as needed -->
+                        </div>
+                    </div>
+
+                    <!-- Rental Fields Section (conditional) -->
+                    <div x-show="$wire.form.listing_type === 'rent'">
+                        <h4 class="text-md font-medium text-gray-700 dark:text-gray-300 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                            Rental Property Details
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Daily Rental Price -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Daily Price</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="currency-dollar" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="number"
+                                        wire:model="form.rental_price_daily"
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                        placeholder="Daily rental price"
+                                        min="0"
+                                    >
+                                    @error('form.rental_price_daily') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <!-- Monthly Rental Price -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Monthly Price</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="currency-dollar" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="number"
+                                        wire:model="form.rental_price_monthly"
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                        placeholder="Monthly rental price"
+                                        min="0"
+                                    >
+                                    @error('form.rental_price_monthly') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <!-- Furnished -->
+                            <div class="flex items-center">
+                                <div class="relative flex items-start pt-6">
+                                    <div class="flex items-center h-5">
+                                        <input 
+                                            type="checkbox" 
+                                            wire:model="form.is_furnished"
+                                            class="h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-[#02c9c2] focus:ring-[#02c9c2]"
+                                        >
+                                    </div>
+                                    <div class="ml-3 text-sm">
+                                        <label class="font-medium text-gray-700 dark:text-gray-300">Furnished</label>
+                                    </div>
+                                </div>
+                                @error('form.is_furnished') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            </div>
+
+                            <!-- Security Deposit -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Security Deposit</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="currency-dollar" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="number"
+                                        wire:model="form.security_deposit"
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                        placeholder="Security deposit amount"
+                                        min="0"
+                                    >
+                                    @error('form.security_deposit') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <!-- More Rental fields can be added as needed -->
+                        </div>
+                    </div>
+
+                    <!-- Airbnb Fields Section (conditional) -->
+                    <div x-show="$wire.form.listing_type === 'airbnb'">
+                        <h4 class="text-md font-medium text-gray-700 dark:text-gray-300 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                            Airbnb Property Details
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Airbnb Nightly Price -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nightly Price</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="currency-dollar" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="number"
+                                        wire:model="form.airbnb_price_nightly"
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                        placeholder="Nightly price"
+                                        min="0"
+                                    >
+                                    @error('form.airbnb_price_nightly') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <!-- Airbnb Weekly Price -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Weekly Price</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="currency-dollar" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="number"
+                                        wire:model="form.airbnb_price_weekly"
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                        placeholder="Weekly price"
+                                        min="0"
+                                    >
+                                    @error('form.airbnb_price_weekly') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <!-- Airbnb Monthly Price -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Monthly Price</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="currency-dollar" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="number"
+                                        wire:model="form.airbnb_price_monthly"
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                        placeholder="Monthly price"
+                                        min="0"
+                                    >
+                                    @error('form.airbnb_price_monthly') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <!-- More Airbnb fields can be added as needed -->
                         </div>
                     </div>
 
@@ -537,6 +1193,7 @@ new class extends Component {
                         </button>
                     </div>
                 </form>
+
             </div>
         </div>
     </flux:modal>
