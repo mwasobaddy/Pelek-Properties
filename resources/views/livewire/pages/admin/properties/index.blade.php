@@ -57,12 +57,68 @@ new class extends Component {
 
     public function with(): array
     {
-        return [
-            'properties' => Property::with(['propertyType', 'images'])
-                ->latest()
-                ->get(),
-            'propertyTypes' => PropertyType::pluck('name', 'id')
-        ];
+        $this->isLoading = true;
+        
+        try {
+            $query = Property::with(['propertyType', 'images'])
+                ->when($this->search, function($query) {
+                    $query->where('title', 'like', '%' . $this->search . '%')
+                        ->orWhere('description', 'like', '%' . $this->search . '%');
+                })
+                ->when($this->filters['status'], fn($query) => 
+                    $query->where('status', $this->filters['status'])
+                )
+                ->when($this->filters['property_type'], fn($query) => 
+                    $query->where('property_type_id', $this->filters['property_type'])
+                )
+                ->when($this->filters['price_range'], function($query) {
+                    [$min, $max] = explode('-', $this->filters['price_range']);
+                    return $query->whereBetween('price', [$min, $max]);
+                });
+                
+            // Handle the sorting
+            if ($this->sortField === 'property_type') {
+                $query->join('property_types', 'properties.property_type_id', '=', 'property_types.id')
+                    ->select('properties.*')
+                    ->orderBy('property_types.name', $this->sortDirection);
+            } else {
+                $query->orderBy($this->sortField, $this->sortDirection);
+            }
+            
+            return [
+                'properties' => $query->paginate(9),
+                'propertyTypes' => PropertyType::pluck('name', 'id'),
+                'priceRanges' => [
+                    '' => 'All Prices',
+                    '0-1000000' => 'Under 1M',
+                    '1000000-5000000' => '1M - 5M',
+                    '5000000-10000000' => '5M - 10M',
+                    '10000000-999999999' => 'Over 10M'
+                ]
+            ];
+        } finally {
+            $this->isLoading = false;
+        }
+    }
+
+    public function sort($field): void 
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+    }
+
+    public function toggleFilters(): void
+    {
+        $this->showFilters = !$this->showFilters;
+    }
+
+    public function resetFilters(): void
+    {
+        $this->reset('filters');
     }
 
     public function rules()
@@ -153,15 +209,100 @@ new class extends Component {
                 </p>
             </div>
             
-            <a 
-                href="{{ route('admin.properties.manage') }}" 
-                wire:navigate
+            <button 
+                wire:click="create"
                 class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#02c9c2] to-[#012e2b] text-white font-medium rounded-lg text-sm hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02c9c2] dark:focus:ring-offset-gray-900 transition-all duration-150 shadow-lg"
+                wire:loading.attr="disabled"
             >
                 <flux:icon wire:loading.remove name="plus" class="w-5 h-5 mr-2" />
                 <flux:icon wire:loading name="arrow-path" class="w-5 h-5 mr-2 animate-spin" />
                 Add New Property
-            </a>
+            </button>
+        </div>
+
+        <!-- Enhanced Search and Filters with Animation -->
+        <div class="mt-8 space-y-4" 
+             x-data="{}"
+             x-intersect="$el.classList.add('animate-fade-in')">
+            <div class="flex flex-col sm:flex-row gap-4">
+                <!-- Search Input -->
+                <div class="flex-1 relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <flux:icon wire:loading.remove wire:target="search" name="magnifying-glass" class="h-5 w-5 text-gray-400" />
+                        <flux:icon wire:loading wire:target="search" name="arrow-path" class="h-5 w-5 text-[#02c9c2] animate-spin" />
+                    </div>
+                    <input wire:model.live.debounce.300ms="search" type="search"
+                           class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-[#02c9c2] focus:ring-[#02c9c2] sm:text-sm"
+                           placeholder="Search properties...">
+                </div>
+
+                <!-- Filter Toggle Button -->
+                <button
+                    wire:click="toggleFilters"
+                    class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02c9c2] dark:focus:ring-offset-gray-900 transition-all duration-150 shadow-sm"
+                >
+                    <flux:icon name="funnel" class="w-5 h-5 mr-2" />
+                    Filters
+                    <span class="ml-2 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full px-2 py-0.5">
+                        {{ array_filter($filters) ? count(array_filter($filters)) : '0' }}
+                    </span>
+                </button>
+            </div>
+
+            <!-- Filters Panel -->
+            <div x-show="$wire.showFilters"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 transform -translate-y-2"
+                 x-transition:enter-end="opacity-100 transform translate-y-0"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 transform translate-y-0"
+                 x-transition:leave-end="opacity-0 transform -translate-y-2"
+                 class="p-4 bg-white/50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 backdrop-blur-xl shadow-sm space-y-4"
+            >
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Status Filter -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                        <select wire:model.live="filters.status"
+                                class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-[#02c9c2] focus:border-[#02c9c2] sm:text-sm rounded-md bg-white dark:bg-gray-800">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+
+                    <!-- Property Type Filter -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Property Type</label>
+                        <select wire:model.live="filters.property_type"
+                                class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-[#02c9c2] focus:border-[#02c9c2] sm:text-sm rounded-md bg-white dark:bg-gray-800">
+                            <option value="">All Types</option>
+                            @foreach($propertyTypes as $id => $type)
+                                <option value="{{ $id }}">{{ $type }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Price Range Filter -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Price Range</label>
+                        <select wire:model.live="filters.price_range"
+                                class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-[#02c9c2] focus:border-[#02c9c2] sm:text-sm rounded-md bg-white dark:bg-gray-800">
+                            @foreach($priceRanges as $value => $label)
+                                <option value="{{ $value }}">{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Filter Actions -->
+                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <button wire:click="resetFilters"
+                            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02c9c2]">
+                        Reset Filters
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -274,6 +415,21 @@ new class extends Component {
                 </div>
             @endforelse
         </div>
+
+        <!-- Loading Overlay -->
+        <div wire:loading.delay class="fixed inset-0 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm z-10 flex items-center justify-center">
+            <div class="flex items-center space-x-4">
+                <flux:icon name="arrow-path" class="w-8 h-8 text-[#02c9c2] animate-spin" />
+                <span class="text-gray-600 dark:text-gray-300 font-medium">Loading properties...</span>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        @if($properties->hasPages())
+            <div class="mt-6">
+                {{ $properties->links() }}
+            </div>
+        @endif
     </div>
 
     <!-- Property Form Modal -->
@@ -293,44 +449,79 @@ new class extends Component {
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Title -->
                         <div class="md:col-span-2">
-                            <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Property Title</label>
-                            <input type="text" wire:model="form.title" id="title" 
-                                   class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 shadow-sm focus:border-[#02c9c2] focus:ring-[#02c9c2]">
-                            @error('form.title') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Property Title</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <flux:icon name="building-office" class="h-5 w-5 text-gray-400" />
+                                </div>
+                                <input
+                                    type="text"
+                                    wire:model="form.title"
+                                    class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                    placeholder="Enter property title"
+                                >
+                                @error('form.title')
+                                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                                @enderror
+                            </div>
                         </div>
 
                         <!-- Property Type -->
                         <div>
-                            <label for="property_type_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Property Type</label>
-                            <select wire:model="form.property_type_id" id="property_type_id"
-                                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 shadow-sm focus:border-[#02c9c2] focus:ring-[#02c9c2]">
-                                <option value="">Select Type</option>
-                                @foreach($propertyTypes as $id => $type)
-                                    <option value="{{ $id }}">{{ $type }}</option>
-                                @endforeach
-                            </select>
-                            @error('form.property_type_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Property Type</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <flux:icon name="home" class="h-5 w-5 text-gray-400" />
+                                </div>
+                                <select
+                                    wire:model="form.property_type_id"
+                                    id="property_type_id"
+                                    class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                >
+                                    <option value="">Select Type</option>
+                                    @foreach($propertyTypes as $id => $type)
+                                        <option value="{{ $id }}">{{ $type }}</option>
+                                    @endforeach
+                                </select>
+                                @error('form.property_type_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            </div>
                         </div>
 
                         <!-- Price -->
                         <div>
-                            <label for="price" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Price (KES)</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Price (KES)</label>
                             <div class="mt-1 relative rounded-md shadow-sm">
-                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                    <span class="text-gray-500 dark:text-gray-400 sm:text-sm">KES</span>
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <flux:icon name="currency-dollar" class="h-5 w-5 text-gray-400" />
                                 </div>
-                                <input type="number" wire:model="form.price" id="price"
-                                       class="pl-12 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 shadow-sm focus:border-[#02c9c2] focus:ring-[#02c9c2]">
+                                <input
+                                    type="number"
+                                    wire:model="form.price"
+                                    id="price"
+                                    class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                    placeholder="Enter property price (KES)"
+                                    min="0"
+                                >
+                                @error('form.price') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                             </div>
-                            @error('form.price') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 
                         <!-- Description -->
                         <div class="md:col-span-2">
                             <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
-                            <textarea wire:model="form.description" id="description" rows="4"
-                                      class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 shadow-sm focus:border-[#02c9c2] focus:ring-[#02c9c2]"></textarea>
-                            @error('form.description') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            <div class="relative">
+                                    <div class="absolute top-3 left-3 flex items-start pointer-events-none">
+                                    <flux:icon name="document-text" class="h-5 w-5 text-gray-400" />
+                                </div>
+                                <textarea
+                                    wire:model="form.description"
+                                    id="description"
+                                    rows="4"
+                                rows="4"
+                                class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm">
+                                </textarea>
+                                @error('form.description') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            </div>
                         </div>
                     </div>
 
