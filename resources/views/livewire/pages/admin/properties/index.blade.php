@@ -153,16 +153,23 @@ new class extends Component {
                 $query->orderBy($this->sortField, $this->sortDirection);
             }
             
+            $minPrice = Property::min('price') ?: 0;
+            $maxPrice = Property::max('price') ?: 0;
+            
+            // Create dynamic range segments
+            $rangeStep = ($maxPrice - $minPrice) / 4; // Divide into 4 segments
+            $ranges = [
+                '' => 'All Prices',
+                "{$minPrice}-" . ($minPrice + $rangeStep) => 'Low Range: ' . number_format($minPrice) . ' - ' . number_format($minPrice + $rangeStep),
+                ($minPrice + $rangeStep + 1) . '-' . ($minPrice + (2 * $rangeStep)) => 'Mid-Low: ' . number_format($minPrice + $rangeStep + 1) . ' - ' . number_format($minPrice + (2 * $rangeStep)),
+                ($minPrice + (2 * $rangeStep) + 1) . '-' . ($minPrice + (3 * $rangeStep)) => 'Mid-High: ' . number_format($minPrice + (2 * $rangeStep) + 1) . ' - ' . number_format($minPrice + (3 * $rangeStep)),
+                ($minPrice + (3 * $rangeStep) + 1) . "-{$maxPrice}" => 'High Range: ' . number_format($minPrice + (3 * $rangeStep) + 1) . ' - ' . number_format($maxPrice),
+            ];
+
             return [
                 'properties' => $query->paginate(9),
                 'propertyTypes' => PropertyType::pluck('name', 'id'),
-                'priceRanges' => [
-                    '' => 'All Prices',
-                    '0-1000000' => 'Under 1M',
-                    '1000000-5000000' => '1M - 5M',
-                    '5000000-10000000' => '5M - 10M',
-                    '10000000-999999999' => 'Over 10M'
-                ]
+                'priceRanges' => $ranges
             ];
         } finally {
             $this->isLoading = false;
@@ -345,6 +352,34 @@ new class extends Component {
         $this->selectedProperty = $property; // Restore selected property after form reset
         $this->form = array_merge($this->form, $propertyData);
         $this->modalMode = 'edit';
+        $this->showFormModal = true;
+    }
+    
+    public function view($id)
+    {
+        $property = Property::with('images')->findOrFail($id);
+        $this->selectedProperty = $property;
+        
+        // Extract property data before resetting the form
+        $propertyData = $property->only([
+            'title', 'property_type_id', 'description', 'type', 'listing_type',
+            'price', 'size', 'square_range', 'location', 'city', 'address',
+            'neighborhood', 'bedrooms', 'bathrooms', 'available', 'whatsapp_number',
+            'status', 'commercial_type', 'commercial_size', 'commercial_price_monthly',
+            'commercial_price_annually', 'floors', 'maintenance_status', 'last_renovation',
+            'has_parking', 'parking_spaces', 'commercial_amenities', 'zoning_info',
+            'price_per_square_foot', 'is_furnished', 'rental_price_daily',
+            'rental_price_monthly', 'security_deposit', 'lease_terms', 'utilities_included',
+            'available_from', 'minimum_lease_period', 'rental_requirements',
+            'amenities_condition', 'airbnb_price_nightly', 'airbnb_price_weekly',
+            'airbnb_price_monthly', 'availability_calendar', 'is_featured',
+            'additional_features'
+        ]);
+        
+        $this->resetForm();
+        $this->selectedProperty = $property; // Restore selected property after form reset
+        $this->form = array_merge($this->form, $propertyData);
+        $this->modalMode = 'view';
         $this->showFormModal = true;
     }
     
@@ -600,7 +635,7 @@ new class extends Component {
                 <!-- Filter Toggle Button -->
                 <button
                     wire:click="toggleFilters"
-                    class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02c9c2] dark:focus:ring-offset-gray-900 transition-all duration-150 shadow-sm"
+                    class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#02c9c2] to-[#012e2b] text-white rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02c9c2] dark:focus:ring-offset-gray-900 transition-all duration-150 shadow-sm backdrop-blur-xl"
                 >
                     <flux:icon name="funnel" class="w-5 h-5 mr-2" />
                     Filters
@@ -624,43 +659,74 @@ new class extends Component {
                     <!-- Status Filter -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
-                        <select wire:model.live="filters.status"
-                                class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-[#02c9c2] focus:border-[#02c9c2] sm:text-sm rounded-md bg-white dark:bg-gray-800">
-                            <option value="">All Status</option>
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                        </select>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <flux:icon name="check-circle" class="h-5 w-5 text-gray-400" />
+                            </div>
+                            <select
+                                wire:model.live="filters.status"
+                                class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                            >
+                                <option value="">All Status</option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
                     </div>
 
                     <!-- Property Type Filter -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Property Type</label>
-                        <select wire:model.live="filters.property_type"
-                                class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-[#02c9c2] focus:border-[#02c9c2] sm:text-sm rounded-md bg-white dark:bg-gray-800">
-                            <option value="">All Types</option>
-                            @foreach($propertyTypes as $id => $type)
-                                <option value="{{ $id }}">{{ $type }}</option>
-                            @endforeach
-                        </select>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <flux:icon name="home" class="h-5 w-5 text-gray-400" />
+                            </div>
+                            <select
+                                wire:model.live="filters.property_type"
+                                class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                            >
+                                <option value="">All Types</option>
+                                @foreach($propertyTypes as $id => $type)
+                                    <option value="{{ $id }}">{{ $type }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
 
                     <!-- Price Range Filter -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Price Range</label>
-                        <select wire:model.live="filters.price_range"
-                                class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-[#02c9c2] focus:border-[#02c9c2] sm:text-sm rounded-md bg-white dark:bg-gray-800">
-                            @foreach($priceRanges as $value => $label)
-                                <option value="{{ $value }}">{{ $label }}</option>
-                            @endforeach
-                        </select>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <flux:icon name="currency-dollar" class="h-5 w-5 text-gray-400" />
+                            </div>
+                            <select
+                                wire:model.live="filters.price_range"
+                                class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                            >
+                                @foreach($priceRanges as $value => $label)
+                                    <option value="{{ $value }}">{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                 </div>
                 
                 <!-- Filter Actions -->
-                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div class="flex flex-col md:flex-row items-center justify-center gap-4 col-span-2 mt-2">
+
+                    <!-- Reset Filters Button -->
                     <button wire:click="resetFilters"
-                            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02c9c2]">
-                        Reset Filters
+                        class="group relative overflow-hidden rounded-lg bg-gradient-to-r from-[#02c9c2] to-[#02a8a2] px-5 py-2.5 text-sm font-medium text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]">
+                        <!-- Background animation on hover -->
+                        <span
+                            class="absolute inset-0 translate-y-full bg-gradient-to-r from-[#012e2b] to-[#014e4a] group-hover:translate-y-0 transition-transform duration-300 ease-out"></span>
+                        <!-- Content remains visible -->
+                        <span class="relative flex items-center gap-2">
+                            <flux:icon name="arrow-path"
+                                class="h-4 w-4 transition-transform group-hover:rotate-180 duration-500" />
+                            <span>Clear All Filters</span>
+                        </span>
                     </button>
                 </div>
             </div>
@@ -713,45 +779,35 @@ new class extends Component {
                                         Active
                                     </span>
                                 </div>
-                                <!-- Dropdown Menu -->
-                                <div class="relative" x-data="{ open: false }">
-                                    <button 
-                                        @click="open = !open"
-                                        class="p-2 text-gray-500 hover:text-[#02c9c2] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-150"
-                                    >
-                                        <flux:icon name="ellipsis-vertical" class="w-5 h-5" />
-                                    </button>
-                                    
-                                    <!-- Dropdown Content -->
-                                    <div 
-                                        x-show="open" 
-                                        @click.away="open = false"
-                                        x-transition
-                                        class="absolute right-0 mt-2 w-48 rounded-lg bg-white dark:bg-gray-800 shadow-lg ring-1 ring-gray-200 dark:ring-gray-700 py-1 z-10"
-                                    >
-                                        <a href="#" wire:click.prevent="edit({{ $property->id }})" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                            <flux:icon name="pencil" class="w-4 h-4 mr-2" />
-                                            Edit Details
-                                        </a>
-                                        <a href="#" wire:click.prevent="confirmDelete({{ $property->id }})" class="flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                            <flux:icon name="trash" class="w-4 h-4 mr-2" />
-                                            Delete
-                                        </a>
-                                    </div>
-                                </div>
                             </div>
                         </div>
 
                         <!-- Enhanced Action Buttons -->
                         <div class="flex items-center gap-2 pt-4 border-t border-gray-100 dark:border-gray-700">
-                            <a 
-                                href="{{ route('admin.properties.photos', $property) }}" 
-                                wire:navigate
-                                class="flex-1 inline-flex justify-center items-center px-4 py-2 text-sm font-medium rounded-lg bg-[#02c9c2]/10 text-[#02c9c2] hover:bg-[#02c9c2]/20 transition-colors duration-150"
+                            <button
+                                wire:click.prevent="view({{ $property->id }})"
+                                class="text-gray-200 dark:text-gray-300 hover:text-[#02c9c2] dark:hover:text-[#02c9c2] transition-colors duration-150 bg-indigo-500 dark:bg-indigo-700/50 rounded-lg p-2"
+                                wire:loading.attr="disabled"
                             >
-                                <flux:icon name="photo" class="w-4 h-4 mr-2" />
-                                Manage Photos
-                            </a>
+                                <flux:icon wire:loading.remove wire:target="view({{ $property->id }})" name="eye" class="w-5 h-5" />
+                                <flux:icon wire:loading wire:target="view({{ $property->id }})" name="arrow-path" class="w-5 h-5 animate-spin" />
+                            </button>
+                            <button
+                                wire:click.prevent="edit({{ $property->id }})"
+                                class="text-gray-200 dark:text-gray-300 hover:text-[#02c9c2] dark:hover:text-[#02c9c2] transition-colors duration-150 bg-green-500 dark:bg-green-700/50 rounded-lg p-2"
+                                wire:loading.attr="disabled"
+                            >
+                                <flux:icon wire:loading.remove wire:target="edit({{ $property->id }})" name="pencil-square" class="w-5 h-5" />
+                                <flux:icon wire:loading wire:target="edit({{ $property->id }})" name="arrow-path" class="w-5 h-5 animate-spin" />
+                            </button>
+                            <button
+                                wire:click.prevent="confirmDelete({{ $property->id }})"
+                                class="text-gray-200 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-500 transition-colors duration-150 bg-red-500 dark:bg-red-700/50 rounded-lg p-2"
+                                wire:loading.attr="disabled"
+                            >
+                                <flux:icon wire:loading.remove wire:target="confirmDelete({{ $property->id }})" name="trash" class="w-5 h-5" />
+                                <flux:icon wire:loading wire:target="confirmDelete({{ $property->id }})" name="arrow-path" class="w-5 h-5 animate-spin" />
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -787,19 +843,40 @@ new class extends Component {
 
         <!-- Pagination -->
         @if($properties->hasPages())
-            <div class="mt-6">
-                {{ $properties->links() }}
+            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700">
+                {{ $properties->links('components.pagination') }}
             </div>
         @endif
     </div>
 
     <!-- Property Form Modal -->
     <flux:modal wire:model="showFormModal" class="w-full max-w-4xl !p-0" @close="$wire.resetForm()">
-        <div class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden">
+        <div
+            class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden" 
+            x-data="{
+                isViewMode: function() { return '{{ $modalMode }}' === 'view' },
+                init() {
+                    // If in view mode, disable all form elements
+                    if (this.isViewMode()) {
+                        this.$nextTick(() => {
+                            this.$el.querySelectorAll('input, select, textarea').forEach(el => {
+                                el.disabled = true;
+                            });
+                        });
+                    }
+                }
+            }"
+        >
             <!-- Modal Header -->
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                    {{ $modalMode === 'create' ? 'Add New Property' : 'Edit Property' }}
+                    @if($modalMode === 'create')
+                        Add New Property
+                    @elseif($modalMode === 'edit')
+                        Edit Property
+                    @else
+                        View Property Details
+                    @endif
                 </h3>
             </div>
 
@@ -824,6 +901,7 @@ new class extends Component {
                                         wire:model="form.title"
                                         class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
                                         placeholder="Enter property title"
+                                        @if($modalMode === 'view') disabled @endif
                                     >
                                     @error('form.title') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
@@ -839,6 +917,7 @@ new class extends Component {
                                     <select
                                         wire:model="form.property_type_id"
                                         class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                        @if($modalMode === 'view') disabled @endif
                                     >
                                         <option value="">Select Type</option>
                                         @foreach($propertyTypes as $id => $type)
@@ -990,12 +1069,35 @@ new class extends Component {
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <flux:icon name="building-office-2" class="h-5 w-5 text-gray-400" />
                                     </div>
-                                    <input
-                                        type="text"
+                                    <select
                                         wire:model="form.city"
                                         class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
-                                        placeholder="City name"
                                     >
+                                        <option value="">Select City</option>
+                                        <option value="Nairobi">Nairobi</option>
+                                        <option value="Mombasa">Mombasa</option>
+                                        <option value="Kisumu">Kisumu</option>
+                                        <option value="Nakuru">Nakuru</option>
+                                        <option value="Eldoret">Eldoret</option>
+                                        <option value="Malindi">Malindi</option>
+                                        <option value="Kitale">Kitale</option>
+                                        <option value="Garissa">Garissa</option>
+                                        <option value="Thika">Thika</option>
+                                        <option value="Nyeri">Nyeri</option>
+                                        <option value="Kakamega">Kakamega</option>
+                                        <option value="Kisii">Kisii</option>
+                                        <option value="Machakos">Machakos</option>
+                                        <option value="Meru">Meru</option>
+                                        <option value="Lamu">Lamu</option>
+                                        <option value="Naivasha">Naivasha</option>
+                                        <option value="Athi River">Athi River</option>
+                                        <option value="Bungoma">Bungoma</option>
+                                        <option value="Kericho">Kericho</option>
+                                        <option value="Kilifi">Kilifi</option>
+                                        <option value="Voi">Voi</option>
+                                        <option value="Webuye">Webuye</option>
+                                        <option value="Ruiru">Ruiru</option>
+                                    </select>
                                     @error('form.city') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
                             </div>
@@ -1383,8 +1485,23 @@ new class extends Component {
                     <div class="space-y-4">
                         <h4 class="text-lg font-medium text-gray-900 dark:text-white">Property Images</h4>
                         
+                        <!-- View Mode Message -->
+                        <div x-show="isViewMode()" class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-4">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <flux:icon name="information-circle" class="h-5 w-5 text-blue-400" />
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-blue-800 dark:text-blue-300">View Mode</h3>
+                                    <div class="mt-2 text-sm text-blue-700 dark:text-blue-400">
+                                        <p>You are currently viewing property details. Images cannot be modified in this mode.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <!-- Image Upload Area -->
-                        <div class="flex items-center justify-center w-full">
+                        <div x-show="!isViewMode()" class="flex items-center justify-center w-full">
                             <label for="image-upload" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500">
                                 <div class="flex flex-col items-center justify-center pt-5 pb-6">
                                     <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
@@ -1424,8 +1541,8 @@ new class extends Component {
                             </div>
                         @endif
 
-                        <!-- Existing Images (Edit Mode) -->
-                        @if($modalMode === 'edit' && $selectedProperty?->images)
+                        <!-- Existing Images (Edit/View Mode) -->
+                        @if(($modalMode === 'edit' || $modalMode === 'view') && $selectedProperty?->images)
                             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
                                 @foreach($selectedProperty->images as $image)
                                     <div class="relative group">
@@ -1434,6 +1551,8 @@ new class extends Component {
                                             class="w-full h-32 object-cover rounded-lg {{ $image->is_featured ? 'ring-2 ring-blue-500' : '' }}"
                                             alt="{{ $image->alt_text }}"
                                         >
+                                        <!-- Only show action buttons in edit mode -->
+                                        @if($modalMode === 'edit')
                                         <div class="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center space-x-2">
                                             <button 
                                                 type="button" 
@@ -1455,6 +1574,17 @@ new class extends Component {
                                                 </svg>
                                             </button>
                                         </div>
+                                        @else
+                                        <!-- View mode indicator for featured images -->
+                                        @if($image->is_featured)
+                                        <div class="absolute bottom-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                                            <span class="flex items-center">
+                                                <flux:icon name="star" class="w-3 h-3 mr-1" />
+                                                Featured
+                                            </span>
+                                        </div>
+                                        @endif
+                                        @endif
                                     </div>
                                 @endforeach
                             </div>
@@ -1466,11 +1596,17 @@ new class extends Component {
             <!-- Modal Footer -->
             <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 flex justify-end space-x-3">
                 <flux:button variant="primary" wire:click="$toggle('showFormModal')">
-                    Cancel
+                    @if($modalMode === 'view')
+                        Close
+                    @else
+                        Cancel
+                    @endif
                 </flux:button>
+                @if($modalMode !== 'view')
                 <flux:button wire:click="save">
                     {{ $modalMode === 'create' ? 'Create Property' : 'Update Property' }}
                 </flux:button>
+                @endif
             </div>
         </div>
     </flux:modal>
@@ -1507,8 +1643,10 @@ new class extends Component {
                         Cancel
                     </button>
                     <button type="button" wire:click="delete"
-                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-gray-900">
-                        <flux:icon name="trash" class="w-4 h-4 mr-1.5" />
+                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-gray-900"
+                            wire:loading.attr="disabled">
+                        <flux:icon wire:loading.remove wire:target="delete" name="trash" class="w-4 h-4 mr-1.5" />
+                        <flux:icon wire:loading wire:target="delete" name="arrow-path" class="w-4 h-4 mr-1.5 animate-spin" />
                         Delete Property
                     </button>
                 </div>
@@ -1539,8 +1677,10 @@ new class extends Component {
                         Cancel
                     </button>
                     <button type="button" wire:click="deleteImage"
-                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-gray-900">
-                        <flux:icon name="trash" class="w-4 h-4 mr-1.5" />
+                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-gray-900"
+                            wire:loading.attr="disabled">
+                        <flux:icon wire:loading.remove wire:target="deleteImage" name="trash" class="w-4 h-4 mr-1.5" />
+                        <flux:icon wire:loading wire:target="deleteImage" name="arrow-path" class="w-4 h-4 mr-1.5 animate-spin" />
                         Delete Image
                     </button>
                 </div>

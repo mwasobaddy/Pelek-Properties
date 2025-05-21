@@ -49,7 +49,12 @@
             <flux:navlist variant="outline" class="mt-6 px-1 space-y-2">
                 <!-- Main Platform Section -->
                 <div class="sidebar-section">
-                    <flux:navlist.group :heading="__('platform')" class="grid gap-1">
+                    <flux:navlist.group 
+                        :heading="__('Quick Access')" 
+                        class="grid gap-1.5 relative"
+                    >
+                        <!-- Add decorative accent element -->
+                        <div class="absolute -left-1 top-0 h-5 w-1 bg-gradient-to-b from-[#02c9c2] to-[#012e2b] rounded-r-full"></div>
                         <flux:navlist.item 
                             icon="home" 
                             :href="route('dashboard')" 
@@ -58,17 +63,52 @@
                             wire:navigate
                         >
                             <span class="flex items-center gap-2">
-                                {{ __('dashboard') }}
+                                {{ __('Dashboard') }}
                                 <!-- New badge example -->
                                 <span class="hidden px-1.5 py-0.5 text-xs bg-[#02c9c2]/20 text-[#02c9c2] rounded-full">New</span>
                             </span>
+                        </flux:navlist.item>
+                        
+                        <flux:navlist.item 
+                            icon="building-office-2" 
+                            :href="route('admin.properties.index')" 
+                            :current="request()->routeIs('admin.properties.index')" 
+                            class="rounded-xl transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2] hover:scale-[1.02]"
+                            wire:navigate
+                        >
+                            {{ __('All Properties') }}
+                        </flux:navlist.item>
+                        
+                        <flux:navlist.item 
+                            icon="users" 
+                            :href="route('admin.tenants.index')" 
+                            :current="request()->routeIs('admin.tenants.index')" 
+                            class="rounded-xl transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2] hover:scale-[1.02]"
+                            wire:navigate
+                        >
+                            {{ __('Manage Tenants') }}
+                        </flux:navlist.item>
+
+                        <flux:navlist.item 
+                            icon="newspaper" 
+                            :href="route('admin.blog.index')" 
+                            :current="request()->routeIs('admin.blog.index')" 
+                            class="rounded-xl transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2] hover:scale-[1.02]"
+                            wire:navigate
+                        >
+                            {{ __('Blog Management') }}
                         </flux:navlist.item>
                     </flux:navlist.group>
                 </div>
 
                 <!-- Property Management Section with Enhanced Visual Hierarchy -->
                 <div class="sidebar-section">
-                    <flux:navlist.group :heading="__('property_management')" class="grid gap-1.5">
+                    <flux:navlist.group 
+                        :heading="__('Property Management')" 
+                        class="grid gap-1.5 relative"
+                    >
+                        <!-- Add decorative accent element -->
+                        <div class="absolute -left-1 top-0 h-5 w-1 bg-gradient-to-b from-[#02c9c2] to-[#012e2b] rounded-r-full"></div>
                         <flux:navlist.item 
                             icon="building-office-2" 
                             :href="route('management.contracts')" 
@@ -76,7 +116,7 @@
                             class="rounded-xl transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2] hover:scale-[1.02]"
                             wire:navigate
                         >
-                            {{ __('management_contracts') }}
+                            {{ __('Management Contracts') }}
                         </flux:navlist.item>
                         
                         <flux:navlist.item 
@@ -87,7 +127,7 @@
                             wire:navigate
                         >
                             <span class="flex items-center justify-between w-full">
-                                {{ __('maintenance_requests') }}
+                                {{ __('Maintenance Requests') }}
                                 <span class="flex h-5 w-5 items-center justify-center rounded-full bg-[#02c9c2] text-white text-xs font-medium">3</span>
                             </span>
                         </flux:navlist.item>
@@ -99,7 +139,7 @@
                             class="rounded-xl transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2] hover:scale-[1.02]"
                             wire:navigate
                         >
-                            {{ __('financial_records') }}
+                            {{ __('Financial Records') }}
                         </flux:navlist.item>
 
                         <flux:navlist.item 
@@ -109,7 +149,7 @@
                             class="rounded-xl transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2] hover:scale-[1.02]"
                             wire:navigate
                         >
-                            {{ __('property_valuations') }}
+                            {{ __('Property Valuations') }}
                         </flux:navlist.item>
 
                         <flux:navlist.item 
@@ -119,14 +159,19 @@
                             class="rounded-xl transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2] hover:scale-[1.02]"
                             wire:navigate
                         >
-                            {{ __('market_analysis') }}
+                            {{ __('Market Analysis') }}
                         </flux:navlist.item>
                     </flux:navlist.group>
                 </div>
 
                 <!-- Viewing Management Section with Visual Distinction -->
                 <div class="sidebar-section">
-                    <flux:navlist.group :heading="__('viewing_management')" class="grid gap-1.5">
+                    <flux:navlist.group 
+                        :heading="__('Schedule Management')" 
+                        class="grid gap-1.5 relative"
+                    >
+                        <!-- Add decorative accent element -->
+                        <div class="absolute -left-1 top-0 h-5 w-1 bg-gradient-to-b from-[#02c9c2] to-[#012e2b] rounded-r-full"></div>
                         <flux:navlist.item 
                             icon="calendar" 
                             :href="route('admin.schedule.index')" 
@@ -134,7 +179,7 @@
                             class="rounded-xl transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2] hover:scale-[1.02]"
                             wire:navigate
                         >
-                            {{ __('viewing_schedule') }}
+                            {{ __('Viewing Schedule') }}
                         </flux:navlist.item>
 
                         <flux:navlist.item 
@@ -144,14 +189,14 @@
                             class="rounded-xl transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2] hover:scale-[1.02]"
                             wire:navigate
                         >
-                            {{ __('manage_appointments') }}
+                            {{ __('Manage Appointments') }}
                         </flux:navlist.item>
                     </flux:navlist.group>
                 </div>
 
                 <!-- Tenant Management Section -->
                 <div class="sidebar-section">
-                    <flux:navlist.group :heading="__('tenant_management')" class="grid gap-1.5">
+                    <flux:navlist.group :heading="__('tenant management')" class="grid gap-1.5">
                         <flux:navlist.item 
                             icon="users" 
                             :href="route('admin.tenants.index')" 
@@ -159,7 +204,7 @@
                             class="rounded-xl transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2] hover:scale-[1.02]"
                             wire:navigate
                         >
-                            {{ __('manage_tenants') }}
+                            {{ __('Manage Tenants') }}
                         </flux:navlist.item>
                     </flux:navlist.group>
                 </div>
@@ -167,7 +212,7 @@
                 <!-- Properties Administration with Enhanced Group Headers -->
                 <div class="sidebar-section">
                     <flux:navlist.group 
-                        :heading="__('properties_admin')" 
+                        :heading="__('Properties Admin')" 
                         class="grid gap-1.5 relative"
                     >
                         <!-- Add decorative accent element -->
@@ -180,17 +225,17 @@
                             class="rounded-xl transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2] hover:scale-[1.02]"
                             wire:navigate
                         >
-                            {{ __('all_properties') }}
+                            {{ __('All Properties') }}
                         </flux:navlist.item>
                         
-                        <flux:navlist.item 
+                        {{-- <flux:navlist.item 
                             icon="cog" 
                             :href="route('admin.properties.manage')" 
                             :current="request()->routeIs('admin.properties.manage')" 
                             class="rounded-xl transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2] hover:scale-[1.02]"
                             wire:navigate
                         >
-                            {{ __('manage_properties') }}
+                            {{ __('Manage Properties') }}
                         </flux:navlist.item>
                         
                         <flux:navlist.item 
@@ -200,7 +245,7 @@
                             class="rounded-xl transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2] hover:scale-[1.02]"
                             wire:navigate
                         >
-                            {{ __('property_photos') }}
+                            {{ __('Property Photos') }}
                         </flux:navlist.item>
                         
                         <flux:navlist.item 
@@ -210,7 +255,7 @@
                             class="rounded-xl transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2] hover:scale-[1.02]"
                             wire:navigate
                         >
-                            {{ __('commercial_properties') }}
+                            {{ __('Commercial Properties') }}
                         </flux:navlist.item>
 
                         <flux:navlist.item 
@@ -220,7 +265,7 @@
                             class="rounded-xl transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2] hover:scale-[1.02]"
                             wire:navigate
                         >
-                            {{ __('property_offers') }}
+                            {{ __('Property Offers') }}
                         </flux:navlist.item>
 
                         <flux:navlist.item 
@@ -230,7 +275,7 @@
                             class="rounded-xl transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2] hover:scale-[1.02]"
                             wire:navigate
                         >
-                            {{ __('document_management') }}
+                            {{ __('Document Management') }}
                         </flux:navlist.item>
 
                         <flux:navlist.item 
@@ -240,7 +285,7 @@
                             class="rounded-xl transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2] hover:scale-[1.02]"
                             wire:navigate
                         >
-                            {{ __('development_projects') }}
+                            {{ __('Development Projects') }}
                         </flux:navlist.item>
 
                         <flux:navlist.item 
@@ -250,25 +295,25 @@
                             class="rounded-xl transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2] hover:scale-[1.02]"
                             wire:navigate
                         >
-                            {{ __('property_sales') }}
-                        </flux:navlist.item>
+                            {{ __('Property Sales') }}
+                        </flux:navlist.item> --}}
                     </flux:navlist.group>
                 </div>
 
                 <!-- Analytics Section with Improved Visual Design -->
                 <div class="sidebar-section">
-                    <flux:navlist.group :heading="__('analytics')" class="grid gap-1.5 relative">
+                    <flux:navlist.group :heading="__('Analytics')" class="grid gap-1.5 relative">
                         <!-- Add decorative accent element -->
                         <div class="absolute -left-1 top-0 h-5 w-1 bg-gradient-to-b from-[#02c9c2] to-[#012e2b] rounded-r-full"></div>
                         
-                        <flux:navlist.item 
+                        {{-- <flux:navlist.item 
                             icon="chart-pie" 
                             :href="route('admin.analytics.dashboard')" 
                             :current="request()->routeIs('admin.analytics.dashboard')" 
                             class="rounded-xl transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2] hover:scale-[1.02]"
                             wire:navigate
                         >
-                            {{ __('analytics_dashboard') }}
+                            {{ __('analytics dashboard') }}
                         </flux:navlist.item>
 
                         <flux:navlist.item 
@@ -278,7 +323,7 @@
                             class="rounded-xl transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2] hover:scale-[1.02]"
                             wire:navigate
                         >
-                            {{ __('reports_exports') }}
+                            {{ __('reports exports') }}
                         </flux:navlist.item>
 
                         <flux:navlist.item 
@@ -288,7 +333,7 @@
                             class="rounded-xl transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2] hover:scale-[1.02]"
                             wire:navigate
                         >
-                            {{ __('occupancy_reports') }}
+                            {{ __('occupancy reports') }}
                         </flux:navlist.item>
 
                         <flux:navlist.item 
@@ -298,39 +343,44 @@
                             class="rounded-xl transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2] hover:scale-[1.02]"
                             wire:navigate
                         >
-                            {{ __('audit_logs') }}
-                        </flux:navlist.item>
+                            {{ __('audit logs') }}
+                        </flux:navlist.item> --}}
+
+                        <!-- Placeholder for future system settings items -->
+                        <div class="px-4 py-2.5 text-xs text-gray-500 dark:text-gray-400 italic">
+                            Analytics coming soon
+                        </div>
                     </flux:navlist.group>
                 </div>
 
                 <!-- Other Management Section -->
                 <div class="sidebar-section"> 
-                    <flux:navlist.group :heading="__('other_management')" class="grid gap-1.5">
+                    <flux:navlist.group :heading="__('Other Management')" class="grid gap-1.5">
                         <flux:navlist.item 
                             icon="newspaper" 
-                            :href="route('blog.index')" 
-                            :current="request()->routeIs('blog.index')" 
+                            :href="route('admin.blog.index')" 
+                            :current="request()->routeIs('admin.blog.index')" 
                             class="rounded-xl transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2] hover:scale-[1.02]"
                             wire:navigate
                         >
-                            {{ __('blog_management') }}
+                            {{ __('Blog Management') }}
                         </flux:navlist.item>
 
-                        <flux:navlist.item 
+                        {{-- <flux:navlist.item 
                             icon="wrench-screwdriver" 
                             :href="route('management.maintenance')" 
                             :current="request()->routeIs('management.maintenance')" 
                             class="rounded-xl transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2] hover:scale-[1.02]"
                             wire:navigate
                         >
-                            {{ __('maintenance_requests') }}
-                        </flux:navlist.item>
+                            {{ __('Maintenance Requests') }}
+                        </flux:navlist.item> --}}
                     </flux:navlist.group>
                 </div>
 
                 <!-- System Settings -->
                 <div class="sidebar-section">
-                    <flux:navlist.group :heading="__('system')" class="grid gap-1.5">
+                    <flux:navlist.group :heading="__('System')" class="grid gap-1.5">
                         <!-- Placeholder for future system settings items -->
                         <div class="px-4 py-2.5 text-xs text-gray-500 dark:text-gray-400 italic">
                             System settings coming soon
