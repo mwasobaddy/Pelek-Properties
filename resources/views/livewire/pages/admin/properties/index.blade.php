@@ -3,9 +3,11 @@ use App\Models\Property;
 use App\Models\PropertyType;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
+use Livewire\WithFileUploads;
 
 new class extends Component {
     use WithPagination;
+    use WithFileUploads;
 
     #[State]
     public $showFilters = false;
@@ -22,6 +24,22 @@ new class extends Component {
     #[State]
     public $search = '';
     
+    // Image management states
+    #[State]
+    public $images = [];
+    
+    #[State]
+    public $temporaryImages = [];
+    
+    #[State]
+    public $imageUploads = [];
+    
+    #[State]
+    public $showImageDeleteModal = false;
+    
+    #[State]
+    public $selectedImage = null;
+
     #[State]
     public $filters = [
         'status' => '',
@@ -226,6 +244,57 @@ new class extends Component {
         ];
     }
 
+    public function updatedImageUploads()
+    {
+        $this->validate([
+            'imageUploads.*' => 'image|max:5120', // 5MB max
+        ]);
+
+        foreach ($this->imageUploads as $image) {
+            $this->temporaryImages[] = [
+                'url' => $image->temporaryUrl(),
+                'file' => $image,
+            ];
+        }
+        $this->imageUploads = [];
+    }
+
+    public function removeTemporaryImage($index)
+    {
+        unset($this->temporaryImages[$index]);
+        $this->temporaryImages = array_values($this->temporaryImages);
+    }
+
+    public function confirmDeleteImage($imageId)
+    {
+        $this->selectedImage = $imageId;
+        $this->showImageDeleteModal = true;
+    }
+
+    public function deleteImage()
+    {
+        if ($this->selectedProperty && $this->selectedImage) {
+            $image = $this->selectedProperty->images()->find($this->selectedImage);
+            if ($image) {
+                app(PropertyImageService::class)->delete($image);
+            }
+        }
+        $this->selectedImage = null;
+        $this->showImageDeleteModal = false;
+        $this->dispatch('notify', type: 'success', message: 'Image deleted successfully.');
+    }
+
+    public function setFeaturedImage($imageId)
+    {
+        if ($this->selectedProperty) {
+            $image = $this->selectedProperty->images()->find($imageId);
+            if ($image) {
+                app(PropertyImageService::class)->setFeatured($image);
+            }
+        }
+        $this->dispatch('notify', type: 'success', message: 'Featured image updated successfully.');
+    }
+
     public function create()
     {
         $this->resetForm();
@@ -235,7 +304,7 @@ new class extends Component {
 
     public function edit($id)
     {
-        $property = Property::findOrFail($id);
+        $property = Property::with('images')->findOrFail($id);
         $this->selectedProperty = $property;
         
         // Extract property data before resetting the form
@@ -265,11 +334,26 @@ new class extends Component {
     {
         $this->validate();
 
+        $propertyService = app(PropertyService::class);
+        $imageService = app(PropertyImageService::class);
+
         if ($this->modalMode === 'create') {
-            Property::create($this->form);
+            $property = $propertyService->create($this->form);
+            
+            // Handle new image uploads
+            foreach ($this->temporaryImages as $tempImage) {
+                $imageService->store($property, $tempImage['file'], count($this->temporaryImages) === 1);
+            }
+            
             $this->dispatch('notify', type: 'success', message: 'Property created successfully.');
         } else {
-            $this->selectedProperty->update($this->form);
+            $propertyService->update($this->selectedProperty, $this->form);
+            
+            // Handle new image uploads for existing property
+            foreach ($this->temporaryImages as $tempImage) {
+                $imageService->store($this->selectedProperty, $tempImage['file'], false);
+            }
+            
             $this->dispatch('notify', type: 'success', message: 'Property updated successfully.');
         }
 
@@ -277,20 +361,7 @@ new class extends Component {
         $this->resetForm();
     }
 
-    public function confirmDelete($id)
-    {
-        $this->selectedProperty = Property::findOrFail($id);
-        $this->showDeleteModal = true;
-    }
-
-    public function delete()
-    {
-        $this->selectedProperty->delete();
-        $this->showDeleteModal = false;
-        $this->selectedProperty = null;
-        $this->dispatch('notify', type: 'success', message: 'Property deleted successfully.');
-    }
-    private function resetForm()
+    public function resetForm()
     {
         $this->form = [
             'title' => '',
@@ -347,6 +418,8 @@ new class extends Component {
             'additional_features' => [],
         ];
         $this->selectedProperty = null;
+        $this->temporaryImages = [];
+        $this->imageUploads = [];
         return $this->form;
     }
 } ?>
@@ -596,19 +669,17 @@ new class extends Component {
     <!-- Property Form Modal -->
     <flux:modal wire:model="showFormModal" class="w-full max-w-4xl !p-0" @close="$wire.resetForm()">
         <div class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden">
-            <div class="bg-gradient-to-r from-[#02c9c2]/20 to-[#012e2b]/20 dark:from-[#02c9c2]/30 dark:to-[#012e2b]/30 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                        <flux:icon name="{{ $modalMode === 'create' ? 'plus' : 'pencil' }}" class="w-5 h-5 text-[#02c9c2]" />
-                        {{ $modalMode === 'create' ? 'New Property' : ($modalMode === 'edit' ? 'Edit Property' : 'View Property') }}
-                    </h3>
-                </div>
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                    {{ $modalMode === 'create' ? 'Add New Property' : 'Edit Property' }}
+                </h3>
             </div>
 
-            <div class="p-6">
-                <!-- Replace the current form in the modal with this expanded form -->
-                <form wire:submit="save" class="space-y-8">
-                    <!-- Basic Information Section -->
+            <!-- Modal Body -->
+            <div class="px-6 py-4 max-h-[calc(100vh-200px)] overflow-y-auto">
+                <div class="grid grid-cols-1 gap-6">
+                    <!-- Basic Property Information -->
                     <div>
                         <h4 class="text-md font-medium text-gray-700 dark:text-gray-300 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
                             Basic Information
@@ -1181,19 +1252,98 @@ new class extends Component {
                         </div>
                     </div>
 
-                    <!-- Form Actions -->
-                    <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <button type="button" wire:click="$set('showFormModal', false)"
-                                class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02c9c2] dark:focus:ring-offset-gray-900">
-                            Cancel
-                        </button>
-                        <button type="submit"
-                                class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#02c9c2] to-[#012e2b] text-white font-medium rounded-md text-sm hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02c9c2] dark:focus:ring-offset-gray-900 transition-all duration-150">
-                            {{ $modalMode === 'create' ? 'Create Property' : 'Update Property' }}
-                        </button>
-                    </div>
-                </form>
+                    <!-- Image Management Section -->
+                    <div class="space-y-4">
+                        <h4 class="text-lg font-medium text-gray-900 dark:text-white">Property Images</h4>
+                        
+                        <!-- Image Upload Area -->
+                        <div class="flex items-center justify-center w-full">
+                            <label for="image-upload" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500">
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                                    </svg>
+                                    <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                                        <span class="font-semibold">Click to upload</span> or drag and drop
+                                    </p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">PNG, JPG or JPEG (MAX. 5MB)</p>
+                                </div>
+                                <input 
+                                    id="image-upload" 
+                                    type="file" 
+                                    class="hidden" 
+                                    wire:model="imageUploads" 
+                                    multiple 
+                                    accept="image/*"
+                                />
+                            </label>
+                        </div>
 
+                        <!-- Preview of New Images -->
+                        @if(count($temporaryImages))
+                            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
+                                @foreach($temporaryImages as $index => $image)
+                                    <div class="relative group">
+                                        <img src="{{ $image['url'] }}" class="w-full h-32 object-cover rounded-lg" alt="Preview">
+                                        <div class="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                                            <button type="button" wire:click="removeTemporaryImage({{ $index }})" class="text-white p-2 hover:text-red-500 transition-colors">
+                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+
+                        <!-- Existing Images (Edit Mode) -->
+                        @if($modalMode === 'edit' && $selectedProperty?->images)
+                            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
+                                @foreach($selectedProperty->images as $image)
+                                    <div class="relative group">
+                                        <img 
+                                            src="{{ Storage::url($image->thumbnail_path) }}" 
+                                            class="w-full h-32 object-cover rounded-lg {{ $image->is_featured ? 'ring-2 ring-blue-500' : '' }}"
+                                            alt="{{ $image->alt_text }}"
+                                        >
+                                        <div class="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center space-x-2">
+                                            <button 
+                                                type="button" 
+                                                wire:click="setFeaturedImage({{ $image->id }})"
+                                                class="text-white p-2 hover:text-yellow-500 transition-colors"
+                                                title="{{ $image->is_featured ? 'Featured Image' : 'Set as Featured' }}"
+                                            >
+                                                <svg class="w-6 h-6" fill="{{ $image->is_featured ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                                </svg>
+                                            </button>
+                                            <button 
+                                                type="button" 
+                                                wire:click="confirmDeleteImage({{ $image->id }})"
+                                                class="text-white p-2 hover:text-red-500 transition-colors"
+                                            >
+                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 flex justify-end space-x-3">
+                <flux:button variant="primary" wire:click="$toggle('showFormModal')">
+                    Cancel
+                </flux:button>
+                <flux:button wire:click="save">
+                    {{ $modalMode === 'create' ? 'Create Property' : 'Update Property' }}
+                </flux:button>
             </div>
         </div>
     </flux:modal>
@@ -1211,7 +1361,7 @@ new class extends Component {
             </div>
 
             <div class="p-6">
-                <p class="text-gray-600 dark:text-gray-300">
+                <p class="text-gray-600 dark:text-gray-400">
                     Are you sure you want to delete this property? This action cannot be undone.
                 </p>
                 @if($selectedProperty)
