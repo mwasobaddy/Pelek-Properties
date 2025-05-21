@@ -7,49 +7,114 @@ use App\Models\PropertyImage;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Log;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class PropertyImageService
 {
+    /**
+     * Validate and prepare an uploaded file for storage
+     */
+    protected function validateAndPrepareImage(UploadedFile $file): bool
+    {
+        try {
+            // Validate mime type
+            $allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+            if (!in_array($file->getMimeType(), $allowedTypes)) {
+                Log::warning('Invalid image type uploaded', [
+                    'mime_type' => $file->getMimeType(),
+                    'allowed_types' => $allowedTypes
+                ]);
+                return false;
+            }
+
+            // Validate file size (max 10MB)
+            $maxSize = 10 * 1024 * 1024; // 10MB
+            if ($file->getSize() > $maxSize) {
+                Log::warning('Image too large', [
+                    'size' => $file->getSize(),
+                    'max_size' => $maxSize
+                ]);
+                return false;
+            }
+
+            // Skip isReadable check for Livewire temporary uploads
+            // Livewire's TemporaryUploadedFile may not pass standard isReadable check
+            // but is still valid for processing
+            if (!$file instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile && !$file->isReadable()) {
+                Log::warning('Image file is not readable', [
+                    'path' => $file->getRealPath()
+                ]);
+                return false;
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Error validating image file', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return false;
+        }
+    }
+
     /**
      * Store a new property image
      */
     public function store(Property $property, UploadedFile $file, bool $isFeatured = false): PropertyImage
     {
-        // Generate unique filename
-        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
-        
-        // Get the next display order
-        $displayOrder = $property->images()->max('display_order') + 1;
+        try {
+            // Validate and prepare the image
+            if (!$this->validateAndPrepareImage($file)) {
+                throw new \Exception('Invalid image file');
+            }
 
-        // Store original image
-        $imagePath = $file->storeAs(
-            "properties/{$property->id}",
-            $filename,
-            'public'
-        );
+            // Generate unique filename
+            $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+            
+            // Get the next display order
+            $displayOrder = $property->images()->max('display_order') + 1;
 
-        // Create and store thumbnail
-        $thumbnail = Image::make($file)
-            ->fit(300, 200)
-            ->encode($file->getClientOriginalExtension(), 90);
+            // Store original image
+            $imagePath = $file->storeAs(
+                "properties/{$property->id}",
+                $filename,
+                'public'
+            );
 
-        $thumbnailPath = "properties/{$property->id}/thumbnails/" . $filename;
-        Storage::disk('public')->put($thumbnailPath, $thumbnail);
+            // Create and store thumbnail
+            $imageManager = new ImageManager(new Driver());
+            $thumbnail = $imageManager->read($file->getRealPath())
+                ->resize(300, 200, function ($constraint) {
+                    $constraint->aspectRatio();
+                    $constraint->upsize();
+                });
+            
+            $thumbnailPath = "properties/{$property->id}/thumbnails/" . $filename;
+            Storage::disk('public')->put($thumbnailPath, $thumbnail->toJpeg());
 
-        // If this is set as featured, unset other featured images
-        if ($isFeatured) {
-            $property->images()->update(['is_featured' => false]);
+            // If this is set as featured, unset other featured images
+            if ($isFeatured) {
+                $property->images()->update(['is_featured' => false]);
+            }
+
+            // Create image record
+            return $property->images()->create([
+                'image_path' => $imagePath,
+                'thumbnail_path' => $thumbnailPath,
+                'is_featured' => $isFeatured,
+                'display_order' => $displayOrder,
+                'alt_text' => $property->title,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to store property image', [
+                'property_id' => $property->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e;
         }
-
-        // Create image record
-        return $property->images()->create([
-            'image_path' => $imagePath,
-            'thumbnail_path' => $thumbnailPath,
-            'is_featured' => $isFeatured,
-            'display_order' => $displayOrder,
-            'alt_text' => $property->title,
-        ]);
     }
 
     /**
@@ -58,51 +123,68 @@ class PropertyImageService
      */
     public function storeAirbnbImage(Property $property, UploadedFile $file, bool $isFeatured = false): PropertyImage
     {
-        // Generate unique filename with airbnb prefix
-        $filename = 'airbnb-' . Str::uuid() . '.' . $file->getClientOriginalExtension();
-        
-        // Get the next display order
-        $displayOrder = $property->images()->max('display_order') + 1;
+        try {
+            // Validate and prepare the image
+            if (!$this->validateAndPrepareImage($file)) {
+                throw new \Exception('Invalid image file');
+            }
 
-        // Store original image in airbnb subfolder
-        $imagePath = $file->storeAs(
-            "properties/{$property->id}/airbnb",
-            $filename,
-            'public'
-        );
+            // Generate unique filename with airbnb prefix
+            $filename = 'airbnb-' . Str::uuid() . '.' . $file->getClientOriginalExtension();
+            
+            // Get the next display order
+            $displayOrder = $property->images()->max('display_order') + 1;
 
-        // Create and store thumbnail with special dimensions optimized for Airbnb
-        // Airbnb prefers 1024x683 px images (3:2 ratio)
-        $thumbnail = Image::make($file)
-            ->fit(1024, 683)
-            ->encode($file->getClientOriginalExtension(), 90);
+            // Store original image in airbnb subfolder
+            $imagePath = $file->storeAs(
+                "properties/{$property->id}/airbnb",
+                $filename,
+                'public'
+            );
 
-        $thumbnailPath = "properties/{$property->id}/airbnb/thumbnails/" . $filename;
-        Storage::disk('public')->put($thumbnailPath, $thumbnail);
+            // Create and store thumbnail with special dimensions optimized for Airbnb
+            // Airbnb prefers 1024x683 px images (3:2 ratio)
+            $imageManager = new ImageManager(new Driver());
+            $thumbnail = $imageManager->read($file->getRealPath())
+                ->resize(1024, 683, function ($constraint) {
+                    $constraint->aspectRatio();
+                    $constraint->upsize();
+                });
+            
+            $thumbnailPath = "properties/{$property->id}/airbnb/thumbnails/" . $filename;
+            Storage::disk('public')->put($thumbnailPath, $thumbnail->toJpeg());
 
-        // If this is set as featured, unset other featured images
-        if ($isFeatured) {
-            $property->images()->update(['is_featured' => false]);
+            // If this is set as featured, unset other featured images
+            if ($isFeatured) {
+                $property->images()->update(['is_featured' => false]);
+            }
+
+            // Create image record with airbnb tag
+            $image = $property->images()->create([
+                'image_path' => $imagePath,
+                'thumbnail_path' => $thumbnailPath,
+                'is_featured' => $isFeatured,
+                'display_order' => $displayOrder,
+                'alt_text' => $property->title . ' - Airbnb',
+            ]);
+            
+            // Add metadata for airbnb images
+            $image->metadata = [
+                'type' => 'airbnb',
+                'optimized' => true,
+                'uploaded_at' => now()->toDateTimeString()
+            ];
+            $image->save();
+            
+            return $image;
+        } catch (\Exception $e) {
+            Log::error('Failed to store Airbnb property image', [
+                'property_id' => $property->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e;
         }
-
-        // Create image record with airbnb tag
-        $image = $property->images()->create([
-            'image_path' => $imagePath,
-            'thumbnail_path' => $thumbnailPath,
-            'is_featured' => $isFeatured,
-            'display_order' => $displayOrder,
-            'alt_text' => $property->title . ' - Airbnb',
-        ]);
-        
-        // Add metadata for airbnb images
-        $image->metadata = [
-            'type' => 'airbnb',
-            'optimized' => true,
-            'uploaded_at' => now()->toDateTimeString()
-        ];
-        $image->save();
-        
-        return $image;
     }
 
     /**
@@ -163,21 +245,31 @@ class PropertyImageService
      */
     public function delete(PropertyImage $image): bool
     {
-        // Delete files
-        Storage::disk('public')->delete($image->image_path);
-        Storage::disk('public')->delete($image->thumbnail_path);
+        try {
+            // Delete files
+            Storage::disk('public')->delete($image->image_path);
+            Storage::disk('public')->delete($image->thumbnail_path);
 
-        // If this was the featured image, set another as featured
-        if ($image->is_featured) {
-            $newFeatured = $image->property->images()
-                ->where('id', '!=', $image->id)
-                ->first();
-            if ($newFeatured) {
-                $newFeatured->update(['is_featured' => true]);
+            // If this was the featured image, set another as featured
+            if ($image->is_featured) {
+                $newFeatured = $image->property->images()
+                    ->where('id', '!=', $image->id)
+                    ->first();
+                if ($newFeatured) {
+                    $newFeatured->update(['is_featured' => true]);
+                }
             }
-        }
 
-        return $image->delete();
+            return $image->delete();
+        } catch (\Exception $e) {
+            Log::error('Failed to delete property image', [
+                'image_id' => $image->id,
+                'property_id' => $image->property_id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return false;
+        }
     }
 
     /**
@@ -197,12 +289,23 @@ class PropertyImageService
      */
     public function setFeatured(PropertyImage $image): PropertyImage
     {
-        $image->property->images()
-            ->where('id', '!=', $image->id)
-            ->update(['is_featured' => false]);
+        try {
+            // Unset all other images as featured
+            $image->property->images()
+                ->where('id', '!=', $image->id)
+                ->update(['is_featured' => false]);
 
-        $image->update(['is_featured' => true]);
+            $image->update(['is_featured' => true]);
 
-        return $image;
+            return $image;
+        } catch (\Exception $e) {
+            Log::error('Failed to set featured property image', [
+                'image_id' => $image->id,
+                'property_id' => $image->property_id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e;
+        }
     }
 }

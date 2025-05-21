@@ -1,9 +1,12 @@
 <?php
 use App\Models\Property;
 use App\Models\PropertyType;
+use App\Services\PropertyService;
+use App\Services\PropertyImageService;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\DB;
 
 new class extends Component {
     use WithPagination;
@@ -188,7 +191,7 @@ new class extends Component {
 
     public function rules()
     {
-        return [
+        $rules = [
             'form.title' => 'required|string|max:255',
             'form.property_type_id' => 'required|exists:property_types,id',
             'form.description' => 'required|string',
@@ -206,42 +209,47 @@ new class extends Component {
             'form.available' => 'boolean',
             'form.whatsapp_number' => 'required|string',
             'form.status' => 'required|in:available,under_contract,sold,rented',
-            
-            // Commercial fields
-            'form.commercial_type' => 'nullable|in:office,retail,industrial,warehouse,mixed_use',
-            'form.commercial_size' => 'nullable|string',
-            'form.commercial_price_monthly' => 'nullable|string',
-            'form.commercial_price_annually' => 'nullable|string',
-            'form.floors' => 'nullable|integer|min:0',
-            'form.maintenance_status' => 'nullable|string',
-            'form.last_renovation' => 'nullable|date',
-            'form.has_parking' => 'boolean',
-            'form.parking_spaces' => 'nullable|integer|min:0',
-            'form.commercial_amenities' => 'nullable|array',
-            'form.zoning_info' => 'nullable|array',
-            'form.price_per_square_foot' => 'nullable|numeric|min:0',
-            
-            // Rental fields
-            'form.is_furnished' => 'boolean',
-            'form.rental_price_daily' => 'nullable|numeric|min:0',
-            'form.rental_price_monthly' => 'nullable|numeric|min:0',
-            'form.security_deposit' => 'nullable|numeric|min:0',
-            'form.lease_terms' => 'nullable|string',
-            'form.utilities_included' => 'nullable|array',
-            'form.available_from' => 'nullable|date',
-            'form.minimum_lease_period' => 'nullable|integer|min:0',
-            'form.rental_requirements' => 'nullable|array',
-            'form.amenities_condition' => 'nullable|array',
-            
-            // Airbnb fields
-            'form.airbnb_price_nightly' => 'nullable|numeric|min:0',
-            'form.airbnb_price_weekly' => 'nullable|numeric|min:0',
-            'form.airbnb_price_monthly' => 'nullable|numeric|min:0',
-            'form.availability_calendar' => 'nullable|array',
-            
             'form.is_featured' => 'boolean',
-            'form.additional_features' => 'nullable|array',
         ];
+
+        // Add conditional rules based on listing type
+        if ($this->form['listing_type'] === 'commercial') {
+            $rules = array_merge($rules, [
+                'form.commercial_type' => 'required|in:office,retail,industrial,warehouse,mixed_use',
+                'form.commercial_size' => 'required|string',
+                'form.commercial_price_monthly' => 'required|numeric|min:0',
+                'form.commercial_price_annually' => 'required|numeric|min:0',
+                'form.floors' => 'nullable|integer|min:0',
+                'form.maintenance_status' => 'nullable|string',
+                'form.last_renovation' => 'nullable|date',
+                'form.has_parking' => 'boolean',
+                'form.parking_spaces' => 'required_if:form.has_parking,true|nullable|integer|min:0',
+                'form.commercial_amenities' => 'nullable|array',
+                'form.zoning_info' => 'nullable|array',
+                'form.price_per_square_foot' => 'nullable|numeric|min:0',
+            ]);
+        } elseif ($this->form['listing_type'] === 'rent') {
+            $rules = array_merge($rules, [
+                'form.is_furnished' => 'boolean',
+                'form.rental_price_monthly' => 'required|numeric|min:0',
+                'form.security_deposit' => 'nullable|numeric|min:0',
+                'form.lease_terms' => 'nullable|string',
+                'form.utilities_included' => 'nullable|array',
+                'form.available_from' => 'nullable|date',
+                'form.minimum_lease_period' => 'nullable|integer|min:0',
+                'form.rental_requirements' => 'nullable|array',
+                'form.amenities_condition' => 'nullable|array',
+            ]);
+        } elseif ($this->form['listing_type'] === 'airbnb') {
+            $rules = array_merge($rules, [
+                'form.airbnb_price_nightly' => 'required|numeric|min:0',
+                'form.airbnb_price_weekly' => 'nullable|numeric|min:0',
+                'form.airbnb_price_monthly' => 'nullable|numeric|min:0',
+                'form.availability_calendar' => 'nullable|array',
+            ]);
+        }
+
+        return $rules;
     }
 
     public function updatedImageUploads()
@@ -251,10 +259,20 @@ new class extends Component {
         ]);
 
         foreach ($this->imageUploads as $image) {
-            $this->temporaryImages[] = [
-                'url' => $image->temporaryUrl(),
-                'file' => $image,
-            ];
+            try {
+                $this->temporaryImages[] = [
+                    'url' => $image->temporaryUrl(),
+                    'file' => $image,
+                    'name' => $image->getClientOriginalName(),
+                    'size' => $image->getSize(),
+                    'type' => $image->getMimeType(),
+                ];
+            } catch (\Exception $e) {
+                logger()->error('Error creating temporary image preview', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+            }
         }
         $this->imageUploads = [];
     }
@@ -332,33 +350,111 @@ new class extends Component {
 
     public function save()
     {
-        $this->validate();
+        try {
+            $this->validate();
 
-        $propertyService = app(PropertyService::class);
-        $imageService = app(PropertyImageService::class);
+            // Clean up form data
+            $formData = collect($this->form)->map(function ($value) {
+                if (is_array($value) && empty($value)) {
+                    return [];
+                }
+                return $value === '' ? null : $value;
+            })->toArray();
 
-        if ($this->modalMode === 'create') {
-            $property = $propertyService->create($this->form);
-            
-            // Handle new image uploads
-            foreach ($this->temporaryImages as $tempImage) {
-                $imageService->store($property, $tempImage['file'], count($this->temporaryImages) === 1);
+            // Add user_id
+            $formData['user_id'] = auth()->id() ?? 1; // Fallback to admin user if not authenticated
+
+            // Handle specific fields based on listing type
+            if ($formData['listing_type'] !== 'commercial') {
+                $formData['commercial_type'] = null;
+            }
+
+            // Sanitize enum fields
+            if (isset($formData['status']) && !in_array($formData['status'], ['available', 'under_contract', 'sold', 'rented'])) {
+                $formData['status'] = 'available';
+            }
+
+            $propertyService = app(PropertyService::class);
+            $imageService = app(PropertyImageService::class);
+
+            DB::beginTransaction();
+
+            try {
+                if ($this->modalMode === 'create') {
+                    $property = $propertyService->create($formData);
+                    
+                    // Handle new image uploads
+                    if (!empty($this->temporaryImages)) {
+                        foreach ($this->temporaryImages as $index => $tempImage) {
+                            try {
+                                if (isset($tempImage['file']) && $tempImage['file']) {
+                                    $imageService->store(
+                                        $property, 
+                                        $tempImage['file'], 
+                                        $index === 0 // First image is featured
+                                    );
+                                }
+                            } catch (\Exception $e) {
+                                logger()->error('Failed to upload image', [
+                                    'property_id' => $property->id,
+                                    'error' => $e->getMessage(),
+                                    'trace' => $e->getTraceAsString()
+                                ]);
+                            }
+                        }
+                    }
+                    
+                    $this->dispatch('notify', type: 'success', message: 'Property created successfully.');
+                    logger()->info('Property created successfully', ['property_id' => $property->id]);
+                } else {
+                    $propertyService->update($this->selectedProperty, $formData);
+                    
+                    // Handle new image uploads for existing property
+                    if (!empty($this->temporaryImages)) {
+                        foreach ($this->temporaryImages as $index => $tempImage) {
+                            try {
+                                if (isset($tempImage['file']) && $tempImage['file']) {
+                                    $imageService->store(
+                                        $this->selectedProperty, 
+                                        $tempImage['file'], 
+                                        empty($this->selectedProperty->images) && $index === 0 // Set as featured if first image for property
+                                    );
+                                }
+                            } catch (\Exception $e) {
+                                logger()->error('Failed to upload image for existing property', [
+                                    'property_id' => $this->selectedProperty->id,
+                                    'error' => $e->getMessage(),
+                                    'trace' => $e->getTraceAsString()
+                                ]);
+                            }
+                        }
+                    }
+                    
+                    $this->dispatch('notify', type: 'success', message: 'Property updated successfully.');
+                    logger()->info('Property updated successfully', ['property_id' => $this->selectedProperty->id]);
+                }
+                
+                DB::commit();
+                $this->resetForm();
+                $this->showFormModal = false;
+                $this->dispatch('propertyListUpdated');
+            } catch (\Exception $e) {
+                DB::rollBack();
+                logger()->error('Transaction failed in property save', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                throw $e;
             }
             
-            $this->dispatch('notify', type: 'success', message: 'Property created successfully.');
-        } else {
-            $propertyService->update($this->selectedProperty, $this->form);
-            
-            // Handle new image uploads for existing property
-            foreach ($this->temporaryImages as $tempImage) {
-                $imageService->store($this->selectedProperty, $tempImage['file'], false);
-            }
-            
-            $this->dispatch('notify', type: 'success', message: 'Property updated successfully.');
+        } catch (\Exception $e) {
+            logger()->error('Error saving property', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'form_data' => $this->form
+            ]);
+            $this->dispatch('notify', type: 'error', message: 'Error saving property: ' . $e->getMessage());
         }
-
-        $this->showFormModal = false;
-        $this->resetForm();
     }
 
     public function resetForm()
@@ -1316,7 +1412,6 @@ new class extends Component {
                                             >
                                                 <svg class="w-6 h-6" fill="{{ $image->is_featured ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                                                </svg>
                                             </button>
                                             <button 
                                                 type="button" 
@@ -1334,7 +1429,7 @@ new class extends Component {
                         @endif
                     </div>
                 </div>
-            </div>
+                       </div>
 
             <!-- Modal Footer -->
             <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 flex justify-end space-x-3">

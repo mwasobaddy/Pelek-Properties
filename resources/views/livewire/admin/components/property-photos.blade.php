@@ -21,19 +21,30 @@ new class extends Component {
             'photos.*' => 'image|max:10240', // 10MB Max
         ]);
 
-        foreach ($this->photos as $photo) {
-            $this->property->images()->create([
-                'image_path' => $photo->store('property-images', 'public'),
-                'thumbnail_path' => $photo->store('property-images/thumbnails', 'public'),
-                'alt_text' => $this->property->title,
+        try {
+            foreach ($this->photos as $photo) {
+                $this->property->images()->create([
+                    'image_path' => $photo->store('property-images', 'public'),
+                    'thumbnail_path' => $photo->store('property-images/thumbnails', 'public'),
+                    'alt_text' => $this->property->title,
+                ]);
+            }
+
+            $this->photos = [];
+            $this->dispatch('notify', [
+                'type' => 'success',
+                'message' => 'Photos uploaded successfully'
+            ]);
+        } catch (\Exception $e) {
+            logger()->error('Error uploading photos', [
+                'property_id' => $this->property->id,
+                'error' => $e->getMessage()
+            ]);
+            $this->dispatch('notify', [
+                'type' => 'error',
+                'message' => 'Error uploading photos'
             ]);
         }
-
-        $this->photos = [];
-        $this->dispatch('notify', [
-            'type' => 'success',
-            'message' => 'Photos uploaded successfully'
-        ]);
     }
 
     public function deleteImage($imageId)
@@ -57,7 +68,7 @@ new class extends Component {
                         <h2 class="text-2xl font-semibold">Manage Photos - {{ $property->title }}</h2>
                         <a 
                             href="{{ route('admin.properties.index') }}" 
-                            class="text-primary-600 hover:text-primary-700"
+                            class="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
                         >
                             ← Back to Properties
                         </a>
@@ -66,41 +77,44 @@ new class extends Component {
                     <!-- Upload Form -->
                     <form wire:submit="save" class="mb-8">
                         <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    Upload Photos
+                            <div class="flex items-center justify-center w-full">
+                                <label for="file-upload" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600">
+                                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                        <flux:icon name="upload" class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" />
+                                        <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                                            <span class="font-semibold">Click to upload</span> or drag and drop
+                                        </p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                                            PNG, JPG or WebP (MAX. 10MB)
+                                        </p>
+                                    </div>
+                                    <input 
+                                        wire:model="photos" 
+                                        id="file-upload" 
+                                        type="file" 
+                                        multiple
+                                        class="hidden" 
+                                        accept="image/*"
+                                    />
                                 </label>
-                                <input 
-                                    type="file" 
-                                    wire:model="photos" 
-                                    multiple 
-                                    class="mt-1 block w-full text-sm text-gray-900 dark:text-gray-300
-                                        file:mr-4 file:py-2 file:px-4
-                                        file:rounded-md file:border-0
-                                        file:text-sm file:font-semibold
-                                        file:bg-primary-600 file:text-white
-                                        hover:file:bg-primary-700"
-                                >
                             </div>
-                            <div>
-                                <button 
-                                    type="submit"
-                                    class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
-                                >
+
+                            <div class="flex justify-end">
+                                <flux:button type="submit">
                                     Upload Photos
-                                </button>
+                                </flux:button>
                             </div>
                         </div>
                     </form>
 
-                    <!-- Existing Photos -->
+                    <!-- Photo Grid -->
                     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         @foreach($property->images as $image)
                             <div class="relative group">
                                 <img 
-                                    src="{{ asset('storage/' . $image->image_path) }}" 
+                                    src="{{ Storage::disk('public')->url($image->image_path) }}" 
                                     alt="{{ $image->alt_text }}"
-                                    class="w-full h-48 object-cover rounded-lg"
+                                    class="w-full h-48 object-cover rounded-lg bg-gray-100 dark:bg-gray-700"
                                 >
                                 <button
                                     wire:click="deleteImage({{ $image->id }})"
