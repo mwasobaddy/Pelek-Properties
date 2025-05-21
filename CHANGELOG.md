@@ -3,6 +3,22 @@
 ## Git Commit Messages
 
 ```
+fix(property-admin): resolve property and image deletion functionality issues
+
+- Added missing confirmDelete method to handle property deletion
+- Added delete method to execute property deletion
+- Added image delete confirmation modal
+- Fixed image deletion flow with proper confirmation dialog
+- Improved error handling for deletion operations
+- Enhanced user experience with proper feedback and confirmations
+
+Breaking: No
+Related: #PropertyService #PropertyImageService #Livewire
+Fixes: #METHOD_NOT_FOUND_EXCEPTION
+Date: 2025-05-21
+```
+
+```
 fix(image-upload): resolve image validation issues with Livewire temporary uploads
 
 - Modified PropertyImageService to handle Livewire's TemporaryUploadedFile objects
@@ -122,7 +138,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.1] - 2025-05-21
+## [1.0.4] - 2025-05-21
+
+### Fixed
+- Fixed property deletion functionality by adding missing confirmDelete method
+- Added image deletion confirmation modal for a better user experience
+- Fixed image deletion functionality in the property form
+- Added proper error handling for deletion operations
+- Enhanced UI feedback during deletion operations
+
+### Added
+- Added dedicated image deletion confirmation modal
+- Added proper logging for deletion operations
+- Added visual feedback for delete operations
+
+### Technical Details
+- Added confirmDelete and delete methods to the properties component
+- Implemented property deletion through the PropertyService
+- Added transaction handling for property deletion
+- Enhanced error handling with proper logging
+
+## [1.0.3] - 2025-05-21
 
 ### Added
 - Image management functionality in property form modal

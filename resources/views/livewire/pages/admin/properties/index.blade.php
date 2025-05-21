@@ -347,6 +347,37 @@ new class extends Component {
         $this->modalMode = 'edit';
         $this->showFormModal = true;
     }
+    
+    public function confirmDelete($id)
+    {
+        $this->selectedProperty = Property::findOrFail($id);
+        $this->showDeleteModal = true;
+    }
+    
+    public function delete()
+    {
+        if ($this->selectedProperty) {
+            // Get the property service to handle deletion logic
+            $propertyService = app(PropertyService::class);
+            
+            try {
+                $propertyService->delete($this->selectedProperty);
+                $this->dispatch('notify', type: 'success', message: 'Property deleted successfully.');
+                logger()->info('Property deleted successfully', ['property_id' => $this->selectedProperty->id]);
+            } catch (\Exception $e) {
+                logger()->error('Error deleting property', [
+                    'property_id' => $this->selectedProperty->id,
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                $this->dispatch('notify', type: 'error', message: 'Error deleting property: ' . $e->getMessage());
+            }
+            
+            $this->showDeleteModal = false;
+            $this->selectedProperty = null;
+            $this->dispatch('propertyListUpdated');
+        }
+    }
 
     public function save()
     {
@@ -1412,6 +1443,7 @@ new class extends Component {
                                             >
                                                 <svg class="w-6 h-6" fill="{{ $image->is_featured ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                                </svg>
                                             </button>
                                             <button 
                                                 type="button" 
@@ -1478,6 +1510,38 @@ new class extends Component {
                             class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-gray-900">
                         <flux:icon name="trash" class="w-4 h-4 mr-1.5" />
                         Delete Property
+                    </button>
+                </div>
+            </div>
+        </div>
+    </flux:modal>
+
+    <!-- Image Delete Confirmation Modal -->
+    <flux:modal wire:model="showImageDeleteModal" max-width="md" class="!p-0">
+        <div class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden">
+            <div class="bg-gradient-to-r from-red-500/20 to-red-600/20 dark:from-red-900/30 dark:to-red-700/30 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center gap-2">
+                    <flux:icon name="exclamation-circle" class="w-6 h-6 text-red-600" />
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        Confirm Image Deletion
+                    </h3>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <p class="text-gray-600 dark:text-gray-400">
+                    Are you sure you want to delete this image? This action cannot be undone.
+                </p>
+
+                <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <button type="button" wire:click="$set('showImageDeleteModal', false)"
+                            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-gray-900">
+                        Cancel
+                    </button>
+                    <button type="button" wire:click="deleteImage"
+                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-gray-900">
+                        <flux:icon name="trash" class="w-4 h-4 mr-1.5" />
+                        Delete Image
                     </button>
                 </div>
             </div>
