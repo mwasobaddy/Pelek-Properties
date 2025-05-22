@@ -1,7 +1,15 @@
 <?php
 
+use App\Services\SEOService;
+use Livewire\Attributes\Layout;
 use function Livewire\Volt\{state};
 
+new #[Layout('components.layouts.guest')] class extends Component {
+    public function mount(SEOService $seoService)
+    {
+        $seoService->setServiceMeta('property_management');
+    }
+}
 ?>
 
 <div class="container mx-auto px-4 py-12">
