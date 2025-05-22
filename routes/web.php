@@ -51,9 +51,13 @@ Route::prefix('services')->name('services.')->group(function () {
 // Authenticated routes
 // -------------------------------------
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Dashboard
-    Volt::route('/dashboard', 'pages.admin.dashboard')->name('dashboard');
 
+    // User settings
+    Route::prefix('admin')->name('admin.')->group(function () {
+        // Dashboard
+        Volt::route('/dashboard', 'pages.admin.dashboard')->name('dashboard');
+    });
+    
     // User settings
     Route::prefix('settings')->name('settings.')->group(function () {
         Route::redirect('/', 'settings/profile');
@@ -67,7 +71,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Volt::route('/contracts', 'pages.admin.management.contracts')->name('contracts');
         Volt::route('/maintenance', 'pages.admin.management.maintenance')->name('maintenance');
         Volt::route('/financials', 'pages.admin.management.financials')->name('financials');
-        Volt::route('/properties', 'pages.admin.management.manage-properties')->name('properties');
     });
 
     // Admin routes

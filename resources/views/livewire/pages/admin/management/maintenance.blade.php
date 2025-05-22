@@ -563,14 +563,19 @@ new class extends Component {
 
     <!-- View/Edit Modal -->
     <flux:modal wire:model="showFormModal" class="w-full max-w-4xl !p-0" @close="$wire.resetForm()">
-        <x-card class="w-full overflow-hidden rounded-xl">
-            <x-card.header>
-                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                    {{ $modalMode === 'edit' ? 'Edit Maintenance Record' : 'View Maintenance Record' }}
-                </h3>
-            </x-card.header>
+        <div class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden">
+            <div
+                class="bg-gradient-to-r from-[#02c9c2]/20 to-[#012e2b]/20 dark:from-[#02c9c2]/30 dark:to-[#012e2b]/30 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                        <flux:icon name="{{ $modalMode === 'edit' ? 'wrench-screwdriver' : 'wrench-screwdriver' }}"
+                            class="w-5 h-5 text-[#02c9c2]" />
+                        {{ $modalMode === 'edit' ? 'Edit Maintenance Details' : 'View Maintenance Details' }}
+                    </h3>
+                </div>
+            </div>
 
-            <x-card.body>
+            <div class="p-6">
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Property</label>
@@ -689,54 +694,56 @@ new class extends Component {
                         </div>
                     @endif
                 </div>
-            </x-card.body>
 
-            <x-card.footer>
-                <div class="flex justify-end space-x-2">
+                <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
                     @if($modalMode === 'edit')
-                        <x-button type="button" wire:click="$set('showFormModal', false)" variant="primary">
+                        <flux:button type="button" wire:click="$set('showFormModal', false)" variant="primary">
                             Cancel
-                        </x-button>
-                        <x-button type="button" wire:click="updateStatus" variant="primary">
+                        </flux:button>
+                        <flux:button type="button" wire:click="updateStatus" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#02c9c2] to-[#012e2b] text-white rounded-lg text-sm font-medium hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02c9c2] shadow-sm">
                             Update
-                        </x-button>
+                        </flux:button>
                     @else
-                        <x-button type="button" wire:click="$set('showFormModal', false)" variant="primary">
+                        <flux:button type="button" wire:click="$set('showFormModal', false)" variant="primary">
                             Close
-                        </x-button>
+                        </flux:button>
                     @endif
                 </div>
-            </x-card.footer>
-        </x-card>
+            </div>
+        </div>
     </flux:modal>
 
     <!-- Delete Confirmation Modal -->
     <flux:modal wire:model.live="showDeleteModal" max-width="md" class="!p-0">
-        <x-card class="w-fulloverflow-hidden rounded-xl">
-            <x-card.header>
-                <h3 class="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
-                    <flux:icon name="exclamation-circle" class="w-6 h-6 text-red-600 mr-2" />
-                    Confirm Deletion
-                </h3>
-            </x-card.header>
-            <x-card.body>
+        <div class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden">
+            <div class="bg-gradient-to-r from-red-500/20 to-red-600/20 dark:from-red-900/30 dark:to-red-700/30 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center gap-2">
+                    <flux:icon name="exclamation-circle" class="w-6 h-6 text-red-600" />
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        Confirm Deletion
+                    </h3>
+                </div>
+            </div>
+
+            <div class="p-6">
                 <div class="space-y-4">
                     <p class="text-sm text-gray-500">Are you sure you want to delete this maintenance record? This action cannot be undone.</p>
                 </div>
-            </x-card.body>
 
-            <x-card.footer>
-                <div class="flex justify-end space-x-3">
-                    <flux:button wire:click="$set('showDeleteModal', false)">
+                <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <flux:button wire:click="$set('showDeleteModal', false)" variant="primary">
                         Cancel
                     </flux:button>
-                    <flux:button wire:click="delete" variant="danger" class="bg-red-600 hover:bg-red-700">
-                        <flux:icon wire:loading wire:target="delete" name="arrow-path" class="w-4 h-4 mr-2 animate-spin" />
-                        Delete record
-                    </flux:button>
+                    <button type="button" wire:click="delete"
+                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-gray-900"
+                            wire:loading.attr="disabled">
+                        <flux:icon wire:loading.remove wire:target="delete" name="trash" class="w-4 h-4 mr-1.5" />
+                        <flux:icon wire:loading wire:target="delete" name="arrow-path" class="w-4 h-4 mr-1.5 animate-spin" />
+                        Delete Contract
+                    </button>
                 </div>
-            </x-card.footer>
-        </x-card>
+            </div>
+        </div>
     </flux:modal>
 
     <!-- Decorative Elements -->

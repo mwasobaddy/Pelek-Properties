@@ -13,7 +13,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
     public array $stats = [
         'properties_managed' => 500,
         'client_satisfaction' => 98,
-        'years_in_business' => 15,
+        'years_in_business' => 1,
         'client_base' => 1000,
     ];
 } ?>
@@ -400,7 +400,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
     </div>
 
     <!-- Team Section (New) -->
-    <div class="py-24 bg-white dark:bg-gray-900 relative overflow-hidden">
+    {{-- <div class="py-24 bg-white dark:bg-gray-900 relative overflow-hidden">
         <div class="relative max-w-7xl mx-auto px-6 lg:px-8">
             <div class="text-center mb-16" x-data="{}" x-intersect="$el.classList.add('animate-fade-in')">
                 <span class="inline-flex items-center rounded-full bg-[#02c9c2]/10 px-3 py-1 text-sm font-medium text-[#02c9c2] ring-1 ring-inset ring-[#02c9c2]/20 mb-4 backdrop-blur-md">
@@ -505,7 +505,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <!-- Contact Call to Action (enhanced from the index page reference) -->
     <div class="mt-20 px-6 py-12 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 shadow-xl relative overflow-hidden mx-6 lg:mx-auto max-w-7xl">

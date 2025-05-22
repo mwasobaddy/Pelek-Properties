@@ -456,9 +456,21 @@ new class extends Component {
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                     @forelse($this->records as $record)
-                        <tr class="bg-white/50 dark:bg-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                {{ $record->property->title }}
+                        <tr class="bg-white dark:bg-gray-800/30 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                                        <flux:icon name="building-office" class="w-6 h-6 text-gray-500 dark:text-gray-400" />
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-gray-900 dark:text-white">
+                                            {{ $record->property->title }}
+                                        </div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                                            ID: {{ $record->id }}
+                                        </div>
+                                    </div>
+                                </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span @class([
@@ -509,12 +521,16 @@ new class extends Component {
 
     <!-- Record Details Modal -->
     <flux:modal wire:model="showModal" class="w-full max-w-4xl !p-0" @close="$wire.resetForm()">
-        <x-card class="w-fulloverflow-hidden rounded-xl">
-            <x-card.header>
-                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                    Record Details
-                </h3>
-            </x-card.header>
+        <div class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden">
+            <div
+                class="bg-gradient-to-r from-[#02c9c2]/20 to-[#012e2b]/20 dark:from-[#02c9c2]/30 dark:to-[#012e2b]/30 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                        <flux:icon name="currency-dollar" class="w-5 h-5 text-[#02c9c2]" />
+                            Record Details
+                    </h3>
+                </div>
+            </div>
 
             <x-card.body>
                 @if($selectedRecord)
@@ -590,7 +606,7 @@ new class extends Component {
                     </button>
                 </div>
             </x-card.footer>
-        </x-card>
+        </div>
     </flux:modal>
 
     <!-- Decorative Elements -->

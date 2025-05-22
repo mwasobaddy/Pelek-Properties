@@ -41,7 +41,7 @@
             <flux:sidebar.toggle class="lg:hidden hover:text-[#02c9c2] transition-all duration-300 hover:rotate-180" icon="x-mark" />
 
             <!-- Enhanced Logo with Subtle Animation -->
-            <a href="{{ route('dashboard') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse transform transition-all duration-300 hover:scale-105 group" wire:navigate>
+            <a href="{{ route('admin.dashboard') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse transform transition-all duration-300 hover:scale-105 group" wire:navigate>
                 <x-app-logo class="group-hover:animate-pulse" />
             </a>
 
@@ -57,8 +57,8 @@
                         <div class="absolute -left-1 top-0 h-5 w-1 bg-gradient-to-b from-[#02c9c2] to-[#012e2b] rounded-r-full"></div>
                         <flux:navlist.item 
                             icon="home" 
-                            :href="route('dashboard')" 
-                            :current="request()->routeIs('dashboard')" 
+                            :href="route('admin.dashboard')" 
+                            :current="request()->routeIs('admin.dashboard')" 
                             class="rounded-xl transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2] hover:scale-[1.02]"
                             wire:navigate
                         >

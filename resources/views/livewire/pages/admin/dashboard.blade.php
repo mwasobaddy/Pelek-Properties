@@ -162,7 +162,7 @@ new class extends Component {
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Links</h3>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
             <!-- Add Property -->
-            <a href="{{ route('management.properties') }}" 
+            <a href="{{ route('admin.properties.index') }}" 
                 class="flex flex-col items-center justify-center p-4 bg-white/50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 hover:shadow-md hover:border-[#02c9c2] group">
                 <div class="p-3 bg-[#02c9c2]/10 rounded-full mb-2 group-hover:bg-[#02c9c2]/20 transition-colors">
                     <flux:icon name="plus" class="w-5 h-5 text-[#02c9c2]" />

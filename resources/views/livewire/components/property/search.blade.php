@@ -241,7 +241,7 @@ new class extends Component {
                     </div>
                     
                     {{-- Amenities Multi-Select --}}
-                    <div class="lg:col-span-4">
+                    {{-- <div class="lg:col-span-4">
                         <label class="block text-sm font-medium text-white/90 dark:text-white/80 mb-1.5">Amenities</label>
                         <div class="flex flex-wrap gap-2">
                             @foreach($amenities as $amenity)
@@ -262,7 +262,7 @@ new class extends Component {
                                 </button>
                             @endforeach
                         </div>
-                    </div>
+                    </div> --}}
                 </div>
                 
                 {{-- Modern Search Button with animation --}}

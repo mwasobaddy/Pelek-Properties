@@ -20,6 +20,12 @@ new #[Layout('components.layouts.app')] class extends Component {
     public $modalMode = 'create'; // create, edit, view
     
     #[State]
+    public $showDeleteModal = false;
+
+    #[State]
+    public $postToDelete = null;
+    
+    #[State]
     public $title = '';
     
     #[State]
@@ -97,11 +103,8 @@ new #[Layout('components.layouts.app')] class extends Component {
     {
         $this->isLoading = true;
         try {
-            // Get blog service
-            $blogService = app(BlogService::class);
-            
-            // Build query with filters
-            $query = $blogService->getPostsQuery()
+            // Use the BlogPost model directly
+            $query = \App\Models\BlogPost::query()
                 ->when($this->search, function ($query) {
                     return $query->where('title', 'like', '%' . $this->search . '%');
                 })
@@ -251,10 +254,20 @@ new #[Layout('components.layouts.app')] class extends Component {
 
     public function deletePost(BlogService $blogService, \App\Models\BlogPost $post)
     {
+        if ($this->postToDelete) {
+            $this->authorize('delete', $this->postToDelete);
+            $blogService->deletePost($this->postToDelete);
+            $this->dispatch('notify', type: 'success', message: 'Post deleted successfully');
+            $this->postToDelete = null;
+            $this->showDeleteModal = false;
+        }
+    }
+    
+    public function confirmDelete(\App\Models\BlogPost $post)
+    {
         $this->authorize('delete', $post);
-
-        $blogService->deletePost($post);
-        $this->dispatch('notify', type: 'success', message: 'Post deleted successfully');
+        $this->postToDelete = $post;
+        $this->showDeleteModal = true;
     }
     
     // New methods for search, filters, and sorting
@@ -600,13 +613,12 @@ new #[Layout('components.layouts.app')] class extends Component {
                                     
                                     @can('delete', $post)
                                         <button 
-                                            wire:click="deletePost({{ $post->id }})"
-                                            wire:confirm="Are you sure you want to delete this post?"
+                                            wire:click="confirmDelete({{ $post->id }})"
                                             class="text-gray-200 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-500 transition-colors duration-150 bg-red-500 dark:bg-red-700/50 rounded-lg p-2"
                                             title="Delete Post"
                                         >
-                                            <flux:icon wire:loading.remove wire:target="deletePost({{ $post->id }})" name="trash" class="w-5 h-5" />
-                                            <flux:icon wire:loading wire:target="deletePost({{ $post->id }})" name="arrow-path" class="w-5 h-5 animate-spin" />
+                                            <flux:icon wire:loading.remove wire:target="confirmDelete({{ $post->id }})" name="trash" class="w-5 h-5" />
+                                            <flux:icon wire:loading wire:target="confirmDelete({{ $post->id }})" name="arrow-path" class="w-5 h-5 animate-spin" />
                                         </button>
                                     @endcan
                                 </div>
@@ -757,6 +769,47 @@ new #[Layout('components.layouts.app')] class extends Component {
                     {{ $modalMode === 'create' ? 'Create Post' : 'Update Post' }}
                 </flux:button>
                 @endif
+            </div>
+        </div>
+    </flux:modal>
+
+    <!-- Delete Confirmation Modal -->
+    <flux:modal wire:model="showDeleteModal" max-width="md" class="!p-0">
+        <div class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden">
+            <div class="bg-gradient-to-r from-red-500/20 to-red-600/20 dark:from-red-900/30 dark:to-red-700/30 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center gap-2">
+                    <flux:icon name="exclamation-circle" class="w-6 h-6 text-red-600" />
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        Confirm Deletion
+                    </h3>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <p class="text-gray-600 dark:text-gray-400">
+                    Are you sure you want to delete this blog post? This action cannot be undone.
+                </p>
+                @if($postToDelete)
+                    <div class="mt-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <p class="font-semibold text-gray-900 dark:text-white">{{ $postToDelete->title }}</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Author: {{ $postToDelete->author->name }}</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Created: {{ \Carbon\Carbon::parse($postToDelete->created_at)->format('M d, Y') }}</p>
+                    </div>
+                @endif
+
+                <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <button type="button" wire:click="$set('showDeleteModal', false)"
+                            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-gray-900">
+                        Cancel
+                    </button>
+                    <button type="button" wire:click="deletePost"
+                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-gray-900"
+                            wire:loading.attr="disabled">
+                        <flux:icon wire:loading.remove wire:target="deletePost" name="trash" class="w-4 h-4 mr-1.5" />
+                        <flux:icon wire:loading wire:target="deletePost" name="arrow-path" class="w-4 h-4 mr-1.5 animate-spin" />
+                        Delete Post
+                    </button>
+                </div>
             </div>
         </div>
     </flux:modal>

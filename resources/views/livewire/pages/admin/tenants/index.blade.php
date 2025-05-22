@@ -27,9 +27,6 @@ new class extends Component {
     public $showTenantModal = false;
 
     #[State]
-    public $showTenantDetailsModal = false;
-
-    #[State]
     public $modalMode = 'create';
 
     #[State]
@@ -122,7 +119,9 @@ new class extends Component {
     public function viewTenantDetails($id)
     {
         $this->selectedTenant = TenantInfo::with('property')->findOrFail($id);
-        $this->showTenantDetailsModal = true;
+        $this->form = $this->selectedTenant->toArray();
+        $this->modalMode = 'view';
+        $this->showTenantModal = true;
     }
 
     public function saveTenant()
@@ -586,326 +585,28 @@ new class extends Component {
             @endif
         </div>
     </div>
-
-    <!-- Tenant Form Modal -->
+    
+    <!-- Unified Tenant Modal for Create, Edit, View -->
     <flux:modal wire:model="showTenantModal" class="w-full max-w-4xl !p-0" @close="$wire.resetForm()">
         <div class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden">
-            <div
-                class="bg-gradient-to-r from-[#02c9c2]/20 to-[#012e2b]/20 dark:from-[#02c9c2]/30 dark:to-[#012e2b]/30 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <div @class([
+                'bg-gradient-to-r px-6 py-4 border-b border-gray-200 dark:border-gray-700',
+                'from-[#02c9c2]/20 to-[#012e2b]/20 dark:from-[#02c9c2]/30 dark:to-[#012e2b]/30' => $modalMode === 'create' || $modalMode === 'edit',
+                'from-green-500/20 to-green-600/20 dark:from-green-900/30 dark:to-green-700/30' => 
+                    $modalMode === 'view' && $selectedTenant && $selectedTenant->status === 'active',
+                'from-yellow-500/20 to-yellow-600/20 dark:from-yellow-900/30 dark:to-yellow-700/30' => 
+                    $modalMode === 'view' && $selectedTenant && $selectedTenant->status === 'pending',
+                'from-gray-500/20 to-gray-600/20 dark:from-gray-900/30 dark:to-gray-700/30' => 
+                    $modalMode === 'view' && $selectedTenant && $selectedTenant->status === 'inactive',
+            ])>
                 <div class="flex justify-between items-center">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                        <flux:icon name="{{ $modalMode === 'create' ? 'user-plus' : 'user-circle' }}"
+                        <flux:icon name="{{ $modalMode === 'create' ? 'user-plus' : ($modalMode === 'edit' ? 'pencil-square' : 'user-circle') }}"
                             class="w-5 h-5 text-[#02c9c2]" />
-                        {{ $modalMode === 'create' ? 'Add New Tenant' : 'Edit Tenant Details' }}
+                        {{ $modalMode === 'create' ? 'Add New Tenant' : ($modalMode === 'edit' ? 'Edit Tenant Details' : 'Tenant Details') }}
                     </h3>
-                </div>
-            </div>
-
-            <div class="p-6">
-                <form wire:submit="saveTenant" class="space-y-6">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <!-- Tenant Information Section -->
-                        <div class="space-y-6">
-                            <div class="border-b border-gray-200 dark:border-gray-700 pb-4">
-                                <h4
-                                    class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
-                                    Tenant Information</h4>
-
-                                <div class="space-y-4">
-                                    <div>
-                                        <label for="name"
-                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full
-                                            Name</label>
-                                        <div class="relative">
-                                            <div
-                                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <flux:icon name="user" class="h-5 w-5 text-gray-400" />
-                                            </div>
-                                            <input type="text" wire:model="form.name" id="name"
-                                                class="appearance-none block w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-2.5 pl-10 pr-3 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
-                                                placeholder="Enter tenant's full name">
-                                        </div>
-                                        @error('form.name')
-                                            <span
-                                                class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-
-                                    <div>
-                                        <label for="email"
-                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email
-                                            Address</label>
-                                        <div class="relative">
-                                            <div
-                                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <flux:icon name="envelope" class="h-5 w-5 text-gray-400" />
-                                            </div>
-                                            <input type="email" wire:model="form.email" id="email"
-                                                class="appearance-none block w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-2.5 pl-10 pr-3 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
-                                                placeholder="Email address">
-                                        </div>
-                                        @error('form.email')
-                                            <span
-                                                class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-
-                                    <div>
-                                        <label for="phone"
-                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone
-                                            Number</label>
-                                        <div class="relative">
-                                            <div
-                                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <flux:icon name="phone" class="h-5 w-5 text-gray-400" />
-                                            </div>
-                                            <input type="tel" wire:model="form.phone" id="phone"
-                                                class="appearance-none block w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-2.5 pl-10 pr-3 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
-                                                placeholder="Phone number">
-                                        </div>
-                                        @error('form.phone')
-                                            <span
-                                                class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-
-                                    <div>
-                                        <label for="emergency_contact"
-                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Emergency
-                                            Contact</label>
-                                        <div class="relative">
-                                            <div
-                                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <flux:icon name="phone-arrow-up-right"
-                                                    class="h-5 w-5 text-gray-400" />
-                                            </div>
-                                            <input type="text" wire:model="form.emergency_contact"
-                                                id="emergency_contact"
-                                                class="appearance-none block w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-2.5 pl-10 pr-3 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
-                                                placeholder="Emergency contact details">
-                                        </div>
-                                        @error('form.emergency_contact')
-                                            <span
-                                                class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label for="notes"
-                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Additional
-                                    Notes</label>
-                                <div class="relative">
-                                    <div class="absolute top-3 left-3 flex items-start pointer-events-none">
-                                        <flux:icon name="document-text" class="h-5 w-5 text-gray-400" />
-                                    </div>
-                                    <textarea wire:model="form.notes" id="notes" rows="4"
-                                        class="appearance-none block w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-2.5 pl-10 pr-3 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
-                                        placeholder="Add any additional information about this tenant"></textarea>
-                                </div>
-                                @error('form.notes')
-                                    <span class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <!-- Property and Lease Section -->
-                        <div class="space-y-6">
-                            <div class="border-b border-gray-200 dark:border-gray-700 pb-4">
-                                <h4
-                                    class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
-                                    Property & Lease Details</h4>
-
-                                <div class="space-y-4">
-                                    <div>
-                                        <label for="property_id"
-                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Property</label>
-                                        <div class="relative">
-                                            <div
-                                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <flux:icon name="building-office" class="h-5 w-5 text-gray-400" />
-                                            </div>
-                                                <select wire:model="form.property_id" id="property_id"
-                                                    class="appearance-none block w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-2.5 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm">
-                                                    <option value="">Select Property</option>
-                                                    @foreach ($this->properties() as $property)
-                                                        <option value="{{ $property->id }}">{{ $property->title }}</option>
-                                                    @endforeach
-                                                </select>
-                                            <div
-                                                class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                                                <flux:icon name="chevron-down" class="h-5 w-5 text-gray-400" />
-                                            </div>
-                                        </div>
-                                        @error('form.property_id')
-                                            <span
-                                                class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-
-                                    <div>
-                                        <label for="status"
-                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tenant
-                                            Status</label>
-                                        <div class="relative">
-                                            <div
-                                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <flux:icon name="check-circle" class="h-5 w-5 text-gray-400" />
-                                            </div>
-                                            <select wire:model="form.status" id="status"
-                                                class="appearance-none block w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-2.5 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm">
-                                                <option value="active">Active</option>
-                                                <option value="pending">Pending</option>
-                                                <option value="inactive">Inactive</option>
-                                            </select>
-                                            <div
-                                                class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                                                <flux:icon name="chevron-down" class="h-5 w-5 text-gray-400" />
-                                            </div>
-                                        </div>
-                                        @error('form.status')
-                                            <span
-                                                class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label for="lease_start"
-                                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Lease
-                                                Start</label>
-                                            <div class="relative">
-                                                <div
-                                                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                    <flux:icon name="calendar" class="h-5 w-5 text-gray-400" />
-                                                </div>
-                                                <input type="date" wire:model="form.lease_start" id="lease_start"
-                                                    class="appearance-none block w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-2.5 pl-10 pr-3 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm">
-                                            </div>
-                                            @error('form.lease_start')
-                                                <span
-                                                    class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-
-                                        <div>
-                                            <label for="lease_end"
-                                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Lease
-                                                End</label>
-                                            <div class="relative">
-                                                <div
-                                                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                    <flux:icon name="calendar" class="h-5 w-5 text-gray-400" />
-                                                </div>
-                                                <input type="date" wire:model="form.lease_end" id="lease_end"
-                                                    class="appearance-none block w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-2.5 pl-10 pr-3 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm">
-                                            </div>
-                                            @error('form.lease_end')
-                                                <span
-                                                    class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-                                    </div>
-
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label for="monthly_rent"
-                                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Monthly
-                                                Rent (KES)</label>
-                                            <div class="relative">
-                                                <div
-                                                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                    <flux:icon name="currency-dollar" class="h-5 w-5 text-gray-400" />
-                                                </div>
-                                                <input type="number" wire:model="form.monthly_rent"
-                                                    id="monthly_rent"
-                                                    class="appearance-none block w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-2.5 pl-10 pr-3 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
-                                                    step="0.01" placeholder="0.00">
-                                            </div>
-                                            @error('form.monthly_rent')
-                                                <span
-                                                    class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-
-                                        <div>
-                                            <label for="security_deposit"
-                                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Security
-                                                Deposit (KES)</label>
-                                            <div class="relative">
-                                                <div
-                                                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                    <flux:icon name="currency-dollar" class="h-5 w-5 text-gray-400" />
-                                                </div>
-                                                <input type="number" wire:model="form.security_deposit"
-                                                    id="security_deposit"
-                                                    class="appearance-none block w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-2.5 pl-10 pr-3 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
-                                                    step="0.01" placeholder="0.00">
-                                            </div>
-                                            @error('form.security_deposit')
-                                                <span
-                                                    class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- File upload section could go here -->
-                            <div class="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
-                                <div class="flex items-center mb-2">
-                                    <flux:icon name="document-duplicate" class="h-5 w-5 text-gray-400 mr-2" />
-                                    <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Documents</h4>
-                                </div>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                                    Upload lease agreements and other related documents.
-                                </p>
-                                <button type="button"
-                                    class="text-sm text-[#02c9c2] hover:underline flex items-center">
-                                    <flux:icon name="arrow-up-tray" class="h-4 w-4 mr-1" />
-                                    Add Documents
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <button type="button" wire:click="$set('showTenantModal', false)"
-                            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-                            Cancel
-                        </button>
-                        <button type="submit"
-                            class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#02c9c2] to-[#012e2b] text-white rounded-lg text-sm font-medium hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02c9c2] shadow-sm">
-                            <flux:icon wire:loading wire:target="saveTenant" name="arrow-path"
-                                class="w-4 h-4 mr-2 animate-spin" />
-                            {{ $modalMode === 'create' ? 'Create Tenant' : 'Update Tenant' }}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </flux:modal>
-
-    <!-- Tenant Details Modal -->
-    <flux:modal wire:model="showTenantDetailsModal" class="w-full max-w-4xl !p-0" @close="$wire.resetForm()">
-        <div class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden">
-            @if ($selectedTenant)
-                <div @class([
-                    'bg-gradient-to-r px-6 py-4 border-b border-gray-200 dark:border-gray-700',
-                    'from-green-500/20 to-green-600/20 dark:from-green-900/30 dark:to-green-700/30' =>
-                        $selectedTenant->status === 'active',
-                    'from-yellow-500/20 to-yellow-600/20 dark:from-yellow-900/30 dark:to-yellow-700/30' =>
-                        $selectedTenant->status === 'pending',
-                    'from-gray-500/20 to-gray-600/20 dark:from-gray-900/30 dark:to-gray-700/30' =>
-                        $selectedTenant->status === 'inactive',
-                ])>
-                    <div class="flex justify-between items-center">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                            <flux:icon name="user-circle" class="w-5 h-5 text-[#02c9c2]" />
-                            Tenant Details
-                        </h3>
-
+                    
+                    @if($modalMode === 'view' && $selectedTenant)
                         <span @class([
                             'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
                             'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' =>
@@ -917,10 +618,13 @@ new class extends Component {
                         ])>
                             {{ ucfirst($selectedTenant->status) }}
                         </span>
-                    </div>
+                    @endif
                 </div>
+            </div>
 
-                <div class="p-6">
+            <div class="p-6">
+                @if($modalMode === 'view')
+                    <!-- View Mode Content -->
                     <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
                         <!-- Tenant Info Column -->
                         <div class="md:col-span-3 space-y-6">
@@ -1021,7 +725,7 @@ new class extends Component {
                                                 <div
                                                     class="text-xs font-medium text-amber-600 dark:text-amber-400 flex items-center mt-1">
                                                     <flux:icon name="clock" class="w-4 h-4 mr-1" />
-                                                    Expires in {{ $daysLeft }}days
+                                                    Expires in {{ $daysLeft }} days
                                                 </div>
                                             @else
                                                 <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -1146,15 +850,299 @@ new class extends Component {
                             </div>
                         </div>
                     </div>
+                @else
+                    <!-- Create/Edit Mode Content -->
+                    <form wire:submit="saveTenant" class="space-y-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <!-- Tenant Information Section -->
+                            <div class="space-y-6">
+                                <div class="border-b border-gray-200 dark:border-gray-700 pb-4">
+                                    <h4
+                                        class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
+                                        Tenant Information</h4>
 
-                    <div class="flex justify-end space-x-3 pt-5 mt-6 border-t border-gray-200 dark:border-gray-700">
-                        <button wire:click="$set('showTenantDetailsModal', false)"
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label for="name"
+                                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full
+                                                Name</label>
+                                            <div class="relative">
+                                                <div
+                                                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <flux:icon name="user" class="h-5 w-5 text-gray-400" />
+                                                </div>
+                                                <input type="text" wire:model="form.name" id="name"
+                                                    class="appearance-none block w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-2.5 pl-10 pr-3 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                                    placeholder="Enter tenant's full name">
+                                            </div>
+                                            @error('form.name')
+                                                <span
+                                                    class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
+                                        <div>
+                                            <label for="email"
+                                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email
+                                                Address</label>
+                                            <div class="relative">
+                                                <div
+                                                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <flux:icon name="envelope" class="h-5 w-5 text-gray-400" />
+                                                </div>
+                                                <input type="email" wire:model="form.email" id="email"
+                                                    class="appearance-none block w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-2.5 pl-10 pr-3 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                                    placeholder="Email address">
+                                            </div>
+                                            @error('form.email')
+                                                <span
+                                                    class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
+                                        <div>
+                                            <label for="phone"
+                                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone
+                                                Number</label>
+                                            <div class="relative">
+                                                <div
+                                                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <flux:icon name="phone" class="h-5 w-5 text-gray-400" />
+                                                </div>
+                                                <input type="tel" wire:model="form.phone" id="phone"
+                                                    class="appearance-none block w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-2.5 pl-10 pr-3 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                                    placeholder="Phone number">
+                                            </div>
+                                            @error('form.phone')
+                                                <span
+                                                    class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
+                                        <div>
+                                            <label for="emergency_contact"
+                                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Emergency
+                                                Contact</label>
+                                            <div class="relative">
+                                                <div
+                                                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <flux:icon name="phone-arrow-up-right"
+                                                        class="h-5 w-5 text-gray-400" />
+                                                </div>
+                                                <input type="text" wire:model="form.emergency_contact"
+                                                    id="emergency_contact"
+                                                    class="appearance-none block w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-2.5 pl-10 pr-3 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                                    placeholder="Emergency contact details">
+                                            </div>
+                                            @error('form.emergency_contact')
+                                                <span
+                                                    class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label for="notes"
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Additional
+                                        Notes</label>
+                                    <div class="relative">
+                                        <div class="absolute top-3 left-3 flex items-start pointer-events-none">
+                                            <flux:icon name="document-text" class="h-5 w-5 text-gray-400" />
+                                        </div>
+                                        <textarea wire:model="form.notes" id="notes" rows="4"
+                                            class="appearance-none block w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-2.5 pl-10 pr-3 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                            placeholder="Add any additional information about this tenant"></textarea>
+                                    </div>
+                                    @error('form.notes')
+                                        <span class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <!-- Property and Lease Section -->
+                            <div class="space-y-6">
+                                <div class="border-b border-gray-200 dark:border-gray-700 pb-4">
+                                    <h4
+                                        class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
+                                        Property & Lease Details</h4>
+
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label for="property_id"
+                                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Property</label>
+                                            <div class="relative">
+                                                <div
+                                                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <flux:icon name="building-office" class="h-5 w-5 text-gray-400" />
+                                                </div>
+                                                    <select wire:model="form.property_id" id="property_id"
+                                                        class="appearance-none block w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-2.5 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm">
+                                                        <option value="">Select Property</option>
+                                                        @foreach ($this->properties() as $property)
+                                                            <option value="{{ $property->id }}">{{ $property->title }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                <div
+                                                    class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                                                    <flux:icon name="chevron-down" class="h-5 w-5 text-gray-400" />
+                                                </div>
+                                            </div>
+                                            @error('form.property_id')
+                                                <span class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
+                                        <div>
+                                            <label for="status"
+                                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tenant
+                                                Status</label>
+                                            <div class="relative">
+                                                <div
+                                                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <flux:icon name="check-circle" class="h-5 w-5 text-gray-400" />
+                                                </div>
+                                                <select wire:model="form.status" id="status"
+                                                    class="appearance-none block w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-2.5 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm">
+                                                    <option value="active">Active</option>
+                                                    <option value="pending">Pending</option>
+                                                    <option value="inactive">Inactive</option>
+                                                </select>
+                                                <div
+                                                    class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                                                    <flux:icon name="chevron-down" class="h-5 w-5 text-gray-400" />
+                                                </div>
+                                            </div>
+                                            @error('form.status')
+                                                <span class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label for="lease_start"
+                                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Lease
+                                                    Start</label>
+                                                <div class="relative">
+                                                    <div
+                                                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                        <flux:icon name="calendar" class="h-5 w-5 text-gray-400" />
+                                                    </div>
+                                                    <input type="date" wire:model="form.lease_start" id="lease_start"
+                                                        class="appearance-none block w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-2.5 pl-10 pr-3 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm">
+                                                </div>
+                                                @error('form.lease_start')
+                                                    <span class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+
+                                            <div>
+                                                <label for="lease_end"
+                                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Lease
+                                                    End</label>
+                                                <div class="relative">
+                                                    <div
+                                                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                        <flux:icon name="calendar" class="h-5 w-5 text-gray-400" />
+                                                    </div>
+                                                    <input type="date" wire:model="form.lease_end" id="lease_end"
+                                                        class="appearance-none block w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-2.5 pl-10 pr-3 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm">
+                                                </div>
+                                                @error('form.lease_end')
+                                                    <span class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        </div>
+
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label for="monthly_rent"
+                                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Monthly
+                                                    Rent (KES)</label>
+                                                <div class="relative">
+                                                    <div
+                                                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                        <flux:icon name="currency-dollar" class="h-5 w-5 text-gray-400" />
+                                                    </div>
+                                                    <input type="number" wire:model="form.monthly_rent"
+                                                        id="monthly_rent"
+                                                        class="appearance-none block w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-2.5 pl-10 pr-3 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                                        step="0.01" placeholder="0.00">
+                                                </div>
+                                                @error('form.monthly_rent')
+                                                    <span class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+
+                                            <div>
+                                                <label for="security_deposit"
+                                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Security
+                                                    Deposit (KES)</label>
+                                                <div class="relative">
+                                                    <div
+                                                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                        <flux:icon name="currency-dollar" class="h-5 w-5 text-gray-400" />
+                                                    </div>
+                                                    <input type="number" wire:model="form.security_deposit"
+                                                        id="security_deposit"
+                                                        class="appearance-none block w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-2.5 pl-10 pr-3 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                                        step="0.01" placeholder="0.00">
+                                                </div>
+                                                @error('form.security_deposit')
+                                                    <span class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- File upload section could go here -->
+                                <div class="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
+                                    <div class="flex items-center mb-2">
+                                        <flux:icon name="document-duplicate" class="h-5 w-5 text-gray-400 mr-2" />
+                                        <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Documents</h4>
+                                    </div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                                        Upload lease agreements and other related documents.
+                                    </p>
+                                    <button type="button"
+                                        class="text-sm text-[#02c9c2] hover:underline flex items-center">
+                                        <flux:icon name="arrow-up-tray" class="h-4 w-4 mr-1" />
+                                        Add Documents
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                            <button type="button" wire:click="$set('showTenantModal', false)"
+                                class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                                Cancel
+                            </button>
+                            <button type="submit"
+                                class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#02c9c2] to-[#012e2b] text-white rounded-lg text-sm font-medium hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02c9c2] shadow-sm">
+                                <flux:icon wire:loading wire:target="saveTenant" name="arrow-path"
+                                    class="w-4 h-4 mr-2 animate-spin" />
+                                {{ $modalMode === 'create' ? 'Create Tenant' : 'Update Tenant' }}
+                            </button>
+                        </div>
+                    </form>
+                @endif
+
+                @if($modalMode === 'view')
+                    <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <button wire:click="$set('showTenantModal', false)"
                             class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
                             Close
                         </button>
+                        <button wire:click="editTenant({{ $selectedTenant->id }})"
+                            class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#02c9c2] to-[#012e2b] text-white rounded-lg text-sm font-medium hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02c9c2] shadow-sm">
+                            <flux:icon name="pencil-square" class="w-4 h-4 mr-2" />
+                            Edit Tenant
+                        </button>
                     </div>
-                </div>
-            @endif
+                @endif
+            </div>
         </div>
     </flux:modal>
 </div>
