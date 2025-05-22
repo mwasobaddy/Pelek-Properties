@@ -98,6 +98,28 @@
                         >
                             {{ __('Blog Management') }}
                         </flux:navlist.item>
+                        
+                        <flux:navlist.item 
+                            icon="shield-check" 
+                            :href="route('admin.roles.index')" 
+                            :current="request()->routeIs('admin.roles.index')" 
+                            class="rounded-xl transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2] hover:scale-[1.02]"
+                            wire:navigate
+                        >
+                            {{ __('Roles & Permissions') }}
+                            <span class="hidden px-1.5 py-0.5 text-xs bg-[#02c9c2]/20 text-[#02c9c2] rounded-full">New</span>
+                        </flux:navlist.item>
+
+                        <flux:navlist.item 
+                            icon="user" 
+                            :href="route('admin.users.index')" 
+                            :current="request()->routeIs('admin.users.index')" 
+                            class="rounded-xl transition-all duration-200 hover:bg-[#02c9c2]/10 hover:text-[#02c9c2] hover:scale-[1.02]"
+                            wire:navigate
+                        >
+                            {{ __('User Management') }}
+                            <span class="hidden px-1.5 py-0.5 text-xs bg-[#02c9c2]/20 text-[#02c9c2] rounded-full">New</span>
+                        </flux:navlist.item>
                     </flux:navlist.group>
                 </div>
 

@@ -76,6 +76,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Admin routes
     // -------------------------------------
     Route::prefix('admin')->name('admin.')->group(function () {
+        // Roles and permissions
+        Route::prefix('roles')->name('roles.')->group(function () {
+            Volt::route('/', 'pages.admin.roles-permissions.index')->name('index');
+        });
+
+        // User management
+        Route::prefix('users')->name('users.')->group(function () {
+            Volt::route('/', 'pages.admin.users.index')->name('index');
+        });
+
         // Blog management (admin role required)
         Volt::route('/blog', 'pages.admin.blog.index')
             ->name('blog.index');
