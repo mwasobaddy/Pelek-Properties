@@ -1,18 +1,22 @@
 <?php
 
 use App\Models\BlogPost;
+use App\Services\SEOService;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
 new #[Layout('components.layouts.guest')] class extends Component {
     public BlogPost $post;
 
-    public function mount(BlogPost $post)
+    public function mount(BlogPost $post, SEOService $seoService)
     {
         if (!$post->is_published && !auth()->user()?->hasRole('admin')) {
             abort(404);
         }
         $this->post = $post;
+        
+        // Set SEO meta tags for the blog post
+        $seoService->setBlogPostMeta($post);
     }
 
     public function with(): array

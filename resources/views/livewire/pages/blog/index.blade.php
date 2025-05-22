@@ -1,6 +1,7 @@
 <?php
 
 use App\Services\BlogService;
+use App\Services\SEOService;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
@@ -11,9 +12,26 @@ new #[Layout('components.layouts.guest')] class extends Component {
     
     public $featuredPosts = [];
 
-    public function mount(BlogService $blogService)
+    public function mount(BlogService $blogService, SEOService $seoService)
     {
         $this->featuredPosts = $blogService->getFeaturedPosts();
+        
+        // Set SEO meta tags for blog index
+        SEOMeta::setTitle('Blog - Real Estate Insights & Updates');
+        SEOMeta::setDescription('Discover the latest insights, market trends, and updates about the Kenyan real estate market. Expert advice and property tips from Pelek Properties.');
+        SEOMeta::setCanonical(route('blog.index'));
+        
+        OpenGraph::setTitle('Real Estate Blog - Pelek Properties');
+        OpenGraph::setDescription('Stay informed about the Kenyan real estate market with expert insights and property tips.');
+        OpenGraph::setType('blog');
+        
+        TwitterCard::setTitle('Real Estate Blog - Pelek Properties');
+        TwitterCard::setDescription('Expert real estate insights and property tips from Kenya\'s leading property professionals.');
+        
+        JsonLd::setType('Blog');
+        JsonLd::addValue('@context', 'https://schema.org');
+        JsonLd::setTitle('Real Estate Blog - Pelek Properties');
+        JsonLd::setDescription('Expert insights and updates about the Kenyan real estate market.');
     }
 
     #[Computed]
