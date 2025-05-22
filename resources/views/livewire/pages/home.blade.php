@@ -1,6 +1,7 @@
 <?php
 
 use App\Services\PropertySearchService;
+use App\Services\SEOService;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
@@ -8,10 +9,14 @@ use Livewire\WithPagination;
 new #[Layout('components.layouts.guest')] class extends Component {
     use WithPagination;
 
+    public function mount(SEOService $seoService)
+    {
+        $seoService->setHomeMeta();
+    }
+
     public function with(): array
     {
         return [];
-    }
 } ?>
 
 <div>
