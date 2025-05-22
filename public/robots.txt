@@ -1,2 +1,77 @@
 User-agent: *
-Disallow:
+Allow: /
+Allow: /blog
+Allow: /properties
+Allow: /services
+Allow: /about
+Allow: /contact
+
+# Disallow admin and sensitive areas
+Disallow: /admin/
+Disallow: /login
+Disallow: /register
+Disallow: /password/
+Disallow: /email/
+Disallow: /dashboard
+Disallow: /api/*
+
+# Property filtering parameters to prevent duplicate content
+Disallow: /*?page=*&*
+Disallow: /*?*&page=*
+Disallow: /*?sort=*
+Disallow: /*?filter=*
+Allow: /*?page=*
+
+# Allow search engines to access static assets
+Allow: /*.js$
+Allow: /*.css$
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.gif$
+Allow: /*.svg$
+Allow: /*.webp$
+Allow: /*.ico$
+Allow: /fonts/
+
+# Prevent crawling of system and development files
+Disallow: /*.json$
+Disallow: /*.xml$
+Disallow: /*.txt$
+Disallow: /*.md$
+Disallow: /*.yml$
+Disallow: /*.yaml$
+Disallow: /*.env
+Disallow: /.env.*
+Disallow: /.git/
+Disallow: /.github/
+Disallow: /vendor/
+Disallow: /node_modules/
+Disallow: /storage/
+Disallow: /build/
+
+# Prevent crawling of search results and dynamic content
+Disallow: /search
+Disallow: /api/
+Disallow: /livewire/
+Disallow: /*preview=true
+Disallow: /*draft=true
+
+# Sitemap location
+Sitemap: https://pelekproperties.com/sitemap.xml
+
+# Specific bot directives
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: MJ12bot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10
+
+User-agent: Googlebot
+Crawl-delay: 5
+
+User-agent: Bingbot
+Crawl-delay: 5

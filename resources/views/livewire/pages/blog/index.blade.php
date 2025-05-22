@@ -6,6 +6,10 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
+use Artesaos\SEOTools\Facades\SEOMeta;
+use Artesaos\SEOTools\Facades\OpenGraph;
+use Artesaos\SEOTools\Facades\TwitterCard;
+use Artesaos\SEOTools\Facades\JsonLd;
 
 new #[Layout('components.layouts.guest')] class extends Component {
     use WithPagination;
@@ -16,22 +20,90 @@ new #[Layout('components.layouts.guest')] class extends Component {
     {
         $this->featuredPosts = $blogService->getFeaturedPosts();
         
-        // Set SEO meta tags for blog index
-        SEOMeta::setTitle('Blog - Real Estate Insights & Updates');
-        SEOMeta::setDescription('Discover the latest insights, market trends, and updates about the Kenyan real estate market. Expert advice and property tips from Pelek Properties.');
+        // Meta tags
+        SEOMeta::setTitle('Real Estate Blog - Expert Insights & Market Updates | Pelek Properties');
+        SEOMeta::setDescription('Stay informed with expert real estate insights, market trends, and property tips from Kenya\'s leading property professionals. Discover the latest in Kenyan real estate.');
         SEOMeta::setCanonical(route('blog.index'));
+        SEOMeta::addKeyword([
+            'kenya real estate blog',
+            'property market insights',
+            'real estate tips kenya',
+            'property investment advice',
+            'nairobi real estate market',
+            'kenyan property trends',
+            'property management kenya',
+            'real estate investment kenya'
+        ]);
         
-        OpenGraph::setTitle('Real Estate Blog - Pelek Properties');
-        OpenGraph::setDescription('Stay informed about the Kenyan real estate market with expert insights and property tips.');
+        // Open Graph
+        OpenGraph::setTitle('Real Estate Blog - Expert Insights & Updates | Pelek Properties');
+        OpenGraph::setDescription('Expert insights, market analysis, and property tips from Kenya\'s leading real estate professionals. Stay updated with Pelek Properties.');
+        OpenGraph::setUrl(route('blog.index'));
         OpenGraph::setType('blog');
+        OpenGraph::setSiteName('Pelek Properties');
         
-        TwitterCard::setTitle('Real Estate Blog - Pelek Properties');
+        if (count($this->featuredPosts) > 0 && $this->featuredPosts[0]->featured_image) {
+            $ogImage = $this->featuredPosts[0]->featured_image;
+            OpenGraph::addImage(asset("storage/{$ogImage}"), [
+                'height' => 630,
+                'width' => 1200,
+                'type' => 'image/jpeg'
+            ]);
+        } else {
+            OpenGraph::addImage(asset('favicon.svg'), [
+                'height' => 512,
+                'width' => 512,
+                'type' => 'image/svg+xml'
+            ]);
+        }
+        
+        // Twitter Card
+        TwitterCard::setType('summary_large_image');
+        TwitterCard::setTitle('Real Estate Blog - Expert Insights | Pelek Properties');
         TwitterCard::setDescription('Expert real estate insights and property tips from Kenya\'s leading property professionals.');
+        if (count($this->featuredPosts) > 0 && $this->featuredPosts[0]->featured_image) {
+            TwitterCard::setImage(asset("storage/{$this->featuredPosts[0]->featured_image}"));
+        } else {
+            TwitterCard::setImage(asset('favicon.svg'));
+        }
+        TwitterCard::setSite('@PelekProperties');
         
+        // JSON-LD Schema
         JsonLd::setType('Blog');
         JsonLd::addValue('@context', 'https://schema.org');
         JsonLd::setTitle('Real Estate Blog - Pelek Properties');
         JsonLd::setDescription('Expert insights and updates about the Kenyan real estate market.');
+        JsonLd::addValue('publisher', [
+            '@type' => 'Organization',
+            'name' => 'Pelek Properties',
+            'logo' => [
+                '@type' => 'ImageObject',
+                'url' => asset('favicon.svg')
+            ]
+        ]);
+        JsonLd::addValue('mainEntityOfPage', [
+            '@type' => 'WebPage',
+            '@id' => route('blog.index')
+        ]);
+        
+        // Add blog posts to JSON-LD
+        $blogPosts = [];
+        foreach ($this->featuredPosts as $post) {
+            $blogPosts[] = [
+                '@type' => 'BlogPosting',
+                'headline' => $post->title,
+                'datePublished' => $post->published_at->toIso8601String(),
+                'dateModified' => $post->updated_at->toIso8601String(),
+                'author' => [
+                    '@type' => 'Person',
+                    'name' => $post->author->name
+                ],
+                'url' => route('blog.show', $post->slug),
+                'image' => $post->featured_image ? asset("storage/{$post->featured_image}") : asset('favicon.svg'),
+                'description' => $post->excerpt ?? substr(strip_tags($post->content), 0, 160)
+            ];
+        }
+        JsonLd::addValue('blogPost', $blogPosts);
     }
 
     #[Computed]
@@ -155,18 +227,4 @@ new #[Layout('components.layouts.guest')] class extends Component {
                                 <a href="{{ route('blog.show', ['post' => $post->slug]) }}" 
                                    class="inline-flex items-center justify-center w-full px-4 py-2 bg-[#02c9c2]/10 hover:bg-[#02c9c2]/20 text-[#02c9c2] rounded-full transition-colors duration-200">
                                     Read More
-                                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                    </svg>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-        </div>
-
-        <div class="mt-12">
-            {{ $this->posts->links('components.pagination') }}
-        </div>
-    </div>
-</div>
+                                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0

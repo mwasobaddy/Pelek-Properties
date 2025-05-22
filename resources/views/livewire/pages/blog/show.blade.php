@@ -4,28 +4,86 @@ use App\Models\BlogPost;
 use App\Services\SEOService;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
+use Artesaos\SEOTools\Facades\SEOMeta;
+use Artesaos\SEOTools\Facades\OpenGraph;
+use Artesaos\SEOTools\Facades\TwitterCard;
+use Artesaos\SEOTools\Facades\JsonLd;
 
 new #[Layout('components.layouts.guest')] class extends Component {
     public BlogPost $post;
 
-    public function mount(BlogPost $post, SEOService $seoService)
+    public function mount(BlogPost $post)
     {
         if (!$post->is_published && !auth()->user()?->hasRole('admin')) {
             abort(404);
         }
         $this->post = $post;
         
-        // Set SEO meta tags for the blog post
-        $seoService->setBlogPostMeta($post);
-    }
-
-    public function with(): array
-    {
-        return [
-            'post' => $this->post,
+        // SEO Meta Tags
+        SEOMeta::setTitle("{$post->title} | Real Estate Blog | Pelek Properties");
+        SEOMeta::setDescription(substr(strip_tags($post->content), 0, 160));
+        SEOMeta::setCanonical(route('blog.show', $post->slug));
+        
+        $keywords = [
+            'kenya real estate',
+            'property investment',
+            'real estate tips',
+            strtolower($post->title),
+            'pelek properties blog',
+            'kenyan property market'
         ];
+        SEOMeta::addKeyword($keywords);
+        
+        // Open Graph
+        OpenGraph::setTitle("{$post->title} | Pelek Properties Blog");
+        OpenGraph::setDescription(substr(strip_tags($post->content), 0, 160));
+        OpenGraph::setUrl(route('blog.show', $post->slug));
+        OpenGraph::setType('article');
+        OpenGraph::setArticle([
+            'published_time' => $post->published_at->toIso8601String(),
+            'modified_time' => $post->updated_at->toIso8601String(),
+            'author' => $post->author->name,
+            'section' => 'Real Estate',
+            'tag' => $keywords
+        ]);
+        
+        if ($post->featured_image) {
+            OpenGraph::addImage(asset("storage/{$post->featured_image}"), [
+                'height' => 630,
+                'width' => 1200
+            ]);
+        }
+        
+        // Twitter Card
+        TwitterCard::setType('summary_large_image');
+        TwitterCard::setTitle($post->title);
+        TwitterCard::setDescription(substr(strip_tags($post->content), 0, 160));
+        if ($post->featured_image) {
+            TwitterCard::setImage(asset("storage/{$post->featured_image}"));
+        }
+        
+        // JSON-LD Structured Data
+        JsonLd::setType('Article');
+        JsonLd::setTitle($post->title);
+        JsonLd::setDescription(substr(strip_tags($post->content), 0, 160));
+        JsonLd::addValue('author', [
+            '@type' => 'Person',
+            'name' => $post->author->name
+        ]);
+        JsonLd::addValue('publisher', [
+            '@type' => 'Organization',
+            'name' => 'Pelek Properties',
+            'logo' => [
+                '@type' => 'ImageObject',
+                'url' => asset('favicon.svg')
+            ]
+        ]);
+        JsonLd::addValue('datePublished', $post->published_at->toIso8601String());
+        JsonLd::addValue('dateModified', $post->updated_at->toIso8601String());
+        if ($post->featured_image) {
+            JsonLd::addImage(asset("storage/{$post->featured_image}"));
+        }
     }
-}
 
 ?>
 
