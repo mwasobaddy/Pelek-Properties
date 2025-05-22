@@ -1,21 +1,20 @@
 <?php
 
+use App\Models\Property;
+use App\Services\SEOService;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 use function Livewire\Volt\{state, computed};
 
 new #[Layout('components.layouts.guest')] class extends Component {
-use App\Models\Property;
-use Livewire\Attributes\Layout;
-use Livewire\Volt\Component;
-use function Livewire\Volt\{state, computed};
-
-// new #[Layout('components.layouts.guest')] class extends Component {
     public Property $property;
 
-    public function mount(Property $property)
+    public function mount(Property $property, SEOService $seoService)
     {
         $this->property = $property->load(['propertyType', 'amenities', 'images']);
+        
+        // Set SEO meta tags for this property
+        $seoService->setPropertyMeta($this->property);
     }
 
     public function with(): array

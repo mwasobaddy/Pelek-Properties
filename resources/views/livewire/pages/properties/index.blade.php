@@ -5,6 +5,7 @@ use function Livewire\Volt\{state};
 use App\Models\Property;
 use App\Models\PropertyType;
 use App\Services\PropertySearchService;
+use App\Services\SEOService;
 use Livewire\Attributes\Layout;
 use \Livewire\WithPagination;
 
@@ -16,6 +17,37 @@ new #[Layout('components.layouts.guest')] class extends Component {
     
     // Keep scroll position when paginating
     protected $preserveScroll = true;
+    
+    public function mount(SEOService $seoService)
+    {
+        // Get the property type from the URL query parameter
+        $propertyListingType = request()->query('propertyListingType', 'all');
+        
+        // Set SEO meta tags based on property type
+        if ($propertyListingType !== 'all') {
+            $seoService->setPropertyTypeMeta($propertyListingType);
+        } else {
+            // Set default property listing SEO
+            SEOMeta::setTitle('Properties for Sale, Rent & Airbnb in Kenya | Pelek Properties');
+            SEOMeta::setDescription('Browse our curated selection of properties in Kenya. Find luxury homes, apartments, commercial spaces, and Airbnb rentals. Trusted by thousands for quality real estate.');
+            SEOMeta::addKeyword([
+                'property kenya',
+                'real estate kenya',
+                'houses for sale kenya',
+                'apartments for rent kenya',
+                'commercial property kenya',
+                'airbnb kenya'
+            ]);
+            
+            JsonLd::setType('RealEstateAgent');
+            JsonLd::addValue('@context', 'https://schema.org');
+            JsonLd::setTitle('Pelek Properties - All Properties');
+            JsonLd::setDescription('Browse our complete collection of premium properties across Kenya.');
+            JsonLd::addValue('areaServed', [
+                '@type' => 'Country',
+                'name' => 'Kenya'
+            ]);
+        }
 
     protected $queryString = [
         'search' => ['except' => ''],

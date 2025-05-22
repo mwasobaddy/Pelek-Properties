@@ -17,6 +17,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
     public function with(): array
     {
         return [];
+    }
 } ?>
 
 <div>
