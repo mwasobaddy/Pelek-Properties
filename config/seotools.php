@@ -2,14 +2,7 @@
 /**
  * @see https://github.com/artesaos/seotools
  */
-
-        'defaults' => [
-            'title'       => 'Pelek Properties Kenya', // set false to total remove
-            'description' => 'Discover premier real estate properties in Kenya. Expert property management, sales, and valuations.', // set false to total remove
-            'url'         => 'current', // Set null for using Url::full(), set to 'current' to use Url::current(), set false to total remove
-            'type'        => 'RealEstateAgent',
-            'images'      => ['/images/logo.png'],
-        ],[
+return [
     'inertia' => env('SEO_TOOLS_INERTIA', false),
     'meta' => [
         /*
@@ -68,11 +61,11 @@
          * The default configurations to be used by the json-ld generator.
          */
         'defaults' => [
-            'title'       => 'Over 9000 Thousand!', // set false to total remove
-            'description' => 'For those who helped create the Genki Dama', // set false to total remove
-            'url'         => false, // Set to null or 'full' to use Url::full(), set to 'current' to use Url::current(), set false to total remove
-            'type'        => 'WebPage',
-            'images'      => [],
+            'title'       => 'Pelek Properties - Premier Real Estate in Kenya', // updated from placeholder
+            'description' => 'Discover luxury properties, rentals, and commercial spaces across Kenya. Expert property management and valuation services.', // updated from placeholder
+            'url'         => 'current', // Set to current URL
+            'type'        => 'RealEstateAgent', // Changed to match real estate business
+            'images'      => ['/images/logo.png'],
         ],
     ],
 ];
