@@ -1,24 +1,14 @@
 <?php
 
 use App\Models\Property;
-use function Livewire\Volt\{state, mount};
+use function Livewire\Volt\{state, mount, computed};
 use Illuminate\Support\Facades\Storage;
 use Livewire\Volt\Component;
 
 new class extends Component {
-    #[State]
     public $showModal = false;
-
-    #[State]
-    public $modalName = '';
-
-    #[State]
     public $property = null;
-
-    #[State]
     public $currentImageIndex = 0;
-
-    #[State]
     public $showingSlider = false;
 
     
@@ -133,25 +123,23 @@ new class extends Component {
 
     public function getWhatsAppUrl()
     {
-        $phoneNumber = preg_replace('/[^0-9+]/', '', $this->property->whatsapp_number);
-        $message = urlencode("Hi, I'm interested in the property: {$this->property->title}");
+        $phoneNumber = '254711614099'; // Added country code for Kenya (254)
+        $message = urlencode("Hi, I'm interested in the property: {$this->property->title}. Can you provide more details?");
         return "https://wa.me/{$phoneNumber}?text={$message}";
     }
 
-        public function openInquiryModal(): void 
+    public function openInquiryModal(): void 
     {
         $this->showModal = true;
-        $this->modalName = "whatsapp-modal-{$this->property->id}";
     }
 
     public function closeModal(): void
     {
         $this->showModal = false;
-        $this->modalName = '';
     }
 }; ?>
 
-<div>
+<div x-data="{ showModal: @entangle('showModal') }">
     {{-- Property Card - Modern Design 2024+ --}}
     <div
         class="group relative overflow-hidden rounded-xl bg-white shadow-md transition-all duration-300 hover:shadow-lg dark:bg-gray-800 dark:shadow-gray-700/30">
@@ -242,49 +230,81 @@ new class extends Component {
         </div>
 
         {{-- WhatsApp Modal --}}
-        <flux:modal 
-            wire:model="showModal"
-            name="whatsapp-modal-{{ $this->property->id }}" 
-            dismissible
-            class="max-w-md self-center justify-self-center !p-0"
-        >
-            <div class="p-6">
-                <!-- Modal Content -->
-                <div class="mb-4 flex items-center space-x-4">
-                    <div class="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg">
-                        <img src="{{ $this->getCurrentImage() }}" 
-                            alt="{{ $this->property->title }}"
-                            class="h-full w-full object-cover">
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">{{ $this->property->title }}</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $this->property->location }}</p>
+        <div x-show="showModal" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 transform scale-90"
+             x-transition:enter-end="opacity-100 transform scale-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 transform scale-100"
+             x-transition:leave-end="opacity-0 transform scale-90"
+             class="fixed inset-0 z-50 overflow-y-auto" 
+             aria-labelledby="modal-title" 
+             role="dialog" 
+             aria-modal="true">
+            <div class="flex min-h-screen items-end justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                <!-- Background overlay -->
+                <div class="fixed inset-0 bg-gray-800/50 dark:bg-gray-500/50 transition-opacity" 
+                     x-show="showModal"
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0"
+                     x-transition:enter-end="opacity-100"
+                     x-transition:leave="transition ease-in duration-200"
+                     x-transition:leave-start="opacity-100"
+                     x-transition:leave-end="opacity-0"
+                     @click="showModal = false"></div>
+
+                <!-- Modal panel -->
+                <div class="relative inline-block transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:align-middle dark:bg-gray-800">
+                <div class="bg-gradient-to-r from-green-500/20 to-green-600/20 dark:from-green-900/30 dark:to-green-700/30 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <flux:icon name="chat-bubble-left-ellipsis" class="w-6 h-6 text-green-600" />
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                                Contact via WhatsApp
+                            </h3>
+                        </div>
+                        <button @click="showModal = false" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors">
+                            <flux:icon name="x-mark" class="w-5 h-5" />
+                        </button>
                     </div>
                 </div>
 
-                <div class="mb-6 rounded-lg bg-gray-50 p-4 dark:bg-gray-700/50">
-                    <p class="text-gray-700 dark:text-gray-300">
-                        You'll be redirected to WhatsApp to inquire about this property. Our agent will respond as soon as possible.
-                    </p>
-                </div>
+                <div class="p-6">
+                    <!-- Modal Content -->
+                    <div class="mb-4 flex items-center space-x-4">
+                        <div class="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg">
+                            <img src="{{ $this->getCurrentImage() }}" 
+                                alt="{{ $this->property->title }}"
+                                class="h-full w-full object-cover">
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white">{{ $this->property->title }}</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">{{ $this->property->location }}</p>
+                        </div>
+                    </div>
 
-                <div class="flex justify-end space-x-3">
-                    <flux:button 
-                        wire:click="closeModal" 
-                        variant="ghost"
-                    >
-                        Cancel
-                    </flux:button>
-                    <flux:button 
-                        href="{{ $this->getWhatsAppUrl() }}"
-                        target="_blank" 
-                        icon="chat-bubble-left-ellipsis"
-                        class="bg-green-500 hover:bg-green-600"
-                    >
-                        Open WhatsApp
-                    </flux:button>
+                    <div class="mb-6 rounded-lg bg-gray-50 p-4 dark:bg-gray-700/50">
+                        <p class="text-gray-700 dark:text-gray-300">
+                            You'll be redirected to WhatsApp to inquire about this property. Our agent will respond as soon as possible.
+                        </p>
+                    </div>
+
+                    <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <flux:button @click="showModal = false" variant="primary">
+                            Cancel
+                        </flux:button>
+                        <flux:button 
+                            href="{{ $this->getWhatsAppUrl() }}"
+                            target="_blank"
+                            class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg text-sm font-medium hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-sm"
+                        >
+                            <flux:icon name="chat-bubble-left-ellipsis" class="w-4 h-4 mr-2" />
+                            Open WhatsApp
+                        </flux:button>
+                    </div>
+                </div>
                 </div>
             </div>
-        </flux:modal>
+        </div>
     </div>
 </div>
