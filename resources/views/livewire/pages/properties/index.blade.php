@@ -668,7 +668,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                         </div>
 
                         <!-- Amenities -->
-                        <div class="relative group">
+                        {{-- <div class="relative group">
                             <label
                                 class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Amenities</label>
                             <div class="relative">
@@ -699,7 +699,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
                         <!-- Property Base Type -->
                         <div class="relative group">
