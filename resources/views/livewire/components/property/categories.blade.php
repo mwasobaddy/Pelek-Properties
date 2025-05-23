@@ -121,7 +121,7 @@ new class extends Component {
                     <flux:icon name="{{ $categories[$type]['icon'] }}" class="h-5 w-5 mr-2" />
                     {{ ucfirst($type) }} 
                     @if(isset($this->propertyCounts[$type]))
-                        <span class="ml-2 bg-white bg-opacity-20 text-xs py-0.5 px-2 rounded-full">
+                        <span class="ml-2 bg-white bg-opacity-20 text-xs py-0.5 px-2 rounded-full text-gray-800">
                             {{ $this->propertyCounts[$type] }}
                         </span>
                     @endif
