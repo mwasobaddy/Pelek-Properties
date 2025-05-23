@@ -196,10 +196,10 @@ state([
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
             @foreach($uploadedImages as $image)
                 <div class="relative group bg-white rounded-lg overflow-hidden shadow-sm dark:bg-gray-700">
-                    <img 
-                        src="{{ Storage::url($image->image_path) }}"
-                        alt="{{ $image->alt_text }}" 
+                    <x-responsive-image 
+                        :image="$image"
                         class="w-full h-48 object-cover"
+                        sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, 50vw"
                     />
                     
                     <!-- Overlay with actions -->

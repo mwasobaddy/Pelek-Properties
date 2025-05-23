@@ -17,8 +17,35 @@ new #[Layout('components.layouts.guest')] class extends Component {
     
     // Keep scroll position when paginating
     protected $preserveScroll = true;
+
+    // Define state variables
+    public $search = '';
+    public $propertyType = null;
+    public $priceRange = '';
+    public $onlyAvailable = false;
+    public $listingType = null;
+    public $location = null;
+    public $city = '';
+    public $neighborhood = '';
+    public $bedrooms = '';
+    public $bathrooms = '';
+    public $floors = '';
+    public $squareRange = '';
+    public $propertyListingType = '';
+    public $propertyBaseType = '';
+    public $amenities = [];
+    public $sort = '';
+
+    // Page title and description
+    public $pageTitle = 'Explore Our Properties';
+    public $pageDescription = 'Find your perfect property from our extensive collection';
     
-    public function mount(SEOService $seoService)
+    // Cities and amenities lists
+    public $cities = [];
+    public $allAmenities = [];
+    public $neighborhoods = [];
+    
+    public function mount(SEOService $seoService, $type = null)
     {
         // Get the property type from the URL query parameter
         $propertyListingType = request()->query('propertyListingType', 'all');
@@ -32,7 +59,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
             SEOMeta::setDescription('Browse our curated selection of properties in Kenya. Find luxury homes, apartments, commercial spaces, and Airbnb rentals. Trusted by thousands for quality real estate.');
             SEOMeta::addKeyword([
                 'property kenya',
-                'real estate kenya',
+                'real estate kenya', 
                 'houses for sale kenya',
                 'apartments for rent kenya',
                 'commercial property kenya',
@@ -48,50 +75,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                 'name' => 'Kenya'
             ]);
         }
-
-    protected $queryString = [
-        'search' => ['except' => ''],
-        'propertyType' => ['except' => ''],
-        'priceRange' => ['except' => ''],
-        'onlyAvailable' => ['except' => false],
-        'listingType' => ['except' => ''],
-        'location' => ['except' => ''],
-        'city' => ['except' => ''],
-        'neighborhood' => ['except' => ''],
-        'bedrooms' => ['except' => ''],
-        'bathrooms' => ['except' => ''],
-        'squareRange' => ['except' => ''],
-        'floors' => ['except' => ''],
-        'amenities' => ['except' => ''],
-        'sort' => ['except' => ''],
-        'propertyListingType' => ['except' => ''],
-        'propertyBaseType' => ['except' => ''],
-    ];
-
-    public $priceRange;
-    public $search = '';
-    public $propertyType = null;
-    public $onlyAvailable = false;
-    public $listingType = null;
-    public $location = null;
-    public $city = '';
-    public $neighborhood = '';
-    public $bedrooms = '';
-    public $bathrooms = '';
-    public $squareRange = '';
-    public $floors = '';
-    public $amenities = [];
-    public $sort = '';
-    public $propertyListingType = ''; // For sale, rent, airbnb
-    public $propertyBaseType = ''; // residential, commercial, vacation, etc.
-    public $pageTitle = 'All Properties';
-    public $pageDescription = 'Browse our collection of properties';
-    public $cities = [];
-    public $neighborhoods = [];
-    public $allAmenities = [];
-
-    public function mount($type = null)
-    {
+        
         // Initialize the PropertySearchService
         $propertySearchService = app(PropertySearchService::class);
 
@@ -122,12 +106,62 @@ new #[Layout('components.layouts.guest')] class extends Component {
             }
         }
     }
+    
+    protected $queryString = [
+        'search' => ['except' => ''],
+        'propertyType' => ['except' => ''],
+        'priceRange' => ['except' => ''],
+        'onlyAvailable' => ['except' => false],
+        'listingType' => ['except' => ''],
+        'location' => ['except' => ''],
+        'city' => ['except' => ''],
+        'neighborhood' => ['except' => ''],
+        'bedrooms' => ['except' => ''],
+        'bathrooms' => ['except' => ''],
+        'floors' => ['except' => ''],
+        'squareRange' => ['except' => ''],
+        'propertyListingType' => ['except' => ''],
+        'propertyBaseType' => ['except' => ''],
+        'amenities' => ['except' => []],
+        'sort' => ['except' => '']
+    ];
+
+    public function boot(PropertySearchService $propertySearchService)
+    {
+        // Fetch cities and amenities
+        $this->cities = $propertySearchService->getAvailableCities();
+        $this->allAmenities = $propertySearchService->getAvailableAmenities();
+    }
+
+    public function updating($name, $value)
+    {
+        if ($name === 'listingType') {
+            switch ($value) {
+                case 'sale':
+                    $this->pageTitle = 'Properties for Sale';
+                    $this->pageDescription = "Discover your dream property in Nairobi's most desirable locations";
+                    break;
+                case 'rent':
+                    $this->pageTitle = 'Properties for Rent';
+                    $this->pageDescription = 'Find your perfect rental property in Nairobi';
+                    break;
+                case 'airbnb':
+                    $this->pageTitle = 'Airbnb Properties';
+                    $this->pageDescription = 'Find the perfect holiday home or short-term rental';
+                    break;
+                case 'commercial':
+                    $this->pageTitle = 'Commercial Properties';
+                    $this->pageDescription = 'Explore our range of commercial properties for your business needs';
+                    break;
+            }
+        }
+    }
 
     public function resetFilters()
     {
         $this->search = '';
         $this->propertyType = null;
-        $this->priceRange = null;
+        $this->priceRange = '';
         $this->onlyAvailable = false;
         $this->listingType = null;
         $this->location = null;
@@ -158,7 +192,6 @@ new #[Layout('components.layouts.guest')] class extends Component {
         $this->resetPage();
     }
 
-    // Add these methods to ensure other filters also reset pagination
     public function updatedSearch()
     {
         $this->resetPage();
@@ -259,10 +292,11 @@ new #[Layout('components.layouts.guest')] class extends Component {
                 'property_type_id' => $this->propertyType,
                 'min_price' => $min_price,
                 'max_price' => $max_price,
-                'status' => $this->onlyAvailable ? 'available' : null,            'listing_type' => $this->propertyListingType ?: $this->listingType,
-            'type' => $this->propertyBaseType,
-            'location' => $this->location,
-            'city' => $this->city,
+                'status' => $this->onlyAvailable ? 'available' : null,
+                'listing_type' => $this->propertyListingType ?: $this->listingType,
+                'type' => $this->propertyBaseType,
+                'location' => $this->location,
+                'city' => $this->city,
                 'neighborhood' => $this->neighborhood,
                 'bedrooms' => $this->bedrooms,
                 'bathrooms' => $this->bathrooms,

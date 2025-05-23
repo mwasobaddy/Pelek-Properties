@@ -22,6 +22,9 @@ class Kernel extends ConsoleKernel
             ->onFailure(function () {
                 info('Sitemap generation failed');
             });
+
+        // Generate image sitemap daily at midnight
+        $schedule->command('sitemap:generate-images')->daily();
     }
 
     /**

@@ -111,11 +111,11 @@ new class extends Component {
                     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         @foreach($property->images as $image)
                             <div class="relative group">
-                                <img 
-                                    src="{{ Storage::disk('public')->url($image->image_path) }}" 
-                                    alt="{{ $image->alt_text }}"
+                                <x-responsive-image 
+                                    :image="$image" 
                                     class="w-full h-48 object-cover rounded-lg bg-gray-100 dark:bg-gray-700"
-                                >
+                                    sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, 50vw"
+                                />
                                 <button
                                     wire:click="deleteImage({{ $image->id }})"
                                     class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity"

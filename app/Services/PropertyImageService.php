@@ -13,6 +13,16 @@ use Intervention\Image\Drivers\Gd\Driver;
 
 class PropertyImageService
 {
+    // Image sizes for responsive images (width in pixels)
+    protected const RESPONSIVE_SIZES = [
+        'xs' => 320,
+        'sm' => 640,
+        'md' => 768,
+        'lg' => 1024,
+        'xl' => 1280,
+        '2xl' => 1536
+    ];
+
     /**
      * Validate and prepare an uploaded file for storage
      */
@@ -60,7 +70,43 @@ class PropertyImageService
     }
 
     /**
-     * Store a new property image
+     * Generate responsive images and WebP versions
+     */
+    protected function generateResponsiveImages(
+        ImageManager $imageManager,
+        string $sourcePath,
+        string $baseFilename,
+        string $propertyPath,
+        string $extension
+    ): array {
+        $paths = [];
+        
+        foreach (self::RESPONSIVE_SIZES as $size => $width) {
+            // Regular format
+            $image = $imageManager->read($sourcePath)
+                ->resize($width, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                    $constraint->upsize();
+                })
+                ->optimize();
+            
+            $originalPath = "{$propertyPath}/{$size}_{$baseFilename}.{$extension}";
+            Storage::disk('public')->put($originalPath, $image->encode($extension));
+            $paths[$size] = [
+                'original' => $originalPath
+            ];
+
+            // WebP version
+            $webpPath = "{$propertyPath}/{$size}_{$baseFilename}.webp";
+            Storage::disk('public')->put($webpPath, $image->encode('webp'));
+            $paths[$size]['webp'] = $webpPath;
+        }
+
+        return $paths;
+    }
+
+    /**
+     * Store a new property image with responsive versions
      */
     public function store(Property $property, UploadedFile $file, bool $isFeatured = false): PropertyImage
     {
@@ -70,42 +116,57 @@ class PropertyImageService
                 throw new \Exception('Invalid image file');
             }
 
-            // Generate unique filename
-            $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+            $imageManager = new ImageManager(new Driver());
+            $baseFilename = Str::uuid();
+            $extension = $file->getClientOriginalExtension();
+            $propertyPath = "properties/{$property->id}";
             
+            // Generate responsive images for both original format and WebP
+            $responsivePaths = $this->generateResponsiveImages(
+                $imageManager,
+                $file->getRealPath(),
+                $baseFilename,
+                $propertyPath,
+                $extension
+            );
+
             // Get the next display order
             $displayOrder = $property->images()->max('display_order') + 1;
 
-            // Store original image
-            $imagePath = $file->storeAs(
-                "properties/{$property->id}",
-                $filename,
-                'public'
-            );
-
-            // Create and store thumbnail
-            $imageManager = new ImageManager(new Driver());
+            // Create main thumbnail
             $thumbnail = $imageManager->read($file->getRealPath())
                 ->resize(300, 200, function ($constraint) {
                     $constraint->aspectRatio();
                     $constraint->upsize();
-                });
+                })
+                ->optimize();
             
-            $thumbnailPath = "properties/{$property->id}/thumbnails/" . $filename;
-            Storage::disk('public')->put($thumbnailPath, $thumbnail->toJpeg());
+            $thumbnailPath = "{$propertyPath}/thumbnails/{$baseFilename}.{$extension}";
+            Storage::disk('public')->put($thumbnailPath, $thumbnail->encode($extension));
+            
+            // Create WebP thumbnail
+            $webpThumbnailPath = "{$propertyPath}/thumbnails/{$baseFilename}.webp";
+            Storage::disk('public')->put($webpThumbnailPath, $thumbnail->encode('webp'));
 
             // If this is set as featured, unset other featured images
             if ($isFeatured) {
                 $property->images()->update(['is_featured' => false]);
             }
 
-            // Create image record
+            // Create image record with responsive paths
             return $property->images()->create([
-                'image_path' => $imagePath,
+                'image_path' => $responsivePaths['lg']['original'], // Default size
                 'thumbnail_path' => $thumbnailPath,
                 'is_featured' => $isFeatured,
                 'display_order' => $displayOrder,
                 'alt_text' => $property->title,
+                'metadata' => [
+                    'responsive_paths' => $responsivePaths,
+                    'webp_thumbnail' => $webpThumbnailPath,
+                    'optimized' => true,
+                    'dimensions' => getimagesize($file->getRealPath()),
+                    'uploaded_at' => now()->toDateTimeString()
+                ]
             ]);
         } catch (\Exception $e) {
             Log::error('Failed to store property image', [
