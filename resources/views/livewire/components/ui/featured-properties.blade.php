@@ -102,7 +102,7 @@ new class extends Component {
                         >
                             <!-- Section Title -->
                             <div class="relative mb-10">
-                                <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-12 h-1 bg-gradient-to-r {{ $sections[$type]['accent'] }} rounded-full hidden lg:block"></div>
+                                <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-12 h-1 bg-gradient-to-r {{ $sections[$type]['accent'] }} rounded-full hidden lg:block lg:ml-16"></div>
                                 <div class="text-center lg:text-left lg:ml-16">
                                     <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-3">{{ $sections[$type]['title'] }}</h3>
                                     <p class="text-gray-600 dark:text-gray-300">{{ $sections[$type]['subtitle'] }}</p>

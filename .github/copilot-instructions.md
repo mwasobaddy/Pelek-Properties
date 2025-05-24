@@ -38,24 +38,22 @@ class PropertyService
 
 
 ### 2. Livewire/Volt Components
-php
-// resources/views/livewire/property-search.blade.php
 <?php
-use function Livewire\Volt\{state, mount};
-use App\Services\PropertyService;
-
-state(['searchTerm' => '']);
-
-$search = fn(PropertyService $service) => 
-    $service->searchProperties($this->searchTerm);
-?>
-
+ 
+use Livewire\Volt\Component;
+ 
+new class extends Component {
+    public $count = 0;
+ 
+    public function increment()
+    {
+        $this->count++;
+    }
+} ?>
+ 
 <div>
-    <input wire:model.live="searchTerm" type="text">
-    
-    @foreach($this->search() as $property)
-        <x-property-card :property="$property"/>
-    @endforeach
+    <h1>{{ $count }}</h1>
+    <button wire:click="increment">+</button>
 </div>
 
 ## Best Practices:

@@ -124,7 +124,7 @@ new class extends Component {
     public function getWhatsAppUrl()
     {
         $phoneNumber = '254711614099'; // Added country code for Kenya (254)
-        $message = urlencode("Hi, I'm interested in the property: {$this->property->title}. Can you provide more details?");
+        $message = urlencode("Hi, I'm interested in the property: {$this->property->title} at {$this->property->location}. I would like to know more about it.");
         return "https://wa.me/{$phoneNumber}?text={$message}";
     }
 
@@ -213,18 +213,29 @@ new class extends Component {
 
             {{-- Pricing Section with CTA --}}
             <div class="mt-6">
-                <div class="flex items-end justify-between">
+                <div class="flex items-start justify-between flex-col gap-4">
                     <div>
                         <p class="text-xs text-gray-500 dark:text-gray-400">{{ $this->getPriceLabel() }}</p>
                         <p class="text-xl font-bold text-gray-900 dark:text-white">KSH {{ $this->getFormattedPrice() }}
                         </p>
                     </div>
-                    <button
-                        wire:click="openInquiryModal"
-                        class="flex items-center rounded-lg bg-green-500 px-3 py-2 text-sm font-medium text-white transition-all duration-300 hover:bg-green-600">
-                        <flux:icon name="chat-bubble-left-ellipsis" class="mr-1.5 h-5 w-5" />
-                        Inquire
-                    </button>
+                    <div class="flex items-center space-x-2">
+                        <a 
+                            href="{{ route('properties.show', $property) }}" 
+                            wire:navigate
+                            class="flex items-center rounded-lg bg-indigo-500 px-3 py-2 text-sm font-medium text-white transition-all duration-300 hover:bg-indigo-600"
+                        >
+                            <flux:icon name="eye" class="mr-1.5 h-5 w-5" />
+                            View
+                        </a>
+                        <button
+                            wire:click="openInquiryModal"
+                            class="flex items-center rounded-lg bg-green-500 px-3 py-2 text-sm font-medium text-white transition-all duration-300 hover:bg-green-600"
+                        >
+                            <flux:icon name="chat-bubble-left-ellipsis" class="mr-1.5 h-5 w-5" />
+                            Inquire
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

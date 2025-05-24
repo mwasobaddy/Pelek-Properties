@@ -504,7 +504,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                             </div>
                         </div>
 
-                        <!-- Bathrooms -->
+                        {{-- <!-- Bathrooms -->
                         <div class="relative group">
                             <label
                                 class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bathrooms</label>
@@ -526,7 +526,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                                     <flux:icon name="chevron-down" class="h-5 w-5" />
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
                         <!-- Property Type -->
                         <div class="relative group">
@@ -576,7 +576,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                         </div>
 
                         <!-- Square Range -->
-                        <div class="relative group">
+                        {{-- <div class="relative group">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Square
                                 Range</label>
                             <div class="relative">
@@ -599,7 +599,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                                     <flux:icon name="chevron-down" class="h-5 w-5" />
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
                         <!-- Desktop Sort (hidden on mobile) -->
                         <div class="hidden md:flex justify-end flex-col">
@@ -625,7 +625,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                             </div>
                         </div>
 
-                        <!-- Flat Range -->
+                        {{-- <!-- Flat Range -->
                         <div class="relative group">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Square
                                 Range</label>
@@ -644,7 +644,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                                     <flux:icon name="chevron-down" class="h-5 w-5" />
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
                         <!-- Price Range -->
                         <div class="relative group">
@@ -703,7 +703,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
 
                         <!-- Property Base Type -->
                         <div class="relative group">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Property Type</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Property Category</label>
                             <div class="relative">
                                 <div class="pointer-events-none absolute inset-y-0 left-3 flex items-center">
                                     <flux:icon name="home-modern" class="h-5 w-5 text-gray-400 group-focus-within:text-[#02c9c2] transition-colors duration-200" />
@@ -712,7 +712,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                                     wire:model.live="propertyBaseType"
                                     class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
                                 >
-                                    <option value="">All Types</option>
+                                    <option value="">All Categories</option>
                                     <option value="residential">Residential</option>
                                     <option value="commercial">Commercial</option>
                                     <option value="vacation">Vacation</option>

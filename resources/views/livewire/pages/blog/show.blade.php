@@ -84,6 +84,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
             JsonLd::addImage(asset("storage/{$post->featured_image}"));
         }
     }
+}
 
 ?>
 
