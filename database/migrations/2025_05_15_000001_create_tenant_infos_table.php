@@ -18,6 +18,7 @@ class CreateTenantInfosTable extends Migration
             $table->date('lease_end');
             $table->decimal('monthly_rent', 10, 2);
             $table->decimal('security_deposit', 10, 2);
+            $table->enum('status', ['active', 'inactive', 'pending'])->default('active');
             $table->enum('payment_status', ['pending', 'paid', 'late', 'defaulted'])->default('pending');
             $table->text('notes')->nullable();
             $table->softDeletes();
