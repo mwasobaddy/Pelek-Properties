@@ -7,7 +7,13 @@
             <!-- Logo -->
             <div class="flex items-center">
                 <a href="/" wire:navigate class="flex items-center space-x-2 group">
-                    <div class="w-8 h-8 bg-gradient-to-br from-[#012e2b] to-[#02c9c2] rounded-lg transition-transform duration-300 group-hover:rotate-6"></div>
+                    <div class="w-8 h-8 pr-[2px] pt-[4px] bg-gradient-to-br from-[#02c9c2] to-[#012e2b] rounded-lg transition-transform duration-300 group-hover:rotate-6">
+                        <x-app-logo-icon1 class="size-9 fill-current text-white" />
+                    </div>
+                    {{-- <x-app-logo-icon1 class="size-9 fill-current text-black dark:text-white" /> --}}
+                    {{-- <span class="text-gray-900 dark:text-white font-extrabold text-xl tracking-tight">Pelek<span class="text-[#02c9c2] dark:text-[#3fe8e2]">Properties</span></span> --}}
+                    {{-- <x-app-logo-icon2 class="size-9 fill-current text-black dark:text-white" /> --}}
+                    {{-- <div class="w-8 h-8 bg-gradient-to-br from-[#012e2b] to-[#02c9c2] rounded-lg transition-transform duration-300 group-hover:rotate-6"></div> --}}
                     <span class="text-gray-900 dark:text-white font-extrabold text-xl tracking-tight">Pelek<span class="text-[#02c9c2] dark:text-[#3fe8e2]">Properties</span></span>
                 </a>
             </div>

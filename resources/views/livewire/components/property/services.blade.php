@@ -153,15 +153,15 @@ new class extends Component {
                         @endforeach
                     </ul>
                     
-                    <button 
-                        wire:click="showWhatsAppModal('{{ $service['modal_type'] }}')"
+                    <a
+                        href="{{ route('contact') }}"
                         class="group inline-flex items-center text-{{ $service['color'] }}-600 dark:text-{{ $service['color'] }}-400 hover:text-{{ $service['color'] }}-800 dark:hover:text-{{ $service['color'] }}-300 font-medium"
                     >
                         Learn more about {{ strtolower($service['title']) }}
                         <svg class="w-5 h-5 ml-2 transform transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
-                    </button>
+                    </a>
                 </div>
             @endforeach
         </div>

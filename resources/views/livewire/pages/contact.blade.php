@@ -122,7 +122,6 @@ new #[Layout('components.layouts.guest')] class extends Component {
                                     </div>
                                     <div class="ml-3">
                                         <p class="font-medium">Pelek Properties HQ</p>
-                                        <p>123 Business District</p>
                                         <p>Nairobi, Kenya</p>
                                     </div>
                                 </div>
@@ -135,11 +134,11 @@ new #[Layout('components.layouts.guest')] class extends Component {
                             <div class="space-y-4 text-gray-600 dark:text-gray-300">
                                 <div class="flex items-center">
                                     <flux:icon name="phone" class="h-6 w-6 text-[#02c9c2]" />
-                                    <span class="ml-3">+254 123 456 789</span>
+                                    <span class="ml-3">+(254) 711614099</span>
                                 </div>
                                 <div class="flex items-center">
                                     <flux:icon name="envelope" class="h-6 w-6 text-[#02c9c2]" />
-                                    <span class="ml-3">info@pelekproperties.com</span>
+                                    <span class="ml-3">info@pelekproperties.co.ke</span>
                                 </div>
                             </div>
                         </div>

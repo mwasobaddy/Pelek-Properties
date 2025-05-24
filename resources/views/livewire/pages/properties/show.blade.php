@@ -139,7 +139,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
         </div>
 
         <!-- Main Content Grid -->
-        <div class="grid grid-cols-3 gap-8">
+        <div class="grid md:grid-cols-3 gap-8">
             <!-- Left Column - Main Content -->
             <div class="col-span-3 md:col-span-2 space-y-8">
                 <!-- Property Header -->

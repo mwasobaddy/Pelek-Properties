@@ -115,24 +115,24 @@ new class extends Component {
                     We offer comprehensive property management solutions to help you maximize your investment returns through expert handling and strategic marketing.
                 </p>
                 <div class="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 justify-center">
-                    <button 
-                        wire:click="showWhatsAppModal('sale')"
+                    <a 
+                        href="{{ route('contact') }}"
                         class="group inline-flex justify-center items-center py-3 px-6 text-base font-medium text-center text-white rounded-lg bg-gradient-to-r from-[#02c9c2] to-[#012e2b] hover:from-[#012e2b] hover:to-[#02c9c2] transition-all duration-300 shadow-lg hover:shadow-xl focus:ring-4 focus:ring-[#02c9c2]/50"
                     >
                         List Property For Sale
                         <svg class="w-4 h-4 ml-2 transform transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9" />
                         </svg>
-                    </button>
-                    <button 
-                        wire:click="showWhatsAppModal('rent')"
+                    </a>
+                    <a 
+                        href="{{ route('contact') }}"
                         class="group inline-flex justify-center items-center py-3 px-6 text-base font-medium text-center text-white rounded-lg border border-white hover:bg-white/10 transition-all duration-300 shadow-md hover:shadow-lg focus:ring-4 focus:ring-white/30"
                     >
                         List Property For Rent
                         <svg class="w-4 h-4 ml-2 opacity-0 transform transition-transform duration-300 group-hover:opacity-100 group-hover:translate-x-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9" />
                         </svg>
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>

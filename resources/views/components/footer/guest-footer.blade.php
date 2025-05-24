@@ -124,7 +124,7 @@
                     <h3 class="text-xl font-semibold mb-4 border-b border-[#02c9c2] pb-2 inline-block">Our Services
                     </h3>
                     <ul class="space-y-2">
-                        <li><a href="{{ route('services.valuation') }}" wire:navigate
+                        <li><a href="{{ route('contact') }}" wire:navigate
                                 class="text-gray-300 hover:text-[#02c9c2] transition-colors duration-300 flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
@@ -133,7 +133,7 @@
                                 </svg>
                                 Property Valuation
                             </a></li>
-                        <li><a href="{{ route('services.management') }}" wire:navigate
+                        <li><a href="{{ route('contact') }}" wire:navigate
                                 class="text-gray-300 hover:text-[#02c9c2] transition-colors duration-300 flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
@@ -158,8 +158,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
-                        <a href="https://maps.google.com/?q=123+Property+Street+Real+Estate+City+90210" target="_blank" class="text-gray-300 hover:text-[#02c9c2]">
-                            123 Property Street<br />Real Estate City, 90210
+                        <a href="https://maps.google.com" target="_blank" class="text-gray-300 hover:text-[#02c9c2]">
+                            Nairobi<br />Kenya
                         </a>
                     </li>
                     <li class="flex items-center">
@@ -178,8 +178,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
-                        <a href="mailto:admin@pelekproperties.co.ke" class="text-gray-300 hover:text-[#02c9c2]">
-                            admin@pelekproperties.co.ke
+                        <a href="mailto:info@pelekproperties.co.ke" class="text-gray-300 hover:text-[#02c9c2]">
+                            info@pelekproperties.co.ke
                         </a>
                     </li>
                 </ul>
