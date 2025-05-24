@@ -141,7 +141,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
         <!-- Main Content Grid -->
         <div class="grid grid-cols-3 gap-8">
             <!-- Left Column - Main Content -->
-            <div class="col-span-2 space-y-8">
+            <div class="col-span-3 md:col-span-2 space-y-8">
                 <!-- Property Header -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
                     <div class="absolute top-4 right-4">
@@ -258,7 +258,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
             </div>
 
             <!-- Right Sidebar -->
-            <div class="col-span-1 space-y-8">
+            <div class="col-span-3 md:col-span-1 space-y-8">
                 <!-- Enhanced Contact Card with Modern Design -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700/50">
                     <div class="relative overflow-hidden">
