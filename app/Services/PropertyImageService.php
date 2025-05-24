@@ -10,6 +10,9 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\Encoders\JpegEncoder;
+use Intervention\Image\Encoders\PngEncoder;
+use Intervention\Image\Encoders\WebpEncoder;
 
 class PropertyImageService
 {
@@ -80,25 +83,31 @@ class PropertyImageService
         string $extension
     ): array {
         $paths = [];
-        
+        $extension = strtolower($extension);
         foreach (self::RESPONSIVE_SIZES as $size => $width) {
-            // Regular format
             $image = $imageManager->read($sourcePath)
                 ->resize($width, null, function ($constraint) {
                     $constraint->aspectRatio();
                     $constraint->upsize();
-                })
-                ->optimize();
-            
+                });
+
+            // Choose encoder for original format
+            $encoder = match ($extension) {
+                'jpg', 'jpeg' => new JpegEncoder(),
+                'png' => new PngEncoder(),
+                'webp' => new WebpEncoder(),
+                default => new JpegEncoder(),
+            };
+
             $originalPath = "{$propertyPath}/{$size}_{$baseFilename}.{$extension}";
-            Storage::disk('public')->put($originalPath, $image->encode($extension));
+            Storage::disk('public')->put($originalPath, $image->encode($encoder));
             $paths[$size] = [
                 'original' => $originalPath
             ];
 
             // WebP version
             $webpPath = "{$propertyPath}/{$size}_{$baseFilename}.webp";
-            Storage::disk('public')->put($webpPath, $image->encode('webp'));
+            Storage::disk('public')->put($webpPath, $image->encode(new WebpEncoder()));
             $paths[$size]['webp'] = $webpPath;
         }
 
@@ -138,15 +147,22 @@ class PropertyImageService
                 ->resize(300, 200, function ($constraint) {
                     $constraint->aspectRatio();
                     $constraint->upsize();
-                })
-                ->optimize();
+                });
             
+            // Choose encoder for original format
+            $thumbnailEncoder = match (strtolower($extension)) {
+                'jpg', 'jpeg' => new JpegEncoder(),
+                'png' => new PngEncoder(),
+                'webp' => new WebpEncoder(),
+                default => new JpegEncoder(),
+            };
+
             $thumbnailPath = "{$propertyPath}/thumbnails/{$baseFilename}.{$extension}";
-            Storage::disk('public')->put($thumbnailPath, $thumbnail->encode($extension));
+            Storage::disk('public')->put($thumbnailPath, $thumbnail->encode($thumbnailEncoder));
             
             // Create WebP thumbnail
             $webpThumbnailPath = "{$propertyPath}/thumbnails/{$baseFilename}.webp";
-            Storage::disk('public')->put($webpThumbnailPath, $thumbnail->encode('webp'));
+            Storage::disk('public')->put($webpThumbnailPath, $thumbnail->encode(new WebpEncoder()));
 
             // If this is set as featured, unset other featured images
             if ($isFeatured) {
@@ -212,8 +228,17 @@ class PropertyImageService
                     $constraint->upsize();
                 });
             
+            // Get the extension and choose appropriate encoder
+            $extension = strtolower($file->getClientOriginalExtension());
+            $encoder = match ($extension) {
+                'jpg', 'jpeg' => new JpegEncoder(),
+                'png' => new PngEncoder(),
+                'webp' => new WebpEncoder(),
+                default => new JpegEncoder(),
+            };
+            
             $thumbnailPath = "properties/{$property->id}/airbnb/thumbnails/" . $filename;
-            Storage::disk('public')->put($thumbnailPath, $thumbnail->toJpeg());
+            Storage::disk('public')->put($thumbnailPath, $thumbnail->encode($encoder));
 
             // If this is set as featured, unset other featured images
             if ($isFeatured) {

@@ -495,20 +495,38 @@
 
             <flux:spacer />
 
-            <!-- Notification bell -->
-            <button class="relative p-2 mr-2 rounded-full hover:bg-[#02c9c2]/10 transition-all duration-200">
-                <flux:icon name="bell" class="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                <span class="absolute top-1 right-1 h-2 w-2 bg-[#02c9c2] rounded-full"></span>
-            </button>
+            <!-- Notification bell with maintenance request count -->
+            <flux:dropdown position="bottom" align="end">
+                <button class="relative p-2 mr-2 rounded-full hover:bg-[#02c9c2]/10 transition-all duration-200">
+                    <flux:icon name="bell" class="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    <span class="absolute top-1 right-1 h-2 w-2 bg-[#02c9c2] rounded-full"></span>
+                </button>
 
-            <flux:dropdown position="top" align="end">
+                <!-- Notification Menu -->
+                <flux:menu class="w-[300px] bg-white/90 dark:bg-zinc-800/90 backdrop-blur-xl border border-white/10 shadow-xl rounded-xl overflow-hidden">
+                    <div class="p-4">
+                        <h3 class="text-sm font-semibold mb-2">{{ __('Notifications') }}</h3>
+                        <flux:menu.item 
+                            :href="route('management.maintenance')" 
+                            class="flex items-center justify-between hover:bg-[#02c9c2]/10 hover:text-[#02c9c2]"
+                            wire:navigate
+                        >
+                            <span>{{ __('New maintenance requests') }}</span>
+                            <span class="flex h-5 w-5 items-center justify-center rounded-full bg-[#02c9c2] text-white text-xs font-medium">3</span>
+                        </flux:menu.item>
+                    </div>
+                </flux:menu>
+            </flux:dropdown>
+
+            <flux:dropdown position="bottom" align="end">
                 <flux:profile
                     :initials="auth()->user()->initials()"
                     icon-trailing="chevron-down"
                     class="rounded-full bg-gradient-to-r from-[#02c9c2]/10 to-[#012e2b]/10 dark:from-[#02c9c2]/20 dark:to-[#012e2b]/20 backdrop-blur-sm ring-1 ring-white/10 hover:ring-[#02c9c2]/30 transition-all duration-300"
                 />
 
-                <flux:menu class="bg-white/90 dark:bg-zinc-800/90 backdrop-blur-xl border border-white/10 shadow-xl rounded-xl overflow-hidden">
+                <flux:menu class="w-[300px] bg-white/90 dark:bg-zinc-800/90 backdrop-blur-xl border border-white/10 shadow-xl rounded-xl overflow-hidden">
+                    <!-- User Profile Section -->
                     <flux:menu.radio.group>
                         <div class="p-3 text-sm font-normal">
                             <div class="flex items-center gap-3 px-1 py-1.5 text-start text-sm">
@@ -523,11 +541,89 @@
                                     <span class="text-xs text-gray-500 dark:text-gray-400">{{ auth()->user()->email }}</span>
                                 </div>
                             </div>
+                            
+                            <!-- User status indicator -->
+                            <div class="mt-2 px-1.5 py-1 text-xs bg-[#02c9c2]/10 text-[#02c9c2] rounded-lg flex items-center">
+                                <span class="h-2 w-2 rounded-full bg-[#02c9c2] mr-2"></span>
+                                Online
+                            </div>
                         </div>
                     </flux:menu.radio.group>
 
                     <flux:menu.separator class="border-white/10" />
 
+                    <!-- Quick Access Section -->
+                    <flux:menu.radio.group>
+                        <flux:menu.item 
+                            :href="route('admin.dashboard')" 
+                            icon="home" 
+                            class="hover:bg-[#02c9c2]/10 hover:text-[#02c9c2]"
+                            wire:navigate
+                        >
+                            {{ __('Dashboard') }}
+                        </flux:menu.item>
+
+                        <flux:menu.item 
+                            :href="route('admin.properties.index')" 
+                            icon="building-office-2" 
+                            class="hover:bg-[#02c9c2]/10 hover:text-[#02c9c2]"
+                            wire:navigate
+                        >
+                            {{ __('All Properties') }}
+                        </flux:menu.item>
+
+                        <flux:menu.item 
+                            :href="route('admin.tenants.index')" 
+                            icon="users" 
+                            class="hover:bg-[#02c9c2]/10 hover:text-[#02c9c2]"
+                            wire:navigate
+                        >
+                            {{ __('Manage Tenants') }}
+                        </flux:menu.item>
+
+                        <flux:menu.item 
+                            :href="route('admin.blog.index')" 
+                            icon="newspaper" 
+                            class="hover:bg-[#02c9c2]/10 hover:text-[#02c9c2]"
+                            wire:navigate
+                        >
+                            {{ __('Blog Management') }}
+                        </flux:menu.item>
+
+                        <flux:menu.item 
+                            :href="route('admin.roles.index')" 
+                            icon="shield-check" 
+                            class="hover:bg-[#02c9c2]/10 hover:text-[#02c9c2]"
+                            wire:navigate
+                        >
+                            {{ __('Roles & Permissions') }}
+                        </flux:menu.item>
+
+                        <flux:menu.item 
+                            :href="route('admin.users.index')" 
+                            icon="user" 
+                            class="hover:bg-[#02c9c2]/10 hover:text-[#02c9c2]"
+                            wire:navigate
+                        >
+                            {{ __('User Management') }}
+                        </flux:menu.item>
+
+                        <flux:menu.item 
+                            :href="route('management.maintenance')" 
+                            icon="wrench-screwdriver" 
+                            class="hover:bg-[#02c9c2]/10 hover:text-[#02c9c2]"
+                            wire:navigate
+                        >
+                            <span class="flex items-center justify-between w-full">
+                                {{ __('Maintenance Requests') }}
+                                <span class="flex h-5 w-5 items-center justify-center rounded-full bg-[#02c9c2] text-white text-xs font-medium">3</span>
+                            </span>
+                        </flux:menu.item>
+                    </flux:menu.radio.group>
+
+                    <flux:menu.separator class="border-white/10" />
+
+                    <!-- Settings & Support -->
                     <flux:menu.radio.group>
                         <flux:menu.item 
                             :href="route('settings.profile')" 
@@ -538,7 +634,6 @@
                             {{ __('Settings') }}
                         </flux:menu.item>
                         
-                        <!-- Added help item -->
                         <flux:menu.item 
                             href="#" 
                             icon="question-mark-circle" 
@@ -550,6 +645,7 @@
 
                     <flux:menu.separator class="border-white/10" />
 
+                    <!-- Logout -->
                     <form method="POST" action="{{ route('logout') }}" class="w-full">
                         @csrf
                         <flux:menu.item 
