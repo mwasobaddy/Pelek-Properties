@@ -101,7 +101,7 @@ new #[Layout('components.layouts.app')] class extends Component {
                         @foreach($property->images as $image)
                             <div class="relative group">
                                 <img 
-                                    src="{{ asset('storage/' . $image->image_path) }}" 
+                                    src="{{ asset('property_images/' . $image->image_path) }}" 
                                     alt="{{ $image->alt_text }}"
                                     class="w-full h-48 object-cover rounded-lg"
                                 >

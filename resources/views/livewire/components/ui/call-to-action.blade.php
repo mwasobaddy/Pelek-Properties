@@ -101,7 +101,7 @@ new class extends Component {
 
 <div class="relative">
     <!-- Enhanced Hero Section with Gradient Overlay -->
-    <div class="relative bg-center bg-no-repeat bg-cover py-24 lg:py-32" style="background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('storage/properties/placeholders/property-4-thumb.jpg');">
+    <div class="relative bg-center bg-no-repeat bg-cover py-24 lg:py-32" style="background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('property_images/properties/placeholders/property-4-thumb.jpg');">
         <!-- Decorative Elements -->
         <div class="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-[#02c9c2]/20 to-transparent rounded-full blur-3xl"></div>
         <div class="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-[#02c9c2]/20 to-transparent rounded-full blur-3xl"></div>

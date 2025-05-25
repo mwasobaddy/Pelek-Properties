@@ -93,7 +93,7 @@ $resetFilters = fn() => $this->filters = [
                 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="aspect-w-16 aspect-h-9">
                         @if($property->featured_image)
-                            <img src="{{ Storage::url($property->featured_image) }}" alt="{{ $property->title }}"
+                            <img src="{{ asset('property_images/' . $property->featured_image) }}" alt="{{ $property->title }}"
                                 class="w-full h-full object-cover">
                         @else
                             <div class="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">

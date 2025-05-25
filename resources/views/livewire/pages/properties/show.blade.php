@@ -117,7 +117,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                     <!-- Main Image -->
                     <div class="relative aspect-video">
                         <template x-for="(image, index) in {{ $this->property->images->pluck('image_path')->toJson() }}" :key="index">
-                            <img :src="'/storage/' + image" 
+                            <img :src="'/property_images/' + image" 
                                 :alt="'Property image ' + (index + 1)"
                                 class="absolute inset-0 w-full h-full object-contain transition-opacity duration-300"
                                 :class="currentImage === index ? 'opacity-100' : 'opacity-0'"

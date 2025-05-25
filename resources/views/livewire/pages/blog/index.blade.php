@@ -44,7 +44,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
         
         if (count($this->featuredPosts) > 0 && $this->featuredPosts[0]->featured_image) {
             $ogImage = $this->featuredPosts[0]->featured_image;
-            OpenGraph::addImage(asset("storage/{$ogImage}"), [
+            OpenGraph::addImage(asset('blog_images/' . ltrim($ogImage, '/')), [
                 'height' => 630,
                 'width' => 1200,
                 'type' => 'image/jpeg'
@@ -62,7 +62,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
         TwitterCard::setTitle('Real Estate Blog - Expert Insights | Pelek Properties');
         TwitterCard::setDescription('Expert real estate insights and property tips from Kenya\'s leading property professionals.');
         if (count($this->featuredPosts) > 0 && $this->featuredPosts[0]->featured_image) {
-            TwitterCard::setImage(asset("storage/{$this->featuredPosts[0]->featured_image}"));
+            TwitterCard::setImage(asset('blog_images/' . ltrim($this->featuredPosts[0]->featured_image, '/')));
         } else {
             TwitterCard::setImage(asset('favicon.svg'));
         }
@@ -99,7 +99,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                     'name' => $post->author->name
                 ],
                 'url' => route('blog.show', $post->slug),
-                'image' => $post->featured_image ? asset("storage/{$post->featured_image}") : asset('favicon.svg'),
+                'image' => $post->featured_image ? asset('blog_images/' . ltrim($post->featured_image, '/')) : asset('favicon.svg'),
                 'description' => $post->excerpt ?? substr(strip_tags($post->content), 0, 160)
             ];
         }
@@ -158,7 +158,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                 @foreach($featuredPosts as $post)
                     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
                         @if($post->featured_image)
-                            <img src="{{ $post->featured_image }}" alt="{{ $post->title }}" class="w-full h-48 object-cover">
+                            <img src="{{ asset('blog_images/' . ltrim($post->featured_image, '/')) }}" alt="{{ $post->title }}" class="w-full h-48 object-cover">
                         @endif
                         <div class="p-6">
                             <h3 class="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
@@ -205,7 +205,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
             @foreach($this->posts as $post)
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
                     @if($post->featured_image)
-                        <img src="{{ $post->featured_image }}" alt="{{ $post->title }}" class="w-full h-48 object-cover">
+                        <img src="{{ asset('blog_images/' . ltrim($post->featured_image, '/')) }}" alt="{{ $post->title }}" class="w-full h-48 object-cover">
                     @endif
                     <div class="p-6">
                         <h3 class="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
@@ -236,7 +236,6 @@ new #[Layout('components.layouts.guest')] class extends Component {
                     </div>
                 @endforeach
             </div>
-
             <!-- Pagination -->
             @if($this->posts->hasPages())
                 <div class="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700">

@@ -742,7 +742,7 @@ new class extends Component {
                     <div class="relative h-52 overflow-hidden">
                         @if($property->images->isNotEmpty())
                             <img 
-                                src="{{ asset('storage/' . $property->images->first()->image_path) }}" 
+                                src="{{ asset('property_images/' . $property->images->first()->image_path) }}" 
                                 alt="{{ $property->title }}"
                                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                             >

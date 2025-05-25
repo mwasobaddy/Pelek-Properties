@@ -82,12 +82,12 @@ new class extends Component {
             $images = $this->getPropertyImages();
             if ($images->count() > 0) {
                 $image = $images->get($this->currentImageIndex);
-                return $image ? Storage::disk('public')->url($image->image_path) : asset('images/placeholder.webp');
+                return $image ? asset('property_images/' . $image->image_path) : asset('images/placeholder.webp');
             }
         }
 
         $image = $this->property->featuredImage;
-        return $image ? Storage::disk('public')->url($image->image_path) : asset('images/placeholder.webp');
+        return $image ? asset('property_images/' . $image->image_path) : asset('images/placeholder.webp');
     }
 
     public function nextImage()

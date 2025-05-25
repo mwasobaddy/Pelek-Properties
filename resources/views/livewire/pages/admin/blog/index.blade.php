@@ -80,9 +80,8 @@ new #[Layout('components.layouts.app')] class extends Component {
             ]);
 
             $filename = Str::random(40) . '.' . $value->getClientOriginalExtension();
-            $path = $value->storeAs('public/blogs', $filename);
-            
-            $this->featuredImage = Storage::url($path);
+            $path = $value->storeAs('blog_images', $filename);
+            $this->featuredImage = 'blog_images/' . $filename;
         } catch (\Exception $e) {
             $this->addError('tempImage', 'Failed to upload image: ' . $e->getMessage());
         }
@@ -92,7 +91,7 @@ new #[Layout('components.layouts.app')] class extends Component {
     public function removeImage()
     {
         if ($this->featuredImage) {
-            $path = str_replace('/storage/', 'public/', $this->featuredImage);
+            $path = ltrim($this->featuredImage, '/');
             Storage::delete($path);
             $this->featuredImage = null;
             $this->tempImage = null;

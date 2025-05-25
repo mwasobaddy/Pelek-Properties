@@ -104,7 +104,7 @@ class GenerateSitemap extends Command
 
             if ($post->featured_image) {
                 $url->addImage(
-                    asset('storage/' . $post->featured_image),
+                    asset('blog_images/' . ltrim($post->featured_image, '/')),
                     $post->title,
                     '',
                     (string) $post->excerpt
@@ -124,7 +124,7 @@ class GenerateSitemap extends Command
             // Add featured image
             if ($property->featured_image) {
                 $url->addImage(
-                    asset('storage/' . $property->featured_image),
+                    asset('property_images/' . ltrim($property->featured_image, '/')),
                     $property->title,
                     '',
                     (string) $property->description
@@ -134,7 +134,7 @@ class GenerateSitemap extends Command
             // Add gallery images
             $property->images->each(function ($image) use ($url) {
                 $url->addImage(
-                    asset('storage/' . $image->path),
+                    asset('property_images/' . ltrim($image->path, '/')),
                     $image->title ?? '',
                     '',
                     $image->caption ?? ''

@@ -48,7 +48,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
         ]);
         
         if ($post->featured_image) {
-            OpenGraph::addImage(asset("storage/{$post->featured_image}"), [
+            OpenGraph::addImage(asset('blog_images/' . $post->featured_image), [
                 'height' => 630,
                 'width' => 1200
             ]);
@@ -59,7 +59,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
         TwitterCard::setTitle($post->title);
         TwitterCard::setDescription(substr(strip_tags($post->content), 0, 160));
         if ($post->featured_image) {
-            TwitterCard::setImage(asset("storage/{$post->featured_image}"));
+            TwitterCard::setImage(asset('blog_images/' . $post->featured_image));
         }
         
         // JSON-LD Structured Data
@@ -81,7 +81,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
         JsonLd::addValue('datePublished', $post->published_at->toIso8601String());
         JsonLd::addValue('dateModified', $post->updated_at->toIso8601String());
         if ($post->featured_image) {
-            JsonLd::addImage(asset("storage/{$post->featured_image}"));
+            JsonLd::addImage(asset('blog_images/' . $post->featured_image));
         }
     }
 }
