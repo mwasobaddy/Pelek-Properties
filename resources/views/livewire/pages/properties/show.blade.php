@@ -106,7 +106,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                 <!-- Gallery Controls -->
                 <div class="relative w-full max-w-6xl px-4">
                     <!-- Close Button -->
-                    <button @click="showGallery = false" class="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors">
+                    <button type="button" @click.stop="showGallery = false" class="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors z-20">
                         <flux:icon name="x-mark" class="w-8 h-8" />
                     </button>
 
@@ -118,7 +118,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                     <!-- Main Image -->
                     <div class="relative aspect-video">
                         <template x-for="(image, index) in {{ $this->property->images->pluck('image_path')->toJson() }}" :key="index">
-                            <img :src="'/property_images/' + image" 
+                            <img :src="'{{ Storage::disk('property_images')->url('') }}' + image" 
                                 :alt="'Property image ' + (index + 1)"
                                 class="absolute inset-0 w-full h-full object-contain transition-opacity duration-300"
                                 :class="currentImage === index ? 'opacity-100' : 'opacity-0'"
