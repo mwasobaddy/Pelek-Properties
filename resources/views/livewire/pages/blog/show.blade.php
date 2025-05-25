@@ -96,7 +96,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
             x-on:scroll.window="$el.style.transform = `translateY(${window.scrollY * 0.1}px)`">
             <div class="absolute inset-0 bg-gradient-to-br from-zinc-900/85 via-[#012e2b]/75 to-[#02c9c2]/30 backdrop-blur-sm"></div>
             @if($post->featured_image)
-                <img src="{{ $post->featured_image }}" alt="{{ $post->title }}" class="h-full w-full object-cover opacity-40">
+                <img src="{{ Storage::disk('blog_images')->url($post->featured_image) }}" alt="{{ $post->title }}" class="h-full w-full object-cover opacity-40">
             @else
                 <img src="{{ asset('images/placeholder.webp') }}" alt="{{ $post->title }}" class="h-full w-full object-cover opacity-40">
             @endif

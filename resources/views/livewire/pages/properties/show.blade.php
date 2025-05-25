@@ -4,6 +4,7 @@ use App\Models\Property;
 use App\Services\SEOService;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
+use Illuminate\Support\Facades\Storage;
 use function Livewire\Volt\{state};
 
 state([
@@ -60,7 +61,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                     x-transition.opacity>
                     @if($this->property->images->isNotEmpty())
                         <img 
-                            src="{{ Storage::disk('public')->url($this->property->images->first()->image_path) }}" 
+                            src="{{ Storage::disk('property_images')->url($this->property->images->first()->image_path) }}" 
                             alt="{{ $this->property->title }}"
                             class="w-full h-full object-cover rounded-2xl shadow-lg transition-all duration-500 group-hover:scale-[1.02] group-hover:rotate-[0.5deg]"
                         >
@@ -79,7 +80,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                     @foreach($this->property->images->skip(1)->take(2) as $index => $image)
                         <div class="relative h-[242px] group cursor-pointer overflow-hidden" @click="showGallery = true; currentImage = {{ $index + 1 }}">
                             <img 
-                                src="{{ Storage::disk('public')->url($image->image_path) }}" 
+                                src="{{ Storage::disk('property_images')->url($image->image_path) }}" 
                                 alt="{{ $this->property->title }}"
                                 class="w-full h-full object-cover rounded-2xl shadow-lg transition-transform duration-300 group-hover:scale-[1.02]"
                             >
@@ -335,7 +336,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                                         <div class="flex-shrink-0 w-20 h-20">
                                             @if($similarProperty->images->isNotEmpty())
                                                 <img 
-                                                    src="{{ Storage::disk('public')->url($similarProperty->images->first()->image_path) }}" 
+                                                    src="{{ Storage::disk('property_images')->url($similarProperty->images->first()->image_path) }}" 
                                                     alt="{{ $similarProperty->title }}"
                                                     class="w-full h-full object-cover rounded-lg"
                                                 >

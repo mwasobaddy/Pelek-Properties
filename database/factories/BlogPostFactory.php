@@ -13,7 +13,7 @@ class BlogPostFactory extends Factory
     public function definition(): array
     {
         $imageNumber = $this->faker->numberBetween(1, 5);
-        $basePath = 'images/blog_images/placeholders';
+        $basePath = 'placeholders';
 
         return [
             'title' => $this->faker->sentence(),

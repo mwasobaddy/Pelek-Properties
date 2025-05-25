@@ -671,7 +671,7 @@ new class extends Component {
                                             <li class="py-3 flex items-center">
                                                 <div class="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mr-3 text-gray-500 dark:text-gray-400">
                                                     @if($user->profile_photo_path)
-                                                        <img src="{{ Storage::url($user->profile_photo_path) }}" alt="{{ $user->name }}" class="h-8 w-8 rounded-full object-cover">
+                                                        <img src="{{ Storage::disk('property_images')->url($user->profile_photo_path) }}" alt="{{ $user->name }}" class="h-8 w-8 rounded-full object-cover">
                                                     @else
                                                         <flux:icon name="user" class="h-4 w-4" />
                                                     @endif

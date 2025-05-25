@@ -81,13 +81,17 @@ new class extends Component {
         if ($this->property->listing_type === 'airbnb' && $this->showingSlider) {
             $images = $this->getPropertyImages();
             if ($images->count() > 0) {
-                $image = $images->get($this->currentImageIndex);
-                return $image ? asset('property_images/' . $image->image_path) : asset('images/placeholder.webp');
+                $image = $images[$this->currentImageIndex] ?? $images->first();
+                return $image && $image->image_path
+                    ? Storage::disk('property_images')->url($image->image_path)
+                    : asset('images/placeholder.webp');
             }
         }
 
         $image = $this->property->featuredImage;
-        return $image ? asset('property_images/' . $image->image_path) : asset('images/placeholder.webp');
+        return $image && $image->image_path
+            ? Storage::disk('property_images')->url($image->image_path)
+            : asset('images/placeholder.webp');
     }
 
     public function nextImage()

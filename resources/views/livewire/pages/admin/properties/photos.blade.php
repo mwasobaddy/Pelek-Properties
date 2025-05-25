@@ -4,6 +4,7 @@ use Livewire\Attributes\Layout;
 use App\Models\Property;
 use Livewire\WithFileUploads;
 use function Livewire\Volt\{state, computed};
+use Illuminate\Support\Facades\Storage;
 
 new #[Layout('components.layouts.app')] class extends Component {
     use WithFileUploads;
@@ -101,7 +102,7 @@ new #[Layout('components.layouts.app')] class extends Component {
                         @foreach($property->images as $image)
                             <div class="relative group">
                                 <img 
-                                    src="{{ asset('property_images/' . $image->image_path) }}" 
+                                    src="{{ Storage::disk('property_images')->url($image->image_path) }}" 
                                     alt="{{ $image->alt_text }}"
                                     class="w-full h-48 object-cover rounded-lg"
                                 >

@@ -92,14 +92,10 @@ $resetFilters = fn() => $this->filters = [
             @foreach($this->properties as $property)
                 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="aspect-w-16 aspect-h-9">
-                        @if($property->featured_image)
-                            <img src="{{ asset('property_images/' . $property->featured_image) }}" alt="{{ $property->title }}"
-                                class="w-full h-full object-cover">
-                        @else
-                            <div class="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                <span class="text-gray-400 dark:text-gray-500">No Image</span>
-                            </div>
-                        @endif
+                        @php
+                            $image = $property->featuredImage;
+                        @endphp
+                        <img src="{{ $image ? Storage::disk('property_images')->url($image->image_path) : asset('images/placeholder.webp') }}" alt="{{ $property->title }}" class="w-full h-full object-cover rounded-t-lg">
                     </div>
 
                     <div class="p-6">

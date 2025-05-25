@@ -19,7 +19,7 @@ class PropertyImageFactory extends Factory
     {
         // Generate a random number for the placeholder image
         $imageNumber = $this->faker->numberBetween(1, 5);
-        $basePath = 'images/property_images/placeholders';
+        $basePath = 'placeholders';
         
         return [
             'property_id' => Property::factory(),
