@@ -100,14 +100,14 @@ class PropertyImageService
             };
 
             $originalPath = "{$propertyPath}/{$size}_{$baseFilename}.{$extension}";
-            Storage::disk('public')->put($originalPath, $image->encode($encoder));
+            Storage::disk('property_images')->put($originalPath, $image->encode($encoder));
             $paths[$size] = [
                 'original' => $originalPath
             ];
 
             // WebP version
             $webpPath = "{$propertyPath}/{$size}_{$baseFilename}.webp";
-            Storage::disk('public')->put($webpPath, $image->encode(new WebpEncoder()));
+            Storage::disk('property_images')->put($webpPath, $image->encode(new WebpEncoder()));
             $paths[$size]['webp'] = $webpPath;
         }
 
@@ -158,11 +158,11 @@ class PropertyImageService
             };
 
             $thumbnailPath = "{$propertyPath}/thumbnails/{$baseFilename}.{$extension}";
-            Storage::disk('public')->put($thumbnailPath, $thumbnail->encode($thumbnailEncoder));
+            Storage::disk('property_images')->put($thumbnailPath, $thumbnail->encode($thumbnailEncoder));
             
             // Create WebP thumbnail
             $webpThumbnailPath = "{$propertyPath}/thumbnails/{$baseFilename}.webp";
-            Storage::disk('public')->put($webpThumbnailPath, $thumbnail->encode(new WebpEncoder()));
+            Storage::disk('property_images')->put($webpThumbnailPath, $thumbnail->encode(new WebpEncoder()));
 
             // If this is set as featured, unset other featured images
             if ($isFeatured) {
@@ -216,7 +216,7 @@ class PropertyImageService
             $imagePath = $file->storeAs(
                 "properties/{$property->id}/airbnb",
                 $filename,
-                'public'
+                'property_images'
             );
 
             // Create and store thumbnail with special dimensions optimized for Airbnb
@@ -238,7 +238,7 @@ class PropertyImageService
             };
             
             $thumbnailPath = "properties/{$property->id}/airbnb/thumbnails/" . $filename;
-            Storage::disk('public')->put($thumbnailPath, $thumbnail->encode($encoder));
+            Storage::disk('property_images')->put($thumbnailPath, $thumbnail->encode($encoder));
 
             // If this is set as featured, unset other featured images
             if ($isFeatured) {

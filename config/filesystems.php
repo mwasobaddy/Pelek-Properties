@@ -47,6 +47,24 @@ return [
             'report' => false,
         ],
 
+        'property_images' => [
+            'driver' => 'local',
+            'root' => public_path('images/property_images'),
+            'url' => env('APP_URL').'/images/property_images',
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
+
+        'blog_images' => [
+            'driver' => 'local',
+            'root' => public_path('images/blog_images'),
+            'url' => env('APP_URL').'/images/blog_images',
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

@@ -19,7 +19,7 @@ class PropertyImageFactory extends Factory
     {
         // Generate a random number for the placeholder image
         $imageNumber = $this->faker->numberBetween(1, 5);
-        $basePath = 'properties/placeholders';
+        $basePath = 'images/property_images/placeholders';
         
         return [
             'property_id' => Property::factory(),
@@ -28,6 +28,28 @@ class PropertyImageFactory extends Factory
             'is_featured' => $this->faker->boolean(20),
             'display_order' => $this->faker->numberBetween(1, 10),
             'alt_text' => $this->faker->sentence(),
+            'metadata' => [
+                'optimized' => true,
+                'dimensions' => [800, 600],
+                'responsive_paths' => [
+                    'xs' => [
+                        'original' => "{$basePath}/xs_property-{$imageNumber}.jpg",
+                        'webp' => "{$basePath}/xs_property-{$imageNumber}.webp"
+                    ],
+                    'sm' => [
+                        'original' => "{$basePath}/sm_property-{$imageNumber}.jpg",
+                        'webp' => "{$basePath}/sm_property-{$imageNumber}.webp"
+                    ],
+                    'md' => [
+                        'original' => "{$basePath}/md_property-{$imageNumber}.jpg",
+                        'webp' => "{$basePath}/md_property-{$imageNumber}.webp"
+                    ],
+                    'lg' => [
+                        'original' => "{$basePath}/lg_property-{$imageNumber}.jpg",
+                        'webp' => "{$basePath}/lg_property-{$imageNumber}.webp"
+                    ],
+                ]
+            ]
         ];
     }
 

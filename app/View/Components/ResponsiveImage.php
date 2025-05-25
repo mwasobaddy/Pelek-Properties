@@ -46,7 +46,7 @@ class ResponsiveImage extends Component
                 default => 1024
             };
             
-            return Storage::disk('public')->url($pathInfo['original']) . " {$width}w";
+            return Storage::disk('property_images')->url($pathInfo['original']) . " {$width}w";
         })->implode(', ');
     }
 
@@ -70,7 +70,7 @@ class ResponsiveImage extends Component
                 default => 1024
             };
             
-            return Storage::disk('public')->url($pathInfo['webp']) . " {$width}w";
+            return Storage::disk('property_images')->url($pathInfo['webp']) . " {$width}w";
         })->implode(', ');
     }
 }
