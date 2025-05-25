@@ -15,8 +15,10 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->text('content');
             $table->string('featured_image')->nullable();
+            $table->string('thumbnail_image')->nullable();
             $table->timestamp('published_at')->nullable();
             $table->boolean('is_featured')->default(false);
+            $table->json('metadata')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

@@ -89,15 +89,26 @@ class PropertySeeder extends Seeder
     private function attachPropertiesData($properties, $amenities): void
     {
         $properties->each(function ($property) use ($amenities) {
-            // Batch create images
-            $images = collect([
-                ...PropertyImage::factory(rand(3, 6))->make([
-                    'property_id' => $property->id,
-                ]),
-                PropertyImage::factory()->featured()->make([
-                    'property_id' => $property->id,
-                ])
+            // Create base images
+            $regularImages = PropertyImage::factory(rand(3, 6))->make([
+                'property_id' => $property->id,
+            ])->map(function ($image) {
+                $array = $image->toArray();
+                $array['metadata'] = json_encode($array['metadata']);
+                return $array;
+            });
+
+            // Create featured image
+            $featuredImage = PropertyImage::factory()->featured()->make([
+                'property_id' => $property->id,
             ]);
+            $featuredArray = $featuredImage->toArray();
+            $featuredArray['metadata'] = json_encode($featuredArray['metadata']);
+
+            // Combine all images
+            $images = $regularImages->push($featuredArray);
+            
+            // Insert all images
             PropertyImage::insert($images->toArray());
 
             // Attach amenities

@@ -17,14 +17,17 @@ class BlogPost extends Model
         'slug',
         'content',
         'featured_image',
+        'thumbnail_image',
         'published_at',
         'is_featured',
         'author_id',
+        'metadata'
     ];
 
     protected $casts = [
         'published_at' => 'datetime',
         'is_featured' => 'boolean',
+        'metadata' => 'array'
     ];
 
     public function author(): BelongsTo
