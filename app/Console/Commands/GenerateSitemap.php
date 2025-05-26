@@ -14,33 +14,20 @@ class GenerateSitemap extends Command
     protected $signature = 'sitemap:generate';
     protected $description = 'Generate the sitemap with images and location support';
 
-    private function pingSearchEngines(): void
+    private function showSubmissionInstructions(): void
     {
         $sitemapUrl = config('app.url') . '/sitemap.xml';
         
-        // Google
-        $googlePing = 'https://www.google.com/ping?sitemap=' . urlencode($sitemapUrl);
-        
-        // Bing
-        $bingPing = 'https://www.bing.com/ping?sitemap=' . urlencode($sitemapUrl);
-        
-        try {
-            $client = new \GuzzleHttp\Client();
-            
-            // Ping Google
-            $response = $client->get($googlePing);
-            if ($response->getStatusCode() === 200) {
-                $this->info('Successfully pinged Google');
-            }
-            
-            // Ping Bing
-            $response = $client->get($bingPing);
-            if ($response->getStatusCode() === 200) {
-                $this->info('Successfully pinged Bing');
-            }
-        } catch (\Exception $e) {
-            $this->error('Failed to ping search engines: ' . $e->getMessage());
-        }
+        $this->info('Sitemap generated successfully!');
+        $this->info('');
+        $this->info('Next steps:');
+        $this->info('1. Submit your sitemap to Google Search Console:');
+        $this->info('   https://search.google.com/search-console');
+        $this->info('');
+        $this->info('2. Submit your sitemap to Bing Webmaster Tools:');
+        $this->info('   https://www.bing.com/webmasters');
+        $this->info('');
+        $this->info('Your sitemap URL: ' . $sitemapUrl);
     }
 
     public function handle(): void
@@ -159,11 +146,7 @@ class GenerateSitemap extends Command
         // Generate and save the sitemap
         $sitemap->writeToFile(public_path('sitemap.xml'));
 
-        $this->info('Sitemap generated successfully!');
-        
-        // Ping search engines
-        $this->pingSearchEngines();
-
-        $this->pingSearchEngines();
+        // Show submission instructions
+        $this->showSubmissionInstructions();
     }
 }

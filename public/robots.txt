@@ -6,6 +6,10 @@ Allow: /services
 Allow: /about
 Allow: /contact
 
+# Sitemap
+Sitemap: https://pelekproperties.co.ke/sitemap.xml
+Sitemap: https://pelekproperties.co.ke/image-sitemap.xml
+
 # Disallow admin and sensitive areas
 Disallow: /admin/
 Disallow: /login
@@ -56,9 +60,6 @@ Disallow: /api/
 Disallow: /livewire/
 Disallow: /*preview=true
 Disallow: /*draft=true
-
-# Sitemap location
-Sitemap: https://pelekproperties.com/sitemap.xml
 
 # Specific bot directives
 User-agent: AhrefsBot
