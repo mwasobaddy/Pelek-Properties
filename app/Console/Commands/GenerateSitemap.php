@@ -115,7 +115,7 @@ class GenerateSitemap extends Command
         });
 
         // Add all active property listings with images
-        Property::where('is_active', true)->get()->each(function (Property $property) use ($sitemap) {
+        Property::where('status', 'available')->get()->each(function (Property $property) use ($sitemap) {
             $url = Url::create("/properties/{$property->id}")
                 ->setPriority(0.9)
                 ->setLastModificationDate($property->updated_at)
@@ -146,7 +146,7 @@ class GenerateSitemap extends Command
 
         // Add location pages
         if (class_exists(Location::class)) {
-            Location::where('is_active', true)->get()->each(function (Location $location) use ($sitemap) {
+            Location::where('status', 'active')->get()->each(function (Location $location) use ($sitemap) {
                 $sitemap->add(
                     Url::create("/properties/location/{$location->slug}")
                         ->setPriority(0.8)

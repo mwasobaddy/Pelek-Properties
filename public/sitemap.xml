@@ -71,159 +71,645 @@
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/blog/est-ad-aut-vitae-eligendi-perspiciatis-totam</loc>
-    <lastmod>2025-05-21T12:24:26+00:00</lastmod>
+    <loc>http://127.0.0.1:8000/blog/natus-at-consequatur-dolorem-ullam-et</loc>
+    <lastmod>2025-05-25T07:13:54+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <image:image>
-    <image:loc>http://127.0.0.1:8000/storage/https://via.placeholder.com/1200x630.png/00aa33?text=ut</image:loc>
-    <image:caption>Est ad aut vitae eligendi perspiciatis totam.</image:caption>
+    <image:loc>http://127.0.0.1:8000/blog_images/placeholders/blog-5.jpg</image:loc>
+    <image:caption>Natus at consequatur dolorem ullam et.</image:caption>
 </image:image>
         </url>
     <url>
-    <loc>http://127.0.0.1:8000/blog/nam-dolores-laudantium-sint-dolorum</loc>
-    <lastmod>2025-05-21T12:18:30+00:00</lastmod>
+    <loc>http://127.0.0.1:8000/blog/impedit-perspiciatis-ut-et-sapiente</loc>
+    <lastmod>2025-05-25T07:13:54+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <image:image>
-    <image:loc>http://127.0.0.1:8000/storage/https://via.placeholder.com/1200x630.png/00aa88?text=reiciendis</image:loc>
-    <image:caption>Nam dolores laudantium sint dolorum.</image:caption>
+    <image:loc>http://127.0.0.1:8000/blog_images/placeholders/blog-2.jpg</image:loc>
+    <image:caption>Impedit perspiciatis ut et sapiente.</image:caption>
 </image:image>
         </url>
     <url>
-    <loc>http://127.0.0.1:8000/blog/vero-sed-quisquam-earum-est-voluptatum-neque-voluptatum</loc>
-    <lastmod>2025-05-20T18:46:59+00:00</lastmod>
+    <loc>http://127.0.0.1:8000/blog/earum-quis-repellendus-id</loc>
+    <lastmod>2025-05-25T07:13:54+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <image:image>
-    <image:loc>http://127.0.0.1:8000/storage/https://via.placeholder.com/1200x630.png/005566?text=molestias</image:loc>
-    <image:caption>Vero sed quisquam earum est voluptatum neque voluptatum.</image:caption>
+    <image:loc>http://127.0.0.1:8000/blog_images/placeholders/blog-1.jpg</image:loc>
+    <image:caption>Earum quis repellendus id.</image:caption>
 </image:image>
         </url>
     <url>
-    <loc>http://127.0.0.1:8000/blog/eveniet-nisi-soluta-et-voluptas-minus-omnis-qui</loc>
-    <lastmod>2025-05-20T18:46:59+00:00</lastmod>
+    <loc>http://127.0.0.1:8000/blog/rerum-beatae-explicabo-natus</loc>
+    <lastmod>2025-05-25T07:13:54+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <image:image>
-    <image:loc>http://127.0.0.1:8000/storage/https://via.placeholder.com/1200x630.png/0011ee?text=aliquam</image:loc>
-    <image:caption>Eveniet nisi soluta et voluptas minus omnis qui.</image:caption>
+    <image:loc>http://127.0.0.1:8000/blog_images/placeholders/blog-3.jpg</image:loc>
+    <image:caption>Rerum beatae explicabo natus.</image:caption>
 </image:image>
         </url>
     <url>
-    <loc>http://127.0.0.1:8000/blog/hic-cum-et-voluptas-rerum-laudantium</loc>
-    <lastmod>2025-05-20T18:46:59+00:00</lastmod>
+    <loc>http://127.0.0.1:8000/blog/voluptatem-nostrum-optio-vero-repellendus-velit-ea</loc>
+    <lastmod>2025-05-25T07:13:54+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <image:image>
-    <image:loc>http://127.0.0.1:8000/storage/https://via.placeholder.com/1200x630.png/0055ee?text=facilis</image:loc>
-    <image:caption>Hic cum et voluptas rerum laudantium.</image:caption>
+    <image:loc>http://127.0.0.1:8000/blog_images/placeholders/blog-2.jpg</image:loc>
+    <image:caption>Voluptatem nostrum optio vero repellendus velit ea.</image:caption>
 </image:image>
         </url>
     <url>
-    <loc>http://127.0.0.1:8000/blog/iure-dicta-provident-error-est-et-repudiandae</loc>
-    <lastmod>2025-05-20T18:46:59+00:00</lastmod>
+    <loc>http://127.0.0.1:8000/blog/occaecati-exercitationem-facilis-ullam-officia-veniam-corrupti-repudiandae</loc>
+    <lastmod>2025-05-25T07:13:54+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <image:image>
-    <image:loc>http://127.0.0.1:8000/storage/https://via.placeholder.com/1200x630.png/00bb33?text=quaerat</image:loc>
-    <image:caption>Iure dicta provident error est et repudiandae.</image:caption>
+    <image:loc>http://127.0.0.1:8000/blog_images/placeholders/blog-1.jpg</image:loc>
+    <image:caption>Occaecati exercitationem facilis ullam officia veniam corrupti repudiandae.</image:caption>
 </image:image>
         </url>
     <url>
-    <loc>http://127.0.0.1:8000/blog/non-nisi-ab-velit-hic-debitis</loc>
-    <lastmod>2025-05-20T18:46:59+00:00</lastmod>
+    <loc>http://127.0.0.1:8000/blog/ut-excepturi-veritatis-rerum-tempore-iste</loc>
+    <lastmod>2025-05-25T07:13:54+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <image:image>
-    <image:loc>http://127.0.0.1:8000/storage/https://via.placeholder.com/1200x630.png/0099ee?text=voluptatem</image:loc>
-    <image:caption>Non nisi ab velit hic debitis.</image:caption>
+    <image:loc>http://127.0.0.1:8000/blog_images/placeholders/blog-4.jpg</image:loc>
+    <image:caption>Ut excepturi veritatis rerum tempore iste.</image:caption>
 </image:image>
         </url>
     <url>
-    <loc>http://127.0.0.1:8000/blog/occaecati-cum-et-iusto</loc>
-    <lastmod>2025-05-20T18:46:59+00:00</lastmod>
+    <loc>http://127.0.0.1:8000/blog/sit-quidem-dolor-quia-recusandae-voluptatem-asperiores</loc>
+    <lastmod>2025-05-25T07:13:54+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <image:image>
-    <image:loc>http://127.0.0.1:8000/storage/https://via.placeholder.com/1200x630.png/000033?text=minima</image:loc>
-    <image:caption>Occaecati cum et iusto.</image:caption>
+    <image:loc>http://127.0.0.1:8000/blog_images/placeholders/blog-2.jpg</image:loc>
+    <image:caption>Sit quidem dolor quia recusandae voluptatem asperiores.</image:caption>
 </image:image>
         </url>
     <url>
-    <loc>http://127.0.0.1:8000/blog/architecto-magnam-ut-asperiores-saepe-omnis-dolores-odit</loc>
-    <lastmod>2025-05-20T18:46:59+00:00</lastmod>
+    <loc>http://127.0.0.1:8000/blog/porro-eius-voluptates-animi-ut-et-unde-necessitatibus-quisquam</loc>
+    <lastmod>2025-05-25T07:13:54+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <image:image>
-    <image:loc>http://127.0.0.1:8000/storage/https://via.placeholder.com/1200x630.png/005555?text=magnam</image:loc>
-    <image:caption>Architecto magnam ut asperiores saepe omnis dolores odit.</image:caption>
+    <image:loc>http://127.0.0.1:8000/blog_images/placeholders/blog-5.jpg</image:loc>
+    <image:caption>Porro eius voluptates animi ut et unde necessitatibus quisquam.</image:caption>
 </image:image>
         </url>
     <url>
-    <loc>http://127.0.0.1:8000/blog/molestias-repudiandae-ut-facilis-qui-dolores-facere-voluptas</loc>
-    <lastmod>2025-05-21T12:15:55+00:00</lastmod>
+    <loc>http://127.0.0.1:8000/blog/incidunt-ut-sit-sunt-sequi-sit-debitis-facilis</loc>
+    <lastmod>2025-05-25T07:13:54+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <image:image>
-    <image:loc>http://127.0.0.1:8000/storage/https://via.placeholder.com/1200x630.png/0066dd?text=quidem</image:loc>
-    <image:caption>Molestias repudiandae ut facilis qui dolores facere voluptas.</image:caption>
+    <image:loc>http://127.0.0.1:8000/blog_images/placeholders/blog-3.jpg</image:loc>
+    <image:caption>Incidunt ut sit sunt sequi sit debitis facilis.</image:caption>
 </image:image>
         </url>
     <url>
-    <loc>http://127.0.0.1:8000/blog/at-in-iste-ut-eius-repudiandae-eos</loc>
-    <lastmod>2025-05-20T18:46:59+00:00</lastmod>
+    <loc>http://127.0.0.1:8000/blog/omnis-quia-officia-rem-quis</loc>
+    <lastmod>2025-05-25T07:13:54+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <image:image>
-    <image:loc>http://127.0.0.1:8000/storage/https://via.placeholder.com/1200x630.png/0022ff?text=laboriosam</image:loc>
-    <image:caption>At in iste ut eius repudiandae eos.</image:caption>
+    <image:loc>http://127.0.0.1:8000/blog_images/placeholders/blog-3.jpg</image:loc>
+    <image:caption>Omnis quia officia rem quis.</image:caption>
 </image:image>
         </url>
     <url>
-    <loc>http://127.0.0.1:8000/blog/ut-voluptas-totam-sit-saepe-quibusdam-quod-facere</loc>
-    <lastmod>2025-05-20T18:46:59+00:00</lastmod>
+    <loc>http://127.0.0.1:8000/blog/voluptatum-est-nobis-repudiandae-est-sed-velit-eos</loc>
+    <lastmod>2025-05-25T07:13:54+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <image:image>
-    <image:loc>http://127.0.0.1:8000/storage/https://via.placeholder.com/1200x630.png/004477?text=exercitationem</image:loc>
-    <image:caption>Ut voluptas totam sit saepe quibusdam quod facere.</image:caption>
+    <image:loc>http://127.0.0.1:8000/blog_images/placeholders/blog-1.jpg</image:loc>
+    <image:caption>Voluptatum est nobis repudiandae est sed velit eos.</image:caption>
 </image:image>
         </url>
     <url>
-    <loc>http://127.0.0.1:8000/blog/nihil-praesentium-iste-voluptatibus-omnis-et</loc>
-    <lastmod>2025-05-20T18:46:59+00:00</lastmod>
+    <loc>http://127.0.0.1:8000/blog/quo-sint-illo-modi</loc>
+    <lastmod>2025-05-25T07:13:54+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <image:image>
-    <image:loc>http://127.0.0.1:8000/storage/https://via.placeholder.com/1200x630.png/0011ee?text=dicta</image:loc>
-    <image:caption>Nihil praesentium iste voluptatibus omnis et.</image:caption>
+    <image:loc>http://127.0.0.1:8000/blog_images/placeholders/blog-3.jpg</image:loc>
+    <image:caption>Quo sint illo modi.</image:caption>
 </image:image>
         </url>
     <url>
-    <loc>http://127.0.0.1:8000/blog/magnam-nihil-iste-aut-ipsam</loc>
-    <lastmod>2025-05-20T18:46:59+00:00</lastmod>
+    <loc>http://127.0.0.1:8000/blog/unde-amet-laboriosam-autem-explicabo-quasi</loc>
+    <lastmod>2025-05-25T07:13:54+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <image:image>
-    <image:loc>http://127.0.0.1:8000/storage/https://via.placeholder.com/1200x630.png/00ccdd?text=tenetur</image:loc>
-    <image:caption>Magnam nihil iste aut ipsam.</image:caption>
+    <image:loc>http://127.0.0.1:8000/blog_images/placeholders/blog-2.jpg</image:loc>
+    <image:caption>Unde amet laboriosam autem explicabo quasi.</image:caption>
 </image:image>
         </url>
     <url>
-    <loc>http://127.0.0.1:8000/blog/nemo-illum-assumenda-est-molestias-temporibus-blanditiis-omnis-corrupti</loc>
-    <lastmod>2025-05-20T18:46:59+00:00</lastmod>
+    <loc>http://127.0.0.1:8000/blog/dolorem-occaecati-totam-mollitia-magnam-facilis-consequuntur-accusantium</loc>
+    <lastmod>2025-05-25T07:13:54+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <image:image>
-    <image:loc>http://127.0.0.1:8000/storage/https://via.placeholder.com/1200x630.png/008844?text=repellendus</image:loc>
-    <image:caption>Nemo illum assumenda est molestias temporibus blanditiis omnis corrupti.</image:caption>
+    <image:loc>http://127.0.0.1:8000/blog_images/placeholders/blog-5.jpg</image:loc>
+    <image:caption>Dolorem occaecati totam mollitia magnam facilis consequuntur accusantium.</image:caption>
 </image:image>
         </url>
     <url>
-    <loc>http://127.0.0.1:8000/blog/test</loc>
-    <lastmod>2025-05-21T22:23:05+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-            </url>
+    <loc>http://127.0.0.1:8000/properties/2</loc>
+    <lastmod>2025-05-25T07:13:51+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+        </url>
+    <url>
+    <loc>http://127.0.0.1:8000/properties/3</loc>
+    <lastmod>2025-05-25T07:13:51+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+        </url>
+    <url>
+    <loc>http://127.0.0.1:8000/properties/7</loc>
+    <lastmod>2025-05-25T07:13:51+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+        </url>
+    <url>
+    <loc>http://127.0.0.1:8000/properties/12</loc>
+    <lastmod>2025-05-25T07:13:51+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+        </url>
+    <url>
+    <loc>http://127.0.0.1:8000/properties/15</loc>
+    <lastmod>2025-05-25T07:13:51+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+        </url>
+    <url>
+    <loc>http://127.0.0.1:8000/properties/16</loc>
+    <lastmod>2025-05-25T07:13:51+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+        </url>
+    <url>
+    <loc>http://127.0.0.1:8000/properties/20</loc>
+    <lastmod>2025-05-25T07:13:51+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+        </url>
+    <url>
+    <loc>http://127.0.0.1:8000/properties/22</loc>
+    <lastmod>2025-05-25T07:13:51+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+        </url>
+    <url>
+    <loc>http://127.0.0.1:8000/properties/24</loc>
+    <lastmod>2025-05-25T07:13:51+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+        </url>
+    <url>
+    <loc>http://127.0.0.1:8000/properties/30</loc>
+    <lastmod>2025-05-25T07:13:51+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+        </url>
+    <url>
+    <loc>http://127.0.0.1:8000/properties/32</loc>
+    <lastmod>2025-05-25T07:13:51+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+        </url>
+    <url>
+    <loc>http://127.0.0.1:8000/properties/34</loc>
+    <lastmod>2025-05-25T07:13:51+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+        </url>
+    <url>
+    <loc>http://127.0.0.1:8000/properties/37</loc>
+    <lastmod>2025-05-25T07:13:51+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+        </url>
+    <url>
+    <loc>http://127.0.0.1:8000/properties/40</loc>
+    <lastmod>2025-05-25T07:13:51+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+        </url>
+    <url>
+    <loc>http://127.0.0.1:8000/properties/42</loc>
+    <lastmod>2025-05-25T07:13:51+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+        </url>
+    <url>
+    <loc>http://127.0.0.1:8000/properties/43</loc>
+    <lastmod>2025-05-25T07:13:51+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+        </url>
+    <url>
+    <loc>http://127.0.0.1:8000/properties/45</loc>
+    <lastmod>2025-05-25T07:13:51+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+        </url>
+    <url>
+    <loc>http://127.0.0.1:8000/properties/46</loc>
+    <lastmod>2025-05-25T07:13:51+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+        </url>
+    <url>
+    <loc>http://127.0.0.1:8000/properties/51</loc>
+    <lastmod>2025-05-25T07:13:51+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+        </url>
+    <url>
+    <loc>http://127.0.0.1:8000/properties/52</loc>
+    <lastmod>2025-05-25T07:13:51+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+        </url>
+    <url>
+    <loc>http://127.0.0.1:8000/properties/56</loc>
+    <lastmod>2025-05-25T07:13:51+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+        </url>
+    <url>
+    <loc>http://127.0.0.1:8000/properties/58</loc>
+    <lastmod>2025-05-25T07:13:51+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+        </url>
+    <url>
+    <loc>http://127.0.0.1:8000/properties/81</loc>
+    <lastmod>2025-05-25T07:17:42+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+<image:image>
+    <image:loc>http://127.0.0.1:8000/property_images</image:loc>
+</image:image>
+        </url>
 </urlset>
