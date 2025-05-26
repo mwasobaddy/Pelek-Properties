@@ -105,9 +105,9 @@ new class extends Component {
             <h1 class="font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
                 Find Your <span class="bg-clip-text text-transparent bg-gradient-to-r from-[#02c9c2] to-[#018f8a]">Perfect Property</span> in Nairobi
             </h1>
-            <p class="mt-5 text-lg leading-relaxed text-zinc-300 dark:text-zinc-200 sm:text-xl max-w-xl">
+            {{-- <p class="mt-5 text-lg leading-relaxed text-zinc-300 dark:text-zinc-200 sm:text-xl max-w-xl">
                 Explore premium properties for sale, rent, or short stays in Nairobi's most desirable neighborhoods.
-            </p>
+            </p> --}}
         </div>
 
         {{-- Enhanced Search Form with glassmorphism design --}}
