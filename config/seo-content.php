@@ -34,7 +34,7 @@ return [
                 'luxury airbnb nairobi',
                 'short term rentals kenya',
                 'serviced apartments nairobi',
-                'vacation rentals kenya',
+                'AirBNB kenya',
                 'luxury accommodation kenya'
             ],
             'schema_type' => 'LodgingBusiness'

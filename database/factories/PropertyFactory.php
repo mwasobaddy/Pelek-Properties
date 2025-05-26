@@ -28,7 +28,7 @@ class PropertyFactory extends Factory
         $type = match ($listingType) {
             'sale' => 'residential',
             'rent' => 'residential',
-            'airbnb' => 'vacation',
+            'airbnb' => 'airbnb',
             'commercial' => $this->faker->randomElement(['office', 'retail', 'industrial', 'warehouse', 'mixed_use']),
         };
 
@@ -156,7 +156,7 @@ class PropertyFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'listing_type' => 'airbnb',
-            'type' => 'vacation',
+            'type' => 'airbnb',
         ]);
     }
     /**

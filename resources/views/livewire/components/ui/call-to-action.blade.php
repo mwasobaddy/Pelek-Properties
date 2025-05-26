@@ -20,7 +20,7 @@ new class extends Component {
             'rent' => "Hi, I would like to list my property for rent on Pelek Properties.",
             'airbnb' => "Hi, I would like to list my property on Airbnb through Pelek Properties.",
             'commercial' => "Hi, I would like to list my commercial property on Pelek Properties.",
-            'vacation' => "Hi, I would like to list my vacation property on Pelek Properties.",
+            'airbnb' => "Hi, I would like to list my airbnb property on Pelek Properties.",
             'land' => "Hi, I would like to list my land for sale on Pelek Properties.",
             'airbnb-info' => "Hi, I would like to learn more about your Airbnb management services.",
             'management' => "Hi, I would like to learn more about your property management services.",

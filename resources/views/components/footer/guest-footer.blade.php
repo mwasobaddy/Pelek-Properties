@@ -6,7 +6,7 @@
             <div>
                 <h3 class="text-xl font-semibold mb-4 border-b border-[#02c9c2] pb-2 inline-block">Pelek Properties</h3>
                 <p class="text-gray-300 mb-4">Your premier destination for quality properties across sales, rentals, and
-                    vacation stays.</p>
+                    AirBNB stays.</p>
                 <div class="flex items-center space-x-3 mt-6">
                     <a href="https://www.facebook.com/share/15Me9dJfZ3/?mibextid=wwXIfr" target="_blank"
                         class="text-[#02c9c2] bg-white bg-opacity-10 hover:bg-[#02c9c2] transition-colors duration-300 p-2 rounded-full">
@@ -115,7 +115,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                                 </svg>
-                                Vacation Stays
+                                AirBNB Stays
                             </a></li>
                     </ul>
                 </div>

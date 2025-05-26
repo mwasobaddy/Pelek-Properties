@@ -115,7 +115,7 @@ new class extends Component {
             <div class="rounded-2xl bg-white/8 dark:bg-white/5 backdrop-blur-xl p-6 shadow-2xl ring-1 ring-white/20 dark:ring-white/10 transition-all duration-300">
                 {{-- Listing Type Tabs with modern design --}}
                 <div class="mb-6">
-                    <label class="text-sm font-medium text-white/90 dark:text-white/80">I'm looking to:</label>
+                    <label class="text-sm font-medium text-white/90 dark:text-white/80">I'm looking for:</label>
                     <div class="mt-2.5 flex flex-wrap gap-2 rounded-xl bg-white/5 dark:bg-zinc-800/30 p-1.5">
                         @foreach(['all' => 'All Properties', 'sale' => 'Sale', 'rent' => 'Rent', 'airbnb' => 'Airbnb', 'commercial' => 'Commercial'] as $value => $label)
                             <button

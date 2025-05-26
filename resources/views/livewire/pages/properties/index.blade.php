@@ -715,7 +715,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                                     <option value="">All Categories</option>
                                     <option value="residential">Residential</option>
                                     <option value="commercial">Commercial</option>
-                                    <option value="vacation">Vacation</option>
+                                    <option value="AirBNB">AirBNB</option>
                                     <option value="land">Land</option>
                                     <option value="industrial">Industrial</option>
                                 </select>
