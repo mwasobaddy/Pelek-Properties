@@ -285,7 +285,7 @@ new class extends Component {
                 @foreach([
                     'sale' => ['For Sale', 'shopping-bag', 'from-teal-400 to-emerald-500'],
                     'rent' => ['For Rent', 'home', 'from-cyan-400 to-teal-500'],
-                    'airbnb' => ['Short Stays', 'calendar', 'from-emerald-400 to-teal-500'],
+                    'airbnb' => ['Airbnb', 'calendar', 'from-emerald-400 to-teal-500'],
                     'commercial' => ['Commercial', 'briefcase', 'from-emerald-400 to-teal-500'],
                 ] as $type => $data)
                     <div 

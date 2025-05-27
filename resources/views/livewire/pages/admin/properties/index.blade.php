@@ -822,14 +822,16 @@ new class extends Component {
                     <p class="text-gray-500 dark:text-gray-400 max-w-md mb-6">
                         Get started by adding your first property listing to the portfolio.
                     </p>
-                    <a 
-                        href="{{ route('admin.properties.manage') }}" 
-                        wire:navigate
-                        class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#02c9c2] to-[#012e2b] text-white font-medium rounded-lg text-sm hover:opacity-90 transition-all duration-150 shadow-lg"
+                    
+                    <button 
+                        wire:click="create"
+                        class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#02c9c2] to-[#012e2b] text-white font-medium rounded-lg text-sm hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02c9c2] dark:focus:ring-offset-gray-900 transition-all duration-150 shadow-lg"
+                        wire:loading.attr="disabled"
                     >
-                        <flux:icon name="plus" class="w-5 h-5 mr-2" />
-                        Add Property
-                    </a>
+                        <flux:icon wire:loading.remove name="plus" class="w-5 h-5 mr-2" />
+                        <flux:icon wire:loading name="arrow-path" class="w-5 h-5 mr-2 animate-spin" />
+                        Add New Property
+                    </button>
                 </div>
             @endforelse
         </div>

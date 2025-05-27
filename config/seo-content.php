@@ -107,7 +107,7 @@ return [
     ],
     'homepage' => [
         'title' => 'Pelek Properties | Premier Real Estate Services in Kenya',
-        'description' => 'Your trusted partner for premium real estate in Kenya. Discover luxury properties for sale, rent, or short stays in Nairobi, Mombasa, Kisumu, and more. Professional property management and valuation services.',
+        'description' => 'Your trusted partner for premium real estate in Kenya. Discover luxury properties for sale or rent in Nairobi, Mombasa, Kisumu, and more. Professional property management and valuation services.',
         'keywords' => [
             'real estate kenya',
             'property management kenya',

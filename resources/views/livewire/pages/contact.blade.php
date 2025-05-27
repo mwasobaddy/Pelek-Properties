@@ -112,9 +112,9 @@ new #[Layout('components.layouts.guest')] class extends Component {
                 <!-- Contact Information -->
                 <div class="md:col-span-1">
                     <div class="space-y-12">
-                        <!-- Office Location -->
+                        <!-- Location -->
                         <div>
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Office Location</h3>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Location</h3>
                             <div class="space-y-4 text-gray-600 dark:text-gray-300">
                                 <div class="flex items-start">
                                     <div class="flex-shrink-0 mt-1">

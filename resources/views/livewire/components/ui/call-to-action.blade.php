@@ -4,7 +4,7 @@ use Livewire\Volt\Component;
 
 new class extends Component {
     public string $listingType = '';
-    public string $phoneNumber = '+254712345678'; // Replace with actual business phone number
+    public string $phoneNumber = '+254711614099'; // Replace with actual business phone number
 
     public function showWhatsAppModal($type) {
         $this->listingType = $type;
