@@ -12,9 +12,12 @@ use Illuminate\Support\Facades\Storage;
 new class extends Component {
     use WithPagination;
     use WithFileUploads;
-
-    protected $listeners = ['notify' => 'handleNotification'];
-
+    
+    protected function getListeners()
+    {
+        return ['notify' => 'handleNotification'];
+    }
+    
     public function handleNotification($data)
     {
         $this->dispatch('showToast', 
@@ -22,6 +25,24 @@ new class extends Component {
             message: $data['message'] ?? 'Operation completed',
             timer: $data['timer'] ?? 3000
         );
+    }
+    
+    public function notifySuccess(string $message, int $timer = 3000): void
+    {
+        $this->dispatch('notify', [
+            'type' => 'success',
+            'message' => $message,
+            'timer' => $timer
+        ]);
+    }
+    
+    public function notifyError(string $message, int $timer = 5000): void
+    {
+        $this->dispatch('notify', [
+            'type' => 'error',
+            'message' => $message,
+            'timer' => $timer
+        ]);
     }
 
     #[State]
@@ -308,6 +329,12 @@ new class extends Component {
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString()
                 ]);
+                
+                $this->dispatch('notify', [
+                    'type' => 'error',
+                    'message' => 'Error creating temporary image preview: ' . $e->getMessage(),
+                    'timer' => 3000
+                ]);
             }
         }
         $this->imageUploads = [];
@@ -335,7 +362,11 @@ new class extends Component {
         }
         $this->selectedImage = null;
         $this->showImageDeleteModal = false;
-        $this->dispatch('notify', type: 'success', message: 'Image deleted successfully.');
+        $this->dispatch('notify', [
+            'type' => 'success',
+            'message' => 'Image deleted successfully.',
+            'timer' => 3000
+        ]);
     }
 
     public function setFeaturedImage($imageId)
@@ -346,7 +377,11 @@ new class extends Component {
                 app(PropertyImageService::class)->setFeatured($image);
             }
         }
-        $this->dispatch('notify', type: 'success', message: 'Featured image updated successfully.');
+        $this->dispatch('notify', [
+            'type' => 'success',
+            'message' => 'Image set as featured successfully.',
+            'timer' => 3000
+        ]);
     }
 
     public function create()
@@ -426,15 +461,21 @@ new class extends Component {
             
             try {
                 $propertyService->delete($this->selectedProperty);
-                $this->dispatch('notify', type: 'success', message: 'Property deleted successfully.');
-                logger()->info('Property deleted successfully', ['property_id' => $this->selectedProperty->id]);
+                $this->dispatch('notify', [
+                    'type' => 'success',
+                    'message' => 'Property deleted successfully.',
+                    'timer' => 3000
+                ]);
             } catch (\Exception $e) {
                 logger()->error('Error deleting property', [
                     'property_id' => $this->selectedProperty->id,
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString()
                 ]);
-                $this->dispatch('notify', type: 'error', message: 'Error deleting property: ' . $e->getMessage());
+                $this->dispatch('notify', [
+                    'type' => 'error',
+                    'message' => 'Error deleting property: ' . $e->getMessage()
+                ]);
             }
             
             $this->showDeleteModal = false;
@@ -498,8 +539,11 @@ new class extends Component {
                             }
                         }
                     }
-                    
-                    $this->dispatch('notify', type: 'success', message: 'Property created successfully.');
+                    $this->dispatch('notify', [
+                        'type' => 'success',
+                        'message' => 'Property created successfully.',
+                        'timer' => 3000
+                    ]);
                     logger()->info('Property created successfully', ['property_id' => $property->id]);
                 } else {
                     $propertyService->update($this->selectedProperty, $formData);
@@ -524,8 +568,11 @@ new class extends Component {
                             }
                         }
                     }
-                    
-                    $this->dispatch('notify', type: 'success', message: 'Property updated successfully.');
+                    $this->dispatch('notify', [
+                        'type' => 'success',
+                        'message' => 'Property updated successfully.',
+                        'timer' => 3000
+                    ]);
                     logger()->info('Property updated successfully', ['property_id' => $this->selectedProperty->id]);
                 }
                 
@@ -535,6 +582,11 @@ new class extends Component {
                 $this->dispatch('propertyListUpdated');
             } catch (\Exception $e) {
                 DB::rollBack();
+                $this->dispatch('notify', [
+                    'type' => 'error',
+                    'message' => 'Transaction failed: ' . $e->getMessage(),
+                    'timer' => 5000
+                ]);
                 logger()->error('Transaction failed in property save', [
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString()
@@ -548,7 +600,11 @@ new class extends Component {
                 'trace' => $e->getTraceAsString(),
                 'form_data' => $this->form
             ]);
-            $this->dispatch('notify', type: 'error', message: 'Error saving property: ' . $e->getMessage());
+            $this->dispatch('notify', [
+                'type' => 'error',
+                'message' => 'Error saving property: ' . $e->getMessage(),
+                'timer' => 5000
+            ]);
         }
     }
 
