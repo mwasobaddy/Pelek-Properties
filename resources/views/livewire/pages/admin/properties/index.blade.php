@@ -13,6 +13,17 @@ new class extends Component {
     use WithPagination;
     use WithFileUploads;
 
+    protected $listeners = ['notify' => 'handleNotification'];
+
+    public function handleNotification($data)
+    {
+        $this->dispatch('showToast', 
+            type: $data['type'] ?? 'success',
+            message: $data['message'] ?? 'Operation completed',
+            timer: $data['timer'] ?? 3000
+        );
+    }
+
     #[State]
     public $showFilters = false;
     
@@ -123,6 +134,23 @@ new class extends Component {
         'is_featured' => false,
         'additional_features' => [],
     ];
+
+
+    // mount to display the toast if it working
+    public function mount(): void
+    {
+        // $this->dispatch('showToast', [
+        //     'type' => 'success',
+        //     'message' => 'Component mounted successfully!',
+        //     'timer' => 3000
+        // ]);
+        
+        $this->dispatch('notify', [
+            'type' => 'success',
+            'message' => 'Property created successfully',
+            'timer' => 3000 // optional, defaults to 3000ms
+        ]);
+    }
 
     public function with(): array
     {
@@ -1693,4 +1721,31 @@ new class extends Component {
     <!-- Enhanced Decorative Elements -->
     <div class="absolute top-40 left-0 w-64 h-64 bg-gradient-to-br from-[#02c9c2]/10 to-transparent rounded-full blur-3xl -z-10"></div>
     <div class="absolute bottom-20 right-0 w-96 h-96 bg-gradient-to-tl from-[#012e2b]/10 to-transparent rounded-full blur-3xl -z-10"></div>
+
+    <!-- SweetAlert2 Toast Setup -->
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            Livewire.on('showToast', (data) => {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: data.timer || 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+
+                Toast.fire({
+                    icon: data.type,
+                    title: data.message,
+                    background: data.type === 'success' ? '#10B981' : '#EF4444',
+                    color: '#ffffff',
+                    iconColor: '#ffffff'
+                });
+            });
+        });
+    </script>
 </div>
