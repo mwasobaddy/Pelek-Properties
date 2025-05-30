@@ -45,6 +45,16 @@ new class extends Component {
         ]);
     }
 
+    // Helper method to format validation errors for toast notifications
+    private function formatValidationErrors(array $errors): string
+    {
+        if (count($errors) === 1) {
+            return $errors[0];
+        }
+        
+        return 'Please fix the following errors:<br>• ' . implode('<br>• ', $errors);
+    }
+
     #[State]
     public $showFilters = false;
     
@@ -311,33 +321,33 @@ new class extends Component {
 
     public function updatedImageUploads()
     {
-        $this->validate([
-            'imageUploads.*' => 'image|max:5120', // 5MB max
-        ]);
+        try {
+            $this->validate([
+                'imageUploads.*' => 'image|max:5120', // 5MB max
+            ]);
 
-        foreach ($this->imageUploads as $image) {
-            try {
-                $this->temporaryImages[] = [
-                    'url' => $image->temporaryUrl(),
-                    'file' => $image,
-                    'name' => $image->getClientOriginalName(),
-                    'size' => $image->getSize(),
-                    'type' => $image->getMimeType(),
-                ];
-            } catch (\Exception $e) {
-                logger()->error('Error creating temporary image preview', [
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString()
-                ]);
-                
-                $this->dispatch('notify', [
-                    'type' => 'error',
-                    'message' => 'Error creating temporary image preview: ' . $e->getMessage(),
-                    'timer' => 3000
-                ]);
+            foreach ($this->imageUploads as $image) {
+                try {
+                    $this->temporaryImages[] = [
+                        'url' => $image->temporaryUrl(),
+                        'file' => $image,
+                        'name' => $image->getClientOriginalName(),
+                        'size' => $image->getSize(),
+                        'type' => $image->getMimeType(),
+                    ];
+                } catch (\Exception $e) {
+                    logger()->error('Error creating temporary image preview', [
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
+                    
+                    $this->notifyError('Error creating temporary image preview: ' . $e->getMessage());
+                }
             }
+            $this->imageUploads = [];
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->notifyError($this->formatValidationErrors($e->validator->errors()->all()));
         }
-        $this->imageUploads = [];
     }
 
     public function removeTemporaryImage($index)
@@ -362,11 +372,7 @@ new class extends Component {
         }
         $this->selectedImage = null;
         $this->showImageDeleteModal = false;
-        $this->dispatch('notify', [
-            'type' => 'success',
-            'message' => 'Image deleted successfully.',
-            'timer' => 3000
-        ]);
+        $this->notifySuccess('Image deleted successfully.');
     }
 
     public function setFeaturedImage($imageId)
@@ -377,11 +383,7 @@ new class extends Component {
                 app(PropertyImageService::class)->setFeatured($image);
             }
         }
-        $this->dispatch('notify', [
-            'type' => 'success',
-            'message' => 'Image set as featured successfully.',
-            'timer' => 3000
-        ]);
+        $this->notifySuccess('Image set as featured successfully.');
     }
 
     public function create()
@@ -461,21 +463,14 @@ new class extends Component {
             
             try {
                 $propertyService->delete($this->selectedProperty);
-                $this->dispatch('notify', [
-                    'type' => 'success',
-                    'message' => 'Property deleted successfully.',
-                    'timer' => 3000
-                ]);
+                $this->notifySuccess('Property deleted successfully.');
             } catch (\Exception $e) {
                 logger()->error('Error deleting property', [
                     'property_id' => $this->selectedProperty->id,
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString()
                 ]);
-                $this->dispatch('notify', [
-                    'type' => 'error',
-                    'message' => 'Error deleting property: ' . $e->getMessage()
-                ]);
+                $this->notifyError('Error deleting property: ' . $e->getMessage());
             }
             
             $this->showDeleteModal = false;
@@ -487,6 +482,7 @@ new class extends Component {
     public function save()
     {
         try {
+            // Try validation - this will throw ValidationException if it fails
             $this->validate();
 
             // Clean up form data
@@ -539,11 +535,7 @@ new class extends Component {
                             }
                         }
                     }
-                    $this->dispatch('notify', [
-                        'type' => 'success',
-                        'message' => 'Property created successfully.',
-                        'timer' => 3000
-                    ]);
+                    $this->notifySuccess('Property created successfully.');
                     logger()->info('Property created successfully', ['property_id' => $property->id]);
                 } else {
                     $propertyService->update($this->selectedProperty, $formData);
@@ -568,11 +560,7 @@ new class extends Component {
                             }
                         }
                     }
-                    $this->dispatch('notify', [
-                        'type' => 'success',
-                        'message' => 'Property updated successfully.',
-                        'timer' => 3000
-                    ]);
+                    $this->notifySuccess('Property updated successfully.');
                     logger()->info('Property updated successfully', ['property_id' => $this->selectedProperty->id]);
                 }
                 
@@ -582,29 +570,24 @@ new class extends Component {
                 $this->dispatch('propertyListUpdated');
             } catch (\Exception $e) {
                 DB::rollBack();
-                $this->dispatch('notify', [
-                    'type' => 'error',
-                    'message' => 'Transaction failed: ' . $e->getMessage(),
-                    'timer' => 5000
-                ]);
+                $this->notifyError('Transaction failed: ' . $e->getMessage());
                 logger()->error('Transaction failed in property save', [
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString()
                 ]);
                 throw $e;
             }
-            
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Format validation errors and show as toast
+            $this->notifyError($this->formatValidationErrors($e->validator->errors()->all()));
+            // The validation errors will also be displayed inline by default Livewire behavior
         } catch (\Exception $e) {
             logger()->error('Error saving property', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
                 'form_data' => $this->form
             ]);
-            $this->dispatch('notify', [
-                'type' => 'error',
-                'message' => 'Error saving property: ' . $e->getMessage(),
-                'timer' => 5000
-            ]);
+            $this->notifyError('Error saving property: ' . $e->getMessage());
         }
     }
 

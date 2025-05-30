@@ -150,7 +150,6 @@
                         >
                             <span class="flex items-center justify-between w-full">
                                 {{ __('Maintenance Requests') }}
-                                <span class="flex h-5 w-5 items-center justify-center rounded-full bg-[#02c9c2] text-white text-xs font-medium">3</span>
                             </span>
                         </flux:navlist.item>
                         
@@ -512,7 +511,6 @@
                             wire:navigate
                         >
                             <span>{{ __('New maintenance requests') }}</span>
-                            <span class="flex h-5 w-5 items-center justify-center rounded-full bg-[#02c9c2] text-white text-xs font-medium">3</span>
                         </flux:menu.item>
                     </div>
                 </flux:menu>
@@ -616,7 +614,6 @@
                         >
                             <span class="flex items-center justify-between w-full">
                                 {{ __('Maintenance Requests') }}
-                                <span class="flex h-5 w-5 items-center justify-center rounded-full bg-[#02c9c2] text-white text-xs font-medium">3</span>
                             </span>
                         </flux:menu.item>
                     </flux:menu.radio.group>
