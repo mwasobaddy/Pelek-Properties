@@ -54,25 +54,92 @@ new #[Layout('components.layouts.guest')] class extends Component {
             }
         }" class="relative mb-8">
             <!-- Main Gallery Grid with Improved Layout -->
-            <div class="grid md:grid-cols-3 gap-4">
-                <!-- Featured Image with Enhanced Hover Effect -->
-                <div class="md:col-span-2 relative h-[500px] group cursor-pointer overflow-hidden" 
-                    @click="showGallery = true; initGallery()"
-                    x-transition.opacity>
-                    @if($this->property->images->isNotEmpty())
-                        <img 
-                            src="{{ Storage::disk('property_images')->url($this->property->images->first()->image_path) }}" 
-                            alt="{{ $this->property->title }}"
-                            class="w-full h-full object-cover rounded-2xl shadow-lg transition-all duration-500 group-hover:scale-[1.02] group-hover:rotate-[0.5deg]"
-                        >
-                        <!-- View All Photos Overlay -->
-                        <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl flex items-center justify-center">
-                            <div class="text-white text-center">
-                                <flux:icon name="photo" class="w-8 h-8 mx-auto mb-2" />
-                                <span class="text-sm font-medium">View All Photos</span>
+            <div x-data="{
+                    currentIndex: 0,
+                    images: {{ $this->property->images->pluck('image_path')->toJson() }},
+                    autoSlideInterval: null,
+                    isPaused: false,
+                    nextSlide() {
+                        this.currentIndex = this.currentIndex === this.images.length - 1 ? 0 : this.currentIndex + 1;
+                    },
+                    prevSlide() {
+                        this.currentIndex = this.currentIndex === 0 ? this.images.length - 1 : this.currentIndex - 1;
+                    },
+                    goToSlide(index) {
+                        this.currentIndex = index;
+                    },
+                    startAutoSlide() {
+                        if (!this.isPaused) {
+                            this.autoSlideInterval = setInterval(() => {
+                                this.nextSlide();
+                            }, 5000);
+                        }
+                    },
+                    pauseAutoSlide() {
+                        this.isPaused = true;
+                        if (this.autoSlideInterval) clearInterval(this.autoSlideInterval);
+                    },
+                    resumeAutoSlide() {
+                        this.isPaused = false;
+                        this.startAutoSlide();
+                    }
+                }" 
+                x-init="startAutoSlide()"
+                class="grid md:grid-cols-3 gap-4"
+                @mouseenter="pauseAutoSlide()"
+                @mouseleave="resumeAutoSlide()"
+            >
+                <!-- Main Carousel -->
+                <div class="md:col-span-2 relative h-[500px] group cursor-pointer">
+                    <div class="relative h-[400px] md:h-[500px] overflow-hidden rounded-2xl">
+                        <!-- Images -->
+                        <template x-for="(image, index) in images" :key="index">
+                            <div x-show="currentIndex === index"
+                                x-transition:enter="transition ease-out duration-500"
+                                x-transition:enter-start="opacity-0 transform scale-95"
+                                x-transition:enter-end="opacity-100 transform scale-100"
+                                x-transition:leave="transition ease-in duration-300"
+                                x-transition:leave-start="opacity-100 transform scale-100"
+                                x-transition:leave-end="opacity-0 transform scale-95"
+                                class="absolute inset-0">
+                                <img :src="'{{ Storage::disk('property_images')->url('') }}' + image"
+                                    :alt="`Property image ${index + 1}`"
+                                    class="w-full h-full object-cover"
+                                    @click="showGallery = true; currentImage = index; initGallery()">
                             </div>
-                        </div>
-                    @endif
+                        </template>
+                        
+                        <!-- Carousel Controls -->
+                        <button @click.stop="prevSlide" 
+                                class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-2 rounded-full transition-colors">
+                            <flux:icon name="chevron-left" class="w-6 h-6" />
+                        </button>
+                        
+                        <button @click.stop="nextSlide" 
+                                class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-2 rounded-full transition-colors">
+                            <flux:icon name="chevron-right" class="w-6 h-6" />
+                        </button>
+                        
+                        <!-- View All Photos Button -->
+                        <button @click.stop="showGallery = true; currentImage = currentIndex; initGallery()" 
+                                class="absolute right-4 bottom-4 bg-black/50 hover:bg-black/70 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
+                            <flux:icon name="photo" class="w-5 h-5" />
+                            <span class="text-sm font-medium">View All Photos</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Thumbnail Navigation -->
+                    <div class="flex justify-center mt-4 space-x-2 overflow-x-auto pb-2">
+                        <template x-for="(image, index) in images" :key="index">
+                            <button @click="goToSlide(index)" 
+                                    class="w-16 h-16 rounded-md overflow-hidden transition-all duration-300 focus:outline-none"
+                                    :class="currentIndex === index ? 'ring-2 ring-[#02c9c2]' : 'opacity-70 hover:opacity-100'">
+                                <img :src="'{{ Storage::disk('property_images')->url('') }}' + image" 
+                                    :alt="`Thumbnail ${index + 1}`"
+                                    class="w-full h-full object-cover">
+                            </button>
+                        </template>
+                    </div>
                 </div>
 
                 <!-- Side Images with Hover Effects -->
@@ -155,7 +222,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                 <div class="p-6">
                     <!-- Overview Section -->
                     <div class="p-6 space-y-6">
-                        <div class="flex justify-between items-start">
+                        <div class="flex justify-between items-start flex-col md:flex-row space-y-4 md:space-y-0">
                             <div>
                                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                                     {{ $this->property->title }}
@@ -165,7 +232,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                                     {{ $this->property->location }}
                                 </p>
                             </div>
-                            <div class="text-right">
+                            <div class="text-right w-full md:w-[unset]">
                                 <p class="text-3xl font-bold text-[#02c9c2]">
                                     KSH {{ number_format($this->property->rental_price_daily) }}
                                 </p>
