@@ -234,7 +234,20 @@ new #[Layout('components.layouts.guest')] class extends Component {
                             </div>
                             <div class="text-right w-full md:w-[unset]">
                                 <p class="text-3xl font-bold text-[#02c9c2]">
-                                    KSH {{ number_format($this->property->rental_price_daily) }}
+                                    @if($this->property->listing_type === 'airbnb')
+                                        KSH {{ number_format($this->property->airbnb_price_nightly) }}
+                                        KSH {{ number_format($this->property->airbnb_price_weekly) }}
+                                        KSH {{ number_format($this->property->airbnb_price_monthly) }}
+                                    @elseif($this->property->listing_type === 'rent')
+                                        KSH {{ number_format($this->property->rental_price_daily) }}
+                                        KSH {{ number_format($this->property->rental_price_weekly) }}
+                                        KSH {{ number_format($this->property->rental_price_monthly) }}
+                                    @elseif($this->property->listing_type === 'commercial')
+                                        KSH {{ number_format($this->property->commercial_price_monthly) }}
+                                        KSH {{ number_format($this->property->commercial_price_annually) }}
+                                    @else
+                                        KSH {{ number_format($this->property->price) }}
+                                    @endif
                                 </p>
                                 <p class="text-sm text-gray-600 dark:text-gray-400">per {{ $this->property->listing_type === 'airbnb' ? 'night' : 'month' }}</p>
                             </div>
@@ -352,7 +365,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                                 <div>
                                     <p class="font-medium text-gray-900 dark:text-white">Property Agent</p>
                                     <p class="text-sm text-gray-500 dark:text-gray-400">Real Estate Expert</p>
-                                    <p class="text-xs text-[#02c9c2] mt-1">Usually responds within 1 hour</p>
+                                    <p class="text-xs text-[#02c9c2] mt-1">Usually responds within 30 minutes</p>
                                 </div>
                             </div>
                         

@@ -148,7 +148,7 @@ new class extends Component {
     <div
         class="group relative overflow-hidden rounded-xl bg-white shadow-md transition-all duration-300 hover:shadow-lg dark:bg-gray-800 dark:shadow-gray-700/30">
         {{-- Image Section with Slider for Airbnb Properties --}}
-        <div class="relative aspect-w-16 aspect-h-10 overflow-hidden">
+        <div class="relative h-52 overflow-hidden">
             {{-- Main Image --}}
             <img src="{{ $this->getCurrentImage() }}" alt="{{ $this->property->title }}"
                 class="h-full w-full object-cover transition-all duration-500 group-hover:scale-110">
