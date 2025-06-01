@@ -235,18 +235,23 @@ new #[Layout('components.layouts.guest')] class extends Component {
                             <div class="text-right w-full md:w-[unset]">
                                 <p class="text-3xl font-bold text-[#02c9c2]">
                                     @if($this->property->listing_type === 'airbnb')
-                                        KSH {{ number_format($this->property->airbnb_price_nightly) }}
-                                        KSH {{ number_format($this->property->airbnb_price_weekly) }}
-                                        KSH {{ number_format($this->property->airbnb_price_monthly) }}
+                                        KSH {{ number_format($this->property->airbnb_price_nightly) }} per night
+                                        <br>
+                                        KSH {{ number_format($this->property->airbnb_price_weekly) }} per week
+                                        <br>
+                                        KSH {{ number_format($this->property->airbnb_price_monthly) }} per month
                                     @elseif($this->property->listing_type === 'rent')
-                                        KSH {{ number_format($this->property->rental_price_daily) }}
-                                        KSH {{ number_format($this->property->rental_price_weekly) }}
-                                        KSH {{ number_format($this->property->rental_price_monthly) }}
+                                        KSH {{ number_format($this->property->rental_price_daily) }} per day
+                                        <br>
+                                        KSH {{ number_format($this->property->rental_price_weekly) }} per week
+                                        <br>
+                                        KSH {{ number_format($this->property->rental_price_monthly) }} per month
                                     @elseif($this->property->listing_type === 'commercial')
-                                        KSH {{ number_format($this->property->commercial_price_monthly) }}
-                                        KSH {{ number_format($this->property->commercial_price_annually) }}
+                                        KSH {{ number_format($this->property->commercial_price_monthly) }} per month
+                                        <br>
+                                        KSH {{ number_format($this->property->commercial_price_annually) }} per year
                                     @else
-                                        KSH {{ number_format($this->property->price) }}
+                                        KSH {{ number_format($this->property->price) }} per month
                                     @endif
                                 </p>
                                 <p class="text-sm text-gray-600 dark:text-gray-400">per {{ $this->property->listing_type === 'airbnb' ? 'night' : 'month' }}</p>
