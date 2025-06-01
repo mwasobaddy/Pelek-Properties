@@ -434,7 +434,15 @@ new #[Layout('components.layouts.guest')] class extends Component {
                                                 {{ $similarProperty->location }}
                                             </p>
                                             <p class="text-sm font-semibold text-[#02c9c2]">
-                                                KSH {{ number_format($similarProperty->rental_price_daily) }} / day
+                                                @if($similarProperty->listing_type === 'airbnb')
+                                                    KSH {{ number_format($similarProperty->airbnb_price_nightly) }} <span class="text-xs text-gray-500 dark:text-gray-400">per night</span>
+                                                @elseif($similarProperty->listing_type === 'rent')
+                                                    KSH {{ number_format($similarProperty->rental_price_monthly) }} <span class="text-xs text-gray-500 dark:text-gray-400">per month</span>
+                                                @elseif($similarProperty->listing_type === 'commercial')
+                                                    KSH {{ number_format($similarProperty->commercial_price_monthly) }} <span class="text-xs text-gray-500 dark:text-gray-400">per month</span>
+                                                @else
+                                                    KSH {{ number_format($similarProperty->price) }} <span class="text-xs text-gray-500 dark:text-gray-400">per month</span>
+                                                @endif
                                             </p>
                                         </div>
                                     </div>
