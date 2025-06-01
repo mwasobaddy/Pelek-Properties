@@ -210,6 +210,7 @@ new class extends Component {
                                             <a 
                                                 href="{{ route($categories[$type]['route']) }}"
                                                 class="group relative inline-flex items-center justify-center w-full px-8 py-4 border border-transparent text-base font-medium rounded-lg text-white bg-gradient-to-r from-[#02c9c2] to-[#012e2b] hover:from-[#012e2b] hover:to-[#02c9c2] transition-all duration-300 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02c9c2] dark:focus:ring-offset-gray-900"
+                                                wire:navigate
                                             >
                                                 Explore {{ ucfirst($type) }} Properties
                                                 <flux:icon name="arrow-right" class="ml-2 -mr-1 h-5 w-5 transform transition-transform duration-300 group-hover:translate-x-2" />
