@@ -51,8 +51,16 @@
                 
                 <!-- Action buttons with hover effects -->
                 <div class="flex flex-row gap-4 justify-center">
-                    <a href="{{ route('home') }}" 
-                        class="group relative px-6 py-3 bg-gradient-to-r from-[#02c9c2] to-[#01706c] text-white font-medium rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
+                    <a href="
+                        @auth
+                            {{ route('admin.dashboard') }}
+                        @else
+                            {{ route('home') }}
+                        @endauth
+                    " 
+                        class="group relative px-6 py-3 bg-gradient-to-r from-[#02c9c2] to-[#01706c] text-white font-medium rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden"
+                        wire:navigate
+                    >
                         <span class="absolute inset-0 w-full h-full bg-gradient-to-r from-white/0 via-white/20 to-white/0 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
                         <span class="relative flex items-center">
                             <flux:icon name="arrow-left" class="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
