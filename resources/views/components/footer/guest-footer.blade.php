@@ -5,8 +5,7 @@
             <!-- Column 1: About -->
             <div>
                 <h3 class="text-xl font-semibold mb-4 border-b border-[#02c9c2] pb-2 inline-block">Pelek Properties</h3>
-                <p class="text-gray-300 mb-4">Your premier destination for quality properties across sales, rentals, and
-                    AirBNB stays.</p>
+                <p class="text-gray-300 mb-4">Your trusted partner for quality properties: from residential sales, rentals, and Airbnb stays to prime commercial spaces.</p>
                 <div class="flex items-center space-x-3 mt-6">
                     <a href="https://www.facebook.com/share/15Me9dJfZ3/?mibextid=wwXIfr" target="_blank"
                         class="text-[#02c9c2] bg-white bg-opacity-10 hover:bg-[#02c9c2] transition-colors duration-300 p-2 rounded-full">
