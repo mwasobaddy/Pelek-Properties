@@ -154,6 +154,20 @@ class PropertySearchService
     }
 
     /**
+     * Get unique locations from properties
+     */
+    public function getAvailableLocations(): array
+    {
+        return Cache::remember('available_locations', 3600, function () {
+            return Property::distinct()
+                ->pluck('location')
+                ->sort()
+                ->values()
+                ->toArray();
+        });
+    }
+
+    /**
      * Get neighborhoods for a specific city
      */
     public function getNeighborhoodsByCity(string $city): array

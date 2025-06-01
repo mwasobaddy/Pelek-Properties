@@ -16,7 +16,7 @@ new class extends Component {
     public string $listingType = 'all';
 
     public array $propertyTypes = [];
-    public array $cities = [];
+    public array $locations = [];
     public array $propertyStats = [];
     public array $priceRanges = [];
     public array $amenities = [];
@@ -51,9 +51,8 @@ new class extends Component {
     public function loadComputedProperties()
     {
         $searchService = app(PropertySearchService::class);
-        
         $this->propertyTypes = PropertyType::orderBy('name')->get()->toArray();
-        $this->cities = $searchService->getAvailableCities();
+        $this->locations = $searchService->getAvailableLocations();
         $this->propertyStats = $searchService->getPropertyCountsByType();
         $this->priceRanges = $searchService->getPriceRanges($this->listingType !== 'all' ? $this->listingType : null);
         $this->amenities = $searchService->getAvailableAmenities();
@@ -70,7 +69,7 @@ new class extends Component {
     {
         return [
             'propertyTypes' => $this->propertyTypes,
-            'cities' => $this->cities,
+            'locations' => $this->locations,
             'propertyStats' => $this->propertyStats,
             'priceRanges' => $this->priceRanges,
             'amenities' => $this->amenities,
@@ -185,8 +184,8 @@ new class extends Component {
                                 class="w-full appearance-none rounded-lg border-0 bg-white/10 dark:bg-zinc-800/50 py-3 pl-4 pr-10 text-white ring-1 ring-white/20 dark:ring-white/10 transition-all duration-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:bg-white/15 dark:focus:bg-zinc-800/80 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm group-hover:ring-[#02c9c2]/50"
                             >
                                 <option value="">Any Location</option>
-                                @foreach($cities as $availableCity)
-                                    <option value="{{ $availableCity }}">{{ $availableCity }}</option>
+                                @foreach($locations as $availableLocation)
+                                    <option value="{{ $availableLocation }}">{{ $availableLocation }}</option>
                                 @endforeach
                             </select>
                             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-zinc-400 group-hover:text-[#02c9c2] transition-colors duration-200">
