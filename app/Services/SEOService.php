@@ -330,29 +330,12 @@ class SEOService
      */
     public function setLegalPageMeta(string $page)
     {
-        $configs = [
-            'privacy' => [
-                'title' => 'Privacy Policy | Pelek Properties',
-                'description' => 'Our privacy policy outlines how we collect, use, and protect your personal information when you use Pelek Properties services.',
-                'type' => 'PrivacyPolicy'
-            ],
-            'terms' => [
-                'title' => 'Terms of Service | Pelek Properties',
-                'description' => 'Read our terms of service to understand your rights and responsibilities when using Pelek Properties services.',
-                'type' => 'TermsOfService'
-            ],
-            'cookies' => [
-                'title' => 'Cookie Policy | Pelek Properties',
-                'description' => 'Learn how Pelek Properties uses cookies and similar technologies to enhance your browsing experience.',
-                'type' => 'WebPage'
-            ]
-        ];
-
-        $config = $configs[$page] ?? null;
+        $config = $this->seoConfig['legal'][$page] ?? null;
         if (!$config) return;
 
         SEOMeta::setTitle($config['title']);
         SEOMeta::setDescription($config['description']);
+        SEOMeta::addKeyword($config['keywords']);
         SEOMeta::setCanonical(route($page));
 
         OpenGraph::setTitle($config['title']);
@@ -363,7 +346,7 @@ class SEOService
         TwitterCard::setTitle($config['title']);
         TwitterCard::setDescription($config['description']);
 
-        JsonLd::setType($config['type']);
+        JsonLd::setType($config['schema_type']);
         JsonLd::addValue('@context', 'https://schema.org');
         JsonLd::setTitle($config['title']);
         JsonLd::setDescription($config['description']);
@@ -413,5 +396,179 @@ class SEOService
                 'description' => "Schedule a viewing for {$property->title}"
             ]
         ]);
+    }
+
+    /**
+     * Get recommended schema type for a specific page or content type
+     * 
+     * @param string $pageType The type of page (e.g., 'property', 'blog', 'contact', etc.)
+     * @param string|null $subType Optional subtype (e.g., 'sale', 'rental', 'airbnb' for property type)
+     * @return string The recommended schema.org type
+     */
+    /**
+     * Set SEO meta tags for location-specific pages
+     * 
+     * @param string $city The city name (e.g., 'nairobi', 'mombasa')
+     * @param string|null $area The specific area within the city (optional)
+     * @param string|null $propertyType The type of property listing (optional)
+     */
+    public function setLocationMeta(string $city, ?string $area = null, ?string $propertyType = null)
+    {
+        // Get city data from config
+        $cityData = $this->seoConfig['locations']['cities'][$city] ?? null;
+        if (!$cityData) return;
+        
+        $cityName = $cityData['name'];
+        
+        // Build title and description based on parameters
+        $title = "{$cityName} ";
+        $description = "";
+        
+        if ($propertyType) {
+            $propertyTypeConfig = $this->seoConfig['property_types'][$propertyType] ?? null;
+            if ($propertyTypeConfig) {
+                // For specific property type in location
+                $title .= match($propertyType) {
+                    'sale' => 'Properties for Sale',
+                    'rental' => 'Properties for Rent',
+                    'airbnb' => 'Airbnb Accommodations',
+                    'commercial' => 'Commercial Properties',
+                    default => 'Real Estate'
+                };
+                
+                $description = "Discover " . match($propertyType) {
+                    'sale' => "premium properties for sale",
+                    'rental' => "quality rental properties",
+                    'airbnb' => "luxury furnished Airbnb stays",
+                    'commercial' => "prime commercial spaces",
+                    default => "exceptional real estate"
+                } . " in {$cityName}";
+                
+                if ($area) {
+                    $title .= " in {$area}, {$cityName}";
+                    $description .= ", specifically in the {$area} area";
+                } else {
+                    $title .= " in {$cityName}, Kenya";
+                }
+                
+                $description .= ". Exclusive listings by Pelek Properties.";
+                
+                $schemaType = $propertyTypeConfig['schema_type'];
+                $keywords = array_merge(
+                    $propertyTypeConfig['keywords'],
+                    [strtolower($cityName) . " " . $propertyType]
+                );
+            } else {
+                // Generic property type
+                $title .= "Real Estate | Pelek Properties";
+                $description = "Explore real estate options in {$cityName}, Kenya. Quality properties offered by Pelek Properties.";
+                $schemaType = 'RealEstateListing';
+                $keywords = ['real estate', 'properties', strtolower($cityName)];
+            }
+        } else {
+            // General location page
+            $title .= "Real Estate | Properties in {$cityName} | Pelek Properties";
+            $description = "Explore our selection of properties in {$cityName}, Kenya. Find your ideal home, rental, or commercial space with Pelek Properties.";
+            $schemaType = 'RealEstateAgent';
+            $keywords = ['real estate ' . strtolower($cityName), 'properties in ' . strtolower($cityName)];
+        }
+        
+        if ($area) {
+            $keywords[] = strtolower($area) . ' ' . strtolower($cityName);
+        }
+        
+        // Set meta tags
+        SEOMeta::setTitle($title);
+        SEOMeta::setDescription($description);
+        SEOMeta::addKeyword($keywords);
+        
+        $canonicalUrl = $area 
+            ? route('properties.location', ['city' => $city, 'area' => $area]) 
+            : route('properties.city', ['city' => $city]);
+        
+        if ($propertyType) {
+            $canonicalUrl .= "?type={$propertyType}";
+        }
+        
+        SEOMeta::setCanonical($canonicalUrl);
+        
+        // Set Open Graph
+        OpenGraph::setTitle($title);
+        OpenGraph::setDescription($description);
+        OpenGraph::setUrl($canonicalUrl);
+        OpenGraph::setType('website');
+        OpenGraph::addProperty('locale', 'en_KE');
+        OpenGraph::addProperty('location:locality', $cityName);
+        OpenGraph::addProperty('location:region', $cityName);
+        OpenGraph::addProperty('location:country', 'Kenya');
+        
+        // Set Twitter Card
+        TwitterCard::setTitle($title);
+        TwitterCard::setDescription($description);
+        
+        // Set JSON-LD
+        JsonLd::setType($schemaType);
+        JsonLd::addValue('@context', 'https://schema.org');
+        JsonLd::setTitle($title);
+        JsonLd::setDescription($description);
+        
+        // Add location data to JSON-LD
+        JsonLd::addValue('areaServed', [
+            '@type' => 'City',
+            'name' => $cityName,
+            'containedInPlace' => [
+                '@type' => 'Country',
+                'name' => 'Kenya'
+            ]
+        ]);
+        
+        if ($area) {
+            JsonLd::addValue('areaServed', [
+                '@type' => 'Place',
+                'name' => $area,
+                'containedInPlace' => [
+                    '@type' => 'City',
+                    'name' => $cityName
+                ]
+            ]);
+        }
+    }
+    
+    public function getSchemaType(string $pageType, ?string $subType = null): string
+    {
+        $types = [
+            'home' => 'RealEstateAgent',
+            'about' => 'RealEstateAgent',
+            'contact' => 'ContactPage',
+            'blog' => [
+                'index' => 'Blog',
+                'post' => 'BlogPosting',
+            ],
+            'property' => [
+                'default' => 'RealEstateListing',
+                'sale' => 'RealEstateListing',
+                'rental' => 'Apartment',
+                'airbnb' => 'LodgingBusiness',
+                'commercial' => 'CommercialProperty',
+                'booking' => 'Service'
+            ],
+            'service' => [
+                'default' => 'Service',
+                'property_management' => 'PropertyManagementCompany',
+                'valuation' => 'PropertyValue',
+            ],
+            'legal' => [
+                'default' => 'WebPage',
+                'privacy' => 'PrivacyPolicy',
+                'terms' => 'TermsOfService',
+                'cookies' => 'WebPage'
+            ]
+        ];
+
+        if (is_array($types[$pageType])) {
+            return $types[$pageType][$subType] ?? $types[$pageType]['default'] ?? 'WebPage';
+        }
+
+        return $types[$pageType] ?? 'WebPage';
     }
 }

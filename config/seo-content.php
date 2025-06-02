@@ -1,6 +1,41 @@
 <?php
 
 return [
+    'legal' => [
+        'privacy' => [
+            'title' => 'Privacy Policy | Pelek Properties',
+            'description' => 'Our privacy policy outlines how we collect, use, and protect your personal information when you use Pelek Properties services.',
+            'schema_type' => 'PrivacyPolicy',
+            'keywords' => [
+                'privacy policy kenya',
+                'real estate privacy policy',
+                'data protection kenya',
+                'pelek properties privacy'
+            ]
+        ],
+        'terms' => [
+            'title' => 'Terms of Service | Pelek Properties',
+            'description' => 'Read our terms of service to understand your rights and responsibilities when using Pelek Properties services.',
+            'schema_type' => 'TermsOfService',
+            'keywords' => [
+                'terms of service kenya',
+                'property rental terms',
+                'real estate terms conditions',
+                'pelek properties terms'
+            ]
+        ],
+        'cookies' => [
+            'title' => 'Cookie Policy | Pelek Properties',
+            'description' => 'Learn how Pelek Properties uses cookies and similar technologies to enhance your browsing experience.',
+            'schema_type' => 'WebPage',
+            'keywords' => [
+                'cookie policy kenya',
+                'website cookies policy',
+                'real estate website cookies',
+                'pelek properties cookies'
+            ]
+        ]
+    ],
     'locations' => [
         'cities' => [
             'nairobi' => [

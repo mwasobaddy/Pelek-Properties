@@ -61,11 +61,12 @@ return [
          * The default configurations to be used by the json-ld generator.
          */
         'defaults' => [
-            'title'       => 'Pelek Properties - Premier Real Estate in Kenya', // updated from placeholder
-            'description' => 'Discover luxury properties, rentals, and commercial spaces across Kenya. Expert property management and valuation services.', // updated from placeholder
+            'title'       => 'Pelek Properties - Premier Real Estate in Kenya',
+            'description' => 'Discover luxury properties, rentals, and commercial spaces across Kenya. Expert property management and valuation services.',
             'url'         => 'current', // Set to current URL
-            'type'        => 'RealEstateAgent', // Changed to match real estate business
+            'type'        => 'RealEstateAgent',
             'images'      => ['/images/logo.png'],
+            'context'     => 'https://schema.org',
         ],
     ],
 ];
