@@ -129,16 +129,18 @@ new #[Layout('components.layouts.guest')] class extends Component {
                     </div>
                     
                     <!-- Thumbnail Navigation -->
-                    <div class="flex justify-center mt-4 space-x-2 overflow-x-auto pb-2">
-                        <template x-for="(image, index) in images" :key="index">
-                            <button @click="goToSlide(index)" 
-                                    class="w-[150px] md:w-16 h-16 rounded-md overflow-hidden transition-all duration-300 focus:outline-none"
-                                    :class="currentIndex === index ? 'ring-2 ring-[#02c9c2]' : 'opacity-70 hover:opacity-100'">
-                                <img :src="'{{ Storage::disk('property_images')->url('') }}' + image" 
-                                    :alt="`Thumbnail ${index + 1}`"
-                                    class="w-full h-full object-cover">
-                            </button>
-                        </template>
+                    <div class="w-full">
+                        <div class="flex justify-center mt-4 space-x-2 overflow-x-auto pb-2">
+                            <template x-for="(image, index) in images" :key="index">
+                                <button @click="goToSlide(index)" 
+                                        class="w-[150px] md:w-16 h-16 rounded-md overflow-hidden transition-all duration-300 focus:outline-none"
+                                        :class="currentIndex === index ? 'ring-2 ring-[#02c9c2]' : 'opacity-70 hover:opacity-100'">
+                                    <img :src="'{{ Storage::disk('property_images')->url('') }}' + image" 
+                                        :alt="`Thumbnail ${index + 1}`"
+                                        class="w-full h-full object-cover">
+                                </button>
+                            </template>
+                        </div>
                     </div>
                 </div>
 
@@ -207,7 +209,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
         </div>
 
         <!-- Main Content Grid -->
-        <div class="grid md:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <!-- Left Column - Main Content -->
             <div class="col-span-3 md:col-span-2 space-y-8">
                 <!-- Property Header -->
