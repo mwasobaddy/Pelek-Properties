@@ -130,7 +130,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                     
                     <!-- Thumbnail Navigation -->
                     <div class="w-full overflow-scroll">
-                        <div class="flex justify-center mt-4 space-x-2 overflow-x-auto pb-2 w-max">
+                        <div class="flex justify-center mt-4 space-x-2 overflow-x-auto pb-2 w-[max-content]">
                             <template x-for="(image, index) in images" :key="index">
                                 <button @click="goToSlide(index)" 
                                         class="w-[150px] md:w-16 h-16 rounded-md overflow-hidden transition-all duration-300 focus:outline-none"
