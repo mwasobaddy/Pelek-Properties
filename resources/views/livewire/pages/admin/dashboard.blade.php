@@ -13,17 +13,26 @@ use Livewire\Attributes\Computed;
 new class extends Component {
     /** @var \Illuminate\Database\Eloquent\Collection */
     public $properties;
+    public $maintenanceRequests;
+    public $recentTransactions;
     public int $activeContracts = 0;
     public int $pendingMaintenance = 0;
     public float $monthlyRevenue = 0.0;
     public ?Property $selectedProperty = null;
     public bool $loading = false;
 
-    public function mount(PropertyManagementService $propertyService, MaintenanceService $maintenanceService, FinancialService $financialService): void
+    public function mount(): void
     {
         abort_if(!auth()->user()->can('manage_all_properties'), 403);
+        
+        $propertyService = app(PropertyManagementService::class);
+        $financialService = app(FinancialService::class);
+        
         $this->properties = $propertyService->getManagedProperties();
-        $this->maintenanceRequests = MaintenanceRecord::where('status', '!=', 'completed')->with('property')->latest()->get();
+        $this->maintenanceRequests = MaintenanceRecord::where('status', '!=', 'completed')
+            ->with('property')
+            ->latest()
+            ->get();
         $this->recentTransactions = $financialService->getRecentTransactions();
         $this->activeContracts = ManagementContract::where('status', 'active')->count();
         $this->pendingMaintenance = MaintenanceRecord::where('status', 'pending')->count();
