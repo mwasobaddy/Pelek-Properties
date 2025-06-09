@@ -90,7 +90,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                 @mouseleave="resumeAutoSlide()"
             >
                 <!-- Main Carousel -->
-                <div class="md:col-span-2 relative h-[500px] group cursor-pointer overflow-scroll">
+                <div class="md:col-span-2 relative h-[500px] group cursor-pointer overflow-hidden">
                     <div class="relative h-[400px] md:h-[500px] overflow-hidden rounded-2xl">
                         <!-- Images -->
                         <template x-for="(image, index) in images" :key="index">
@@ -129,8 +129,8 @@ new #[Layout('components.layouts.guest')] class extends Component {
                     </div>
                     
                     <!-- Thumbnail Navigation -->
-                    <div class="w-full overflow-scroll">
-                        <div class="flex justify-center mt-4 space-x-2 overflow-x-auto pb-2 w-[max-content]">
+                    <div class="w-full overflow-x-auto">
+                        <div class="flex justify-center mt-4 space-x-2 overflow-x-auto py-2 px-1" style="width: max-content;">
                             <template x-for="(image, index) in images" :key="index">
                                 <button @click="goToSlide(index)" 
                                         class="w-[150px] md:w-16 h-16 rounded-md overflow-hidden transition-all duration-300 focus:outline-none"
@@ -185,7 +185,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                     </div>
 
                     <!-- Main Image -->
-                    <div class="relative aspect-video">
+                    <div class="relative aspect-square overflow-hidden w-full" style="height: 100vh;">
                         <template x-for="(image, index) in {{ $this->property->images->pluck('image_path')->toJson() }}" :key="index">
                             <img :src="'{{ Storage::disk('property_images')->url('') }}' + image" 
                                 :alt="'Property image ' + (index + 1)"
@@ -253,7 +253,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                                         <br>
                                         KSH {{ number_format($this->property->commercial_price_annually) }} <p class="text-sm text-gray-600 dark:text-gray-400">per year</p>
                                     @else
-                                        KSH {{ number_format($this->property->price) }} <p class="text-sm text-gray-600 dark:text-gray-400">per month</p>
+                                        KSH {{ number_format($this->property->price) }}
                                     @endif
                                 </p>
                             </div>
@@ -443,7 +443,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                                                 @elseif($similarProperty->listing_type === 'commercial')
                                                     KSH {{ number_format($similarProperty->commercial_price_monthly) }} <span class="text-xs text-gray-500 dark:text-gray-400">per month</span>
                                                 @else
-                                                    KSH {{ number_format($similarProperty->price) }} <span class="text-xs text-gray-500 dark:text-gray-400">per month</span>
+                                                    KSH {{ number_format($similarProperty->price) }}
                                                 @endif
                                             </p>
                                         </div>

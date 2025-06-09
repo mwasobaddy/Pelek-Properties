@@ -170,17 +170,6 @@ new class extends Component {
     // mount to display the toast if it working
     public function mount(): void
     {
-        // $this->dispatch('showToast', [
-        //     'type' => 'success',
-        //     'message' => 'Component mounted successfully!',
-        //     'timer' => 3000
-        // ]);
-        
-        $this->dispatch('notify', [
-            'type' => 'success',
-            'message' => 'Property created successfully',
-            'timer' => 3000 // optional, defaults to 3000ms
-        ]);
     }
 
     public function with(): array
@@ -271,8 +260,6 @@ new class extends Component {
             'form.city' => 'required|string',
             'form.address' => 'nullable|string',
             'form.neighborhood' => 'nullable|string',
-            'form.bedrooms' => 'nullable|integer|min:0',
-            'form.bathrooms' => 'nullable|integer|min:0',
             'form.available' => 'boolean',
             'form.whatsapp_number' => 'required|string',
             'form.status' => 'required|in:available,under_contract,sold,rented',
@@ -282,7 +269,6 @@ new class extends Component {
         // Add conditional rules based on listing type
         if ($this->form['listing_type'] === 'commercial') {
             $rules = array_merge($rules, [
-                'form.commercial_type' => 'required|in:office,retail,industrial,warehouse,mixed_use',
                 'form.commercial_size' => 'required|string',
                 'form.commercial_price_monthly' => 'required|numeric|min:0',
                 'form.commercial_price_annually' => 'required|numeric|min:0',
@@ -306,6 +292,8 @@ new class extends Component {
                 'form.minimum_lease_period' => 'nullable|integer|min:0',
                 'form.rental_requirements' => 'nullable|array',
                 'form.amenities_condition' => 'nullable|array',
+                'form.bedrooms' => 'nullable|integer|min:0',
+                'form.bathrooms' => 'nullable|integer|min:0',
             ]);
         } elseif ($this->form['listing_type'] === 'airbnb') {
             $rules = array_merge($rules, [
@@ -313,6 +301,13 @@ new class extends Component {
                 'form.airbnb_price_weekly' => 'nullable|numeric|min:0',
                 'form.airbnb_price_monthly' => 'nullable|numeric|min:0',
                 'form.availability_calendar' => 'nullable|array',
+                'form.bedrooms' => 'nullable|integer|min:0',
+                'form.bathrooms' => 'nullable|integer|min:0',
+            ]);
+        } elseif ($this->form['listing_type'] === 'sale') {
+            $rules = array_merge($rules, [
+                'form.bedrooms' => 'nullable|integer|min:0',
+                'form.bathrooms' => 'nullable|integer|min:0',
             ]);
         }
 
@@ -977,44 +972,6 @@ new class extends Component {
                                 </div>
                             </div>
 
-                            <!-- Property Type -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Property Type</label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <flux:icon name="home" class="h-5 w-5 text-gray-400" />
-                                    </div>
-                                    <select
-                                        wire:model="form.property_type_id"
-                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
-                                        @if($modalMode === 'view') disabled @endif
-                                    >
-                                        <option value="">Select Type</option>
-                                        @foreach($propertyTypes as $id => $type)
-                                            <option value="{{ $id }}">{{ $type }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('form.property_type_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                                </div>
-                            </div>
-
-                            <!-- Type -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Property Category</label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <flux:icon name="squares-2x2" class="h-5 w-5 text-gray-400" />
-                                    </div>
-                                    <input
-                                        type="text"
-                                        wire:model="form.type"
-                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
-                                        placeholder="E.g. Apartment, House, Land"
-                                    >
-                                    @error('form.type') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                                </div>
-                            </div>
-
                             <!-- Listing Type -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Listing Type</label>
@@ -1037,6 +994,44 @@ new class extends Component {
                                 </div>
                             </div>
 
+                            <!-- Type -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Property Category</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="squares-2x2" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        wire:model="form.type"
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                        placeholder="E.g. Apartment, House, Land"
+                                    >
+                                    @error('form.type') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <!-- Property Type -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Property Type</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <flux:icon name="home" class="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <select
+                                        wire:model="form.property_type_id"
+                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                        @if($modalMode === 'view') disabled @endif
+                                    >
+                                        <option value="">Select Type</option>
+                                        @foreach($propertyTypes as $id => $type)
+                                            <option value="{{ $id }}">{{ $type }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('form.property_type_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
                             <!-- Price -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Price (KES)</label>
@@ -1056,6 +1051,7 @@ new class extends Component {
                             </div>
 
                             <!-- Size -->
+                            @if ($form['listing_type'] != 'commercial')
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Size (sqm)</label>
                                 <div class="relative">
@@ -1089,6 +1085,7 @@ new class extends Component {
                                     @error('form.square_range') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
                             </div>
+                            @endif
 
                             <!-- Description -->
                             <div class="md:col-span-2">
@@ -1215,6 +1212,7 @@ new class extends Component {
                             Property Features
                         </h4>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            @if($form['listing_type'] != 'commercial')
                             <!-- Bedrooms -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bedrooms</label>
@@ -1250,6 +1248,7 @@ new class extends Component {
                                     @error('form.bathrooms') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
                             </div>
+                            @endif
 
                             <!-- WhatsApp Number -->
                             <div>
@@ -1330,28 +1329,6 @@ new class extends Component {
                             Commercial Property Details
                         </h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Commercial Type -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Commercial Type</label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <flux:icon name="building-storefront" class="h-5 w-5 text-gray-400" />
-                                    </div>
-                                    <select
-                                        wire:model="form.commercial_type"
-                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
-                                    >
-                                        <option value="">Select Type</option>
-                                        <option value="office">Office</option>
-                                        <option value="retail">Retail</option>
-                                        <option value="industrial">Industrial</option>
-                                        <option value="warehouse">Warehouse</option>
-                                        <option value="mixed_use">Mixed Use</option>
-                                    </select>
-                                    @error('form.commercial_type') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                                </div>
-                            </div>
-
                             <!-- Commercial Size -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Commercial Size</label>
@@ -1413,23 +1390,6 @@ new class extends Component {
                             Rental Property Details
                         </h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Daily Rental Price -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Daily Price</label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <flux:icon name="currency-dollar" class="h-5 w-5 text-gray-400" />
-                                    </div>
-                                    <input
-                                        type="number"
-                                        wire:model="form.rental_price_daily"
-                                        class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
-                                        placeholder="Daily rental price"
-                                        min="0"
-                                    >
-                                    @error('form.rental_price_daily') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                                </div>
-                            </div>
 
                             <!-- Monthly Rental Price -->
                             <div>
@@ -1633,6 +1593,7 @@ new class extends Component {
                                             >
                                                 <svg class="w-6 h-6" fill="{{ $image->is_featured ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                                </svg>
                                             </button>
                                             <button 
                                                 type="button" 

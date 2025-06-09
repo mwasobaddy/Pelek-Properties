@@ -27,7 +27,17 @@ class PropertyTypeFactory extends Factory
             'Cottage' => 'Charming small houses, often in rural or scenic locations.',
             'Mansion' => 'Large, luxurious properties with extensive grounds.',
             'Bungalow' => 'Single-story homes perfect for easy living.',
-            'Duplex' => 'Two-story apartments with separate entrances.'
+            'Duplex' => 'Two-story apartments with separate entrances.',
+
+            // 'Commercial' => 'Properties designed for business use, including offices, retail spaces, and warehouses.',
+            'Office' => 'Professional spaces for businesses, including coworking and private offices.',
+            'Retail' => 'Commercial spaces for shops, boutiques, and service providers.',
+            'Industrial' => 'Properties for manufacturing, storage, and distribution.',
+            'Warehouse' => 'Large storage spaces for goods and inventory.',
+            'Mixed Use' => 'Properties that combine residential, commercial, and/or industrial spaces.',
+            'Land' => 'Vacant plots for development, agriculture, or investment purposes.',
+            'Plot' => 'Vacant land available for construction or investment.',
+
         ];
 
         $name = $this->faker->unique()->randomElement(array_keys($propertyTypes));

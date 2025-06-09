@@ -9,6 +9,6 @@ class PropertyTypeSeeder extends Seeder
 {
     public function run(): void
     {
-        PropertyType::factory(10)->create(); // Creates all property types
+        PropertyType::factory(17)->create(); // Creates all property types
     }
 }
