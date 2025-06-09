@@ -90,7 +90,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                 @mouseleave="resumeAutoSlide()"
             >
                 <!-- Main Carousel -->
-                <div class="md:col-span-2 relative h-[500px] group cursor-pointer overflow-hidden">
+                <div class="md:col-span-2 relative h-[500px] group cursor-pointer overflow-scroll">
                     <div class="relative h-[400px] md:h-[500px] overflow-hidden rounded-2xl">
                         <!-- Images -->
                         <template x-for="(image, index) in images" :key="index">
@@ -129,8 +129,8 @@ new #[Layout('components.layouts.guest')] class extends Component {
                     </div>
                     
                     <!-- Thumbnail Navigation -->
-                    <div class="w-full">
-                        <div class="flex justify-center mt-4 space-x-2 overflow-x-auto pb-2">
+                    <div class="w-full overflow-scroll">
+                        <div class="flex justify-center mt-4 space-x-2 overflow-x-auto pb-2 w-max">
                             <template x-for="(image, index) in images" :key="index">
                                 <button @click="goToSlide(index)" 
                                         class="w-[150px] md:w-16 h-16 rounded-md overflow-hidden transition-all duration-300 focus:outline-none"
