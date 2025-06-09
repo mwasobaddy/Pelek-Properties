@@ -1144,29 +1144,30 @@ new class extends Component {
                                         class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
                                     >
                                         <option value="">Select City</option>
-                                        <option value="Nairobi">Nairobi</option>
-                                        <option value="Mombasa">Mombasa</option>
-                                        <option value="Kisumu">Kisumu</option>
-                                        <option value="Nakuru">Nakuru</option>
-                                        <option value="Eldoret">Eldoret</option>
-                                        <option value="Malindi">Malindi</option>
-                                        <option value="Kitale">Kitale</option>
-                                        <option value="Garissa">Garissa</option>
-                                        <option value="Thika">Thika</option>
-                                        <option value="Nyeri">Nyeri</option>
-                                        <option value="Kakamega">Kakamega</option>
-                                        <option value="Kisii">Kisii</option>
-                                        <option value="Machakos">Machakos</option>
-                                        <option value="Meru">Meru</option>
-                                        <option value="Lamu">Lamu</option>
-                                        <option value="Naivasha">Naivasha</option>
                                         <option value="Athi River">Athi River</option>
                                         <option value="Bungoma">Bungoma</option>
+                                        <option value="Eldoret">Eldoret</option>
+                                        <option value="Garissa">Garissa</option>
+                                        <option value="Kakamega">Kakamega</option>
                                         <option value="Kericho">Kericho</option>
+                                        <option value="Kiambu">Kiambu</option>
                                         <option value="Kilifi">Kilifi</option>
+                                        <option value="Kisii">Kisii</option>
+                                        <option value="Kisumu">Kisumu</option>
+                                        <option value="Kitale">Kitale</option>
+                                        <option value="Lamu">Lamu</option>
+                                        <option value="Machakos">Machakos</option>
+                                        <option value="Malindi">Malindi</option>
+                                        <option value="Meru">Meru</option>
+                                        <option value="Mombasa">Mombasa</option>
+                                        <option value="Nairobi">Nairobi</option>
+                                        <option value="Naivasha">Naivasha</option>
+                                        <option value="Nakuru">Nakuru</option>
+                                        <option value="Nyeri">Nyeri</option>
+                                        <option value="Ruiru">Ruiru</option>
+                                        <option value="Thika">Thika</option>
                                         <option value="Voi">Voi</option>
                                         <option value="Webuye">Webuye</option>
-                                        <option value="Ruiru">Ruiru</option>
                                     </select>
                                     @error('form.city') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
