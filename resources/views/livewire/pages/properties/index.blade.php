@@ -438,11 +438,11 @@ new #[Layout('components.layouts.guest')] class extends Component {
                                     <flux:icon name="building-office"
                                         class="h-5 w-5 text-gray-400 group-focus-within:text-[#02c9c2] transition-colors duration-200" />
                                 </div>
-                                <select wire:model.live="city"
+                                <select wire:model.live="location"
                                     class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm">
-                                    <option value="">Any City</option>
-                                    @foreach ($cities as $cityOption)
-                                        <option value="{{ $cityOption }}">{{ $cityOption }}</option>
+                                    <option value="">Any Location</option>
+                                    @foreach ($locations as $locationOption)
+                                        <option value="{{ $locationOption }}">{{ $locationOption }}</option>
                                     @endforeach
                                 </select>
                                 <div
