@@ -64,8 +64,8 @@ class PropertySearchService
         }
 
         // Location filters
-        if (!empty($filters['city'])) {
-            $query->where('city', $filters['city']);
+        if (!empty($filters['location'])) {
+            $query->where('location', $filters['location']);
         }
         if (!empty($filters['neighborhood'])) {
             $query->where('neighborhood', $filters['neighborhood']);

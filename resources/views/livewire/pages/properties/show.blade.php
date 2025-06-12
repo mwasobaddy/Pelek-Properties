@@ -133,7 +133,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                         <div class="flex justify-center mt-4 space-x-2 overflow-x-auto py-2 px-1" style="width: max-content;">
                             <template x-for="(image, index) in images" :key="index">
                                 <button @click="goToSlide(index)" 
-                                        class="w-[150px] md:w-16 h-16 rounded-md overflow-hidden transition-all duration-300 focus:outline-none"
+                                        class="w-16 md:w-16 h-16 rounded-md overflow-hidden transition-all duration-300 focus:outline-none"
                                         :class="currentIndex === index ? 'ring-2 ring-[#02c9c2]' : 'opacity-70 hover:opacity-100'">
                                     <img :src="'{{ Storage::disk('property_images')->url('') }}' + image" 
                                         :alt="`Thumbnail ${index + 1}`"

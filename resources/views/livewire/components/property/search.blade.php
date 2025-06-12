@@ -9,7 +9,7 @@ use function Livewire\Volt\{state, computed};
 new class extends Component {
     public string $search = '';
     public ?string $type = '';
-    public ?string $city = '';
+    public ?string $location = '';
     public ?int $minPrice = null;
     public ?int $maxPrice = null;
     public array $selectedAmenities = [];
@@ -32,7 +32,7 @@ new class extends Component {
         $params = array_filter([
             'search' => $this->search,
             'propertyType' => $this->type,
-            'city' => $this->city,
+            'location' => $this->location,
             'priceRange' => $priceRange,
             'amenities' => !empty($this->selectedAmenities) ? implode(',', $this->selectedAmenities) : null,
             'propertyListingType' => $this->listingType !== 'all' ? $this->listingType : null,
@@ -40,7 +40,7 @@ new class extends Component {
             return $value !== '' && $value !== null;
         });
 
-        return $this->redirect(route('properties.index', $params));
+        return $this->redirect(route('properties.index', $params), navigate: true);
     }
 
     public function mount()
@@ -180,7 +180,7 @@ new class extends Component {
                         <label class="block text-sm font-medium text-white/90 dark:text-white/80 mb-1.5">Location</label>
                         <div class="relative group">
                             <select 
-                                wire:model="city"
+                                wire:model="location"
                                 class="w-full appearance-none rounded-lg border-0 bg-white/10 dark:bg-zinc-800/50 py-3 pl-4 pr-10 text-white ring-1 ring-white/20 dark:ring-white/10 transition-all duration-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:bg-white/15 dark:focus:bg-zinc-800/80 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm group-hover:ring-[#02c9c2]/50"
                             >
                                 <option value="">Any Location</option>

@@ -111,7 +111,8 @@ new class extends Component {
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Properties</p>
-                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mt-1">{{ $this->propertiesCount }}
+                        {{-- use db: to count total properties --}}
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mt-1">{{  \App\Models\Property::count() }}
                         </h3>
                     </div>
                     <div class="p-3 bg-gradient-to-br from-[#02c9c2] to-[#012e2b] rounded-lg">

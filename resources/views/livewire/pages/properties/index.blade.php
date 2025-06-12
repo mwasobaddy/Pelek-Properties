@@ -24,8 +24,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
     public $priceRange = '';
     public $onlyAvailable = false;
     public $listingType = null;
-    public $location = null;
-    public $city = '';
+    public $location = '';
     public $neighborhood = '';
     public $bedrooms = '';
     public $bathrooms = '';
@@ -114,7 +113,6 @@ new #[Layout('components.layouts.guest')] class extends Component {
         'onlyAvailable' => ['except' => false],
         'listingType' => ['except' => ''],
         'location' => ['except' => ''],
-        'city' => ['except' => ''],
         'neighborhood' => ['except' => ''],
         'bedrooms' => ['except' => ''],
         'bathrooms' => ['except' => ''],
@@ -164,8 +162,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
         $this->priceRange = '';
         $this->onlyAvailable = false;
         $this->listingType = null;
-        $this->location = null;
-        $this->city = '';
+        $this->location = '';
         $this->neighborhood = '';
         $this->bedrooms = '';
         $this->bathrooms = '';
