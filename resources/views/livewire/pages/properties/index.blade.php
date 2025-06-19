@@ -126,8 +126,8 @@ new #[Layout('components.layouts.guest')] class extends Component {
 
     public function boot(PropertySearchService $propertySearchService)
     {
-        // Fetch cities and amenities
-        $this->cities = $propertySearchService->getAvailableCities();
+        // Fetch locations and amenities
+        $this->locations = $propertySearchService->getAvailableLocations();
         $this->allAmenities = $propertySearchService->getAvailableAmenities();
     }
 
@@ -209,15 +209,15 @@ new #[Layout('components.layouts.guest')] class extends Component {
         $this->resetPage();
     }
 
-    public function updatedCity()
+    public function updatedLocation()
     {
         $this->resetPage();
-        // Reset neighborhood when city changes
+        // Reset neighborhood when location changes
         $this->neighborhood = '';
 
-        // Update neighborhoods based on selected city using the service
-        if ($this->city) {
-            $this->neighborhoods = app(PropertySearchService::class)->getNeighborhoodsByCity($this->city);
+        // Update neighborhoods based on selected location using the service
+        if ($this->location) {
+            $this->neighborhoods = app(PropertySearchService::class)->getNeighborhoodsByLocation($this->location);
         } else {
             $this->neighborhoods = [];
         }
@@ -293,7 +293,6 @@ new #[Layout('components.layouts.guest')] class extends Component {
                 'listing_type' => $this->propertyListingType ?: $this->listingType,
                 'type' => $this->propertyBaseType,
                 'location' => $this->location,
-                'city' => $this->city,
                 'neighborhood' => $this->neighborhood,
                 'bedrooms' => $this->bedrooms,
                 'bathrooms' => $this->bathrooms,
@@ -463,7 +462,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                                 </div>
                                 <select wire:model.live="neighborhood"
                                     class="appearance-none w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-3 pl-10 pr-10 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
-                                    @disabled(!$city)>
+                                    @disabled(!$location)>
                                     <option value="">Any Neighborhood</option>
                                     @foreach ($neighborhoods ?? [] as $neighborhoodOption)
                                         <option value="{{ $neighborhoodOption }}">{{ $neighborhoodOption }}</option>
