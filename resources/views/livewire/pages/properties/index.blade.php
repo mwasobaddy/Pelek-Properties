@@ -174,11 +174,6 @@ new #[Layout('components.layouts.guest')] class extends Component {
         $this->resetPage();
     }
 
-    public function updatedLocation()
-    {
-        $this->resetPage();
-    }
-
     public function updatedFloors()
     {
         $this->resetPage();
@@ -313,6 +308,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
         return [
             'properties' => $properties,
             'propertyTypes' => PropertyType::orderBy('name')->get(),
+            'locations' => $this->locations, // Ensure locations is available to the view
         ];
     }
 };
