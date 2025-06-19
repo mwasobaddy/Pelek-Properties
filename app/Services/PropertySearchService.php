@@ -184,6 +184,22 @@ class PropertySearchService
     }
 
     /**
+     * Get neighborhoods for a specific location
+     */
+    public function getNeighborhoodsByLocation(string $location): array
+    {
+        return Cache::remember("neighborhoods_location_{$location}", 3600, function () use ($location) {
+            return Property::where('location', $location)
+                ->distinct()
+                ->pluck('neighborhood')
+                ->filter()
+                ->sort()
+                ->values()
+                ->toArray();
+        });
+    }
+
+    /**
      * Get price ranges for properties
      */
     public function getPriceRanges(string $listingType = null): array
