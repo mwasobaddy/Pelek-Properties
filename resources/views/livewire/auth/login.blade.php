@@ -73,10 +73,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
     }
 }; ?>
 
-<div class="min-h-screen w-full flex items-center justify-center animate-fade-in px-4 sm:px-6 lg:px-8 flex-col gap-6"
-    x-data="{ processing: false }"
-    x-on:submit="processing = true"
-    x-on:error.window="processing = false">
+<div class="min-h-screen w-full flex items-center justify-center animate-fade-in px-4 sm:px-6 lg:px-8 flex-col gap-6">
     
     <a href="{{ route('home') }}" class="flex flex-col items-center gap-2 font-medium" wire:navigate>
         <span class="flex mb-1 items-center justify-center rounded-md">
@@ -160,15 +157,16 @@ new #[Layout('components.layouts.auth')] class extends Component {
                     <!-- Submit Button -->
                     <button 
                         type="submit"
-                        class="w-full bg-[#02c9c2] text-white py-3 rounded-xl font-medium hover:bg-[#028e89] transition-all duration-200"
-                        :disabled="processing"
+                        class="w-full bg-[#02c9c2] text-white py-3 rounded-xl font-medium hover:bg-[#028e89] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        wire:loading.attr="disabled"
+                        wire:loading.class="opacity-75"
                     >
-                        <span x-show="processing" class="inline-flex items-center">
+                        <span wire:loading.remove>
+                            Sign in
+                        </span>
+                        <span wire:loading class="inline-flex items-center">
                             <flux:icon name="arrow-path" class="w-5 h-5 animate-spin mr-2" />
                             Processing...
-                        </span>
-                        <span x-show="!processing">
-                            Sign in
                         </span>
                     </button>
 
