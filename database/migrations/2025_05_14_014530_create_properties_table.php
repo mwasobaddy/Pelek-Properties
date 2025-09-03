@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('property_type_id')->constrained()->restrictOnDelete();
             $table->string('title');
-            $table->string('slug')->unique();
+            $table->string('slug');
             $table->text('description');
             $table->string('type');
             $table->enum('listing_type', ['sale', 'rent', 'airbnb', 'commercial'])->default('sale');

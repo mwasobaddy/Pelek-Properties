@@ -128,7 +128,7 @@ new class extends Component {
                                     <div class="absolute inset-0 bg-gradient-to-r {{ $sections[$type]['accent'] }} blur-lg opacity-30 rounded-lg transform scale-105"></div>
                                     
                                     <a 
-                                        href="{{ route($type) }}"
+                                        href="{{ url('/properties?propertyListingType=' . $type) }}"
                                         class="group relative inline-flex items-center px-8 py-4 border border-transparent text-base font-medium rounded-lg text-white bg-gradient-to-r from-[#02c9c2] to-[#012e2b] hover:from-[#012e2b] hover:to-[#02c9c2] transition-all duration-300 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02c9c2] dark:focus:ring-offset-gray-900"
                                     >
                                         {{ $sections[$type]['cta'] }}

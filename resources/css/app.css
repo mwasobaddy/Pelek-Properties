@@ -64,3 +64,140 @@ select:focus[data-flux-control] {
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */
+
+/* ===========================================
+   Custom SweetAlert2 Styles
+   =========================================== */
+
+/* Force high z-index for toasts to appear above modals */
+.custom-swal-toast {
+    z-index: 100000 !important;
+}
+
+/* Custom Toast Styles */
+.custom-swal-toast {
+    @apply shadow-2xl backdrop-blur-md border border-white/20;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9));
+    backdrop-filter: blur(20px);
+    border-radius: 12px;
+    box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.dark .custom-swal-toast {
+    background: linear-gradient(135deg, rgba(17, 24, 39, 0.95), rgba(31, 41, 55, 0.9));
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.3),
+        0 10px 10px -5px rgba(0, 0, 0, 0.2),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Toast Title Styles */
+.custom-swal-title {
+    @apply font-semibold text-sm leading-tight;
+    font-family: 'Instrument Sans', sans-serif;
+}
+
+/* Progress Bar Styles */
+.custom-swal-progress {
+    @apply rounded-full;
+    background: linear-gradient(90deg, #02c9c2, #012e2b);
+}
+
+/* Modal Styles */
+.custom-swal-modal {
+    @apply shadow-2xl backdrop-blur-xl border;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.95));
+    border-color: rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.dark .custom-swal-modal {
+    background: linear-gradient(135deg, rgba(17, 24, 39, 0.98), rgba(31, 41, 55, 0.95));
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Modal Title */
+.custom-swal-modal-title {
+    @apply font-bold text-lg;
+    font-family: 'Instrument Sans', sans-serif;
+    background: linear-gradient(135deg, #02c9c2, #012e2b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Button Styles */
+.custom-swal-confirm-btn {
+    @apply font-semibold px-6 py-3 rounded-lg transition-all duration-200;
+    background: linear-gradient(135deg, #02c9c2, #012e2b);
+    border: none;
+    box-shadow: 0 4px 14px 0 rgba(2, 201, 194, 0.3);
+}
+
+.custom-swal-confirm-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px 0 rgba(2, 201, 194, 0.4);
+}
+
+.custom-swal-cancel-btn {
+    @apply font-semibold px-6 py-3 rounded-lg transition-all duration-200;
+    background: linear-gradient(135deg, #6B7280, #374151);
+    border: none;
+    box-shadow: 0 4px 14px 0 rgba(107, 114, 128, 0.3);
+}
+
+.custom-swal-cancel-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px 0 rgba(107, 114, 128, 0.4);
+}
+
+/* Animation Enhancements */
+.swal2-toast.swal2-show {
+    animation: slideInRight 0.3s ease-out;
+}
+
+.swal2-toast.swal2-hide {
+    animation: slideOutRight 0.2s ease-in;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .custom-swal-toast {
+        @apply mx-4;
+        max-width: calc(100vw - 2rem);
+    }
+
+    .custom-swal-modal {
+        @apply mx-4;
+        max-width: calc(100vw - 2rem);
+    }
+}

@@ -1414,11 +1414,8 @@ new class extends Component {
                                             <option value="linkedin">LinkedIn</option>
                                             <option value="pinterest">Pinterest</option>
                                         </select>
-                                        @error('form.social_links.' . $index . '.platform') 
-                                            <span class="text-red-500 text-sm">{{ $message }}</span> 
-                                        @enderror
                                     </div>
-                                    
+
                                     <!-- URL -->
                                     <div class="md:col-span-6">
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">URL</label>
@@ -1429,11 +1426,8 @@ new class extends Component {
                                             class="w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-2.5 px-3 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
                                             placeholder="https://..."
                                         >
-                                        @error('form.social_links.' . $index . '.url') 
-                                            <span class="text-red-500 text-sm">{{ $message }}</span> 
-                                        @enderror
                                     </div>
-                                    
+
                                     <!-- Title (Optional) -->
                                     <div class="md:col-span-2">
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title (Optional)</label>
@@ -1444,16 +1438,13 @@ new class extends Component {
                                             class="w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-2.5 px-3 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
                                             placeholder="Post title"
                                         >
-                                        @error('form.social_links.' . $index . '.title') 
-                                            <span class="text-red-500 text-sm">{{ $message }}</span> 
-                                        @enderror
                                     </div>
-                                    
+
                                     <!-- Remove Button -->
                                     <div class="md:col-span-1 flex items-end">
                                         <button
                                             type="button"
-                                            wire:click="removeSocialLink({{ $index }})"
+                                            :wire:click="'removeSocialLink(' + index + ')'"
                                             class="w-full md:w-auto p-2.5 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors duration-200"
                                             title="Remove link"
                                         >
@@ -1461,9 +1452,7 @@ new class extends Component {
                                         </button>
                                     </div>
                                 </div>
-                            </template>
-                            
-                            <!-- Empty state -->
+                            </template>                            <!-- Empty state -->
                             <div x-show="socialLinks.length === 0" class="text-center py-8 text-gray-500 dark:text-gray-400">
                                 <flux:icon name="link" class="w-12 h-12 mx-auto mb-3 opacity-50" />
                                 <p>No social media links added yet</p>
@@ -1872,25 +1861,14 @@ new class extends Component {
     <div class="absolute top-40 left-0 w-64 h-64 bg-gradient-to-br from-[#02c9c2]/10 to-transparent rounded-full blur-3xl -z-10"></div>
     <div class="absolute bottom-20 right-0 w-96 h-96 bg-gradient-to-tl from-[#012e2b]/10 to-transparent rounded-full blur-3xl -z-10"></div>
 
-    <!-- SweetAlert2 Toast Setup -->
     <script>
         document.addEventListener('livewire:initialized', () => {
             Livewire.on('showToast', (data) => {
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: data.timer || 3000,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                        toast.onmouseenter = Swal.stopTimer;
-                        toast.onmouseleave = Swal.resumeTimer;
-                    }
-                });
-
-                Toast.fire({
+                // Use the global Toast instance with enhanced configuration
+                window.Toast.fire({
                     icon: data.type,
                     title: data.message,
+                    timer: data.timer || 3000,
                     background: data.type === 'success' ? '#10B981' : '#EF4444',
                     color: '#ffffff',
                     iconColor: '#ffffff'

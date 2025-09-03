@@ -48,13 +48,13 @@ class DatabaseSeeder extends Seeder
         $seeders = [
             PropertyTypeSeeder::class,
             AmenitySeeder::class,
-            PropertySeeder::class,
-            PropertySocialLinkSeeder::class,
-            AvailabilityCalendarSeeder::class,
-            PropertyManagementSeeder::class,
-            MaintenanceRecordSeeder::class, // Added MaintenanceRecordSeeder
-            ValuationSeeder::class, // Added ValuationSeeder
-            BlogPostSeeder::class,
+            // PropertySeeder::class,
+            // PropertySocialLinkSeeder::class,
+            // AvailabilityCalendarSeeder::class,
+            // PropertyManagementSeeder::class,
+            // MaintenanceRecordSeeder::class, // Added MaintenanceRecordSeeder
+            // ValuationSeeder::class, // Added ValuationSeeder
+            // BlogPostSeeder::class,
         ];
 
         // Run all seeders in sequence
