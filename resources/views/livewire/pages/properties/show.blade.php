@@ -18,7 +18,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
     
     public function mount(Property $property, SEOService $seoService)
     {
-        $this->property = $property->load(['propertyType', 'amenities', 'images']);
+        $this->property = $property->load(['propertyType', 'amenities', 'images', 'socialLinks']);
         
         $this->similarProperties = Property::query()
             ->where('property_type_id', $this->property->property_type_id)
@@ -313,6 +313,75 @@ new #[Layout('components.layouts.guest')] class extends Component {
                                 {{ $this->property->description }}
                             </div>
                         </div>
+
+                        <!-- Social Media Links Section -->
+                        @if($this->property->socialLinks->isNotEmpty())
+                            <div class="space-y-6">
+                                <div class="flex items-center justify-between">
+                                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
+                                        <flux:icon name="link" class="w-6 h-6 mr-2 text-[#02c9c2]"/>
+                                        Social Media Posts
+                                    </h2>
+                                    <span class="text-sm text-[#02c9c2]">{{ $this->property->socialLinks->count() }} links</span>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    @foreach($this->property->socialLinks as $socialLink)
+                                        <a href="{{ $socialLink->url }}"
+                                           target="_blank"
+                                           rel="noopener noreferrer"
+                                           class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-gray-50 to-white dark:from-gray-800/50 dark:to-gray-700/50 p-4 border border-gray-100 dark:border-gray-700/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-[#02c9c2]/50">
+                                            <div class="absolute inset-0 bg-[#02c9c2]/5 dark:bg-[#02c9c2]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                            <div class="relative flex items-center gap-3">
+                                                <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-[#02c9c2]/10 dark:bg-[#02c9c2]/20 flex items-center justify-center group-hover:bg-[#02c9c2]/20 dark:group-hover:bg-[#02c9c2]/30 transition-colors">
+                                                    @switch($socialLink->platform)
+                                                        @case('instagram')
+                                                            <flux:icon name="camera" class="w-6 h-6 text-[#02c9c2]"/>
+                                                            @break
+                                                        @case('tiktok')
+                                                            <flux:icon name="video-camera" class="w-6 h-6 text-[#02c9c2]"/>
+                                                            @break
+                                                        @case('facebook')
+                                                            <flux:icon name="home" class="w-6 h-6 text-[#02c9c2]"/>
+                                                            @break
+                                                        @case('twitter')
+                                                            <flux:icon name="chat-bubble-left-right" class="w-6 h-6 text-[#02c9c2]"/>
+                                                            @break
+                                                        @case('youtube')
+                                                            <flux:icon name="video-camera" class="w-6 h-6 text-[#02c9c2]"/>
+                                                            @break
+                                                        @case('linkedin')
+                                                            <flux:icon name="briefcase" class="w-6 h-6 text-[#02c9c2]"/>
+                                                            @break
+                                                        @case('pinterest')
+                                                            <flux:icon name="photo" class="w-6 h-6 text-[#02c9c2]"/>
+                                                            @break
+                                                        @default
+                                                            <flux:icon name="link" class="w-6 h-6 text-[#02c9c2]"/>
+                                                    @endswitch
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="flex items-center gap-2 mb-1">
+                                                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400 capitalize">
+                                                            {{ $socialLink->platform }}
+                                                        </span>
+                                                        <flux:icon name="arrow-up-right" class="w-4 h-4 text-[#02c9c2] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"/>
+                                                    </div>
+                                                    @if($socialLink->title)
+                                                        <p class="text-gray-700 dark:text-gray-300 font-medium truncate group-hover:text-[#02c9c2] transition-colors">
+                                                            {{ $socialLink->title }}
+                                                        </p>
+                                                    @else
+                                                        <p class="text-gray-600 dark:text-gray-400 text-sm">
+                                                            View {{ ucfirst($socialLink->platform) }} post
+                                                        </p>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
 
                     <!-- Enhanced Features Section with Interactive Cards -->
                     @if($this->property->amenities->isNotEmpty())
