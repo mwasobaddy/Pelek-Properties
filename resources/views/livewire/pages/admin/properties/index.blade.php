@@ -164,6 +164,7 @@ new class extends Component {
         
         'is_featured' => false,
         'additional_features' => [],
+        'social_links' => [],
     ];
 
 
@@ -264,6 +265,10 @@ new class extends Component {
             'form.whatsapp_number' => 'required|string',
             'form.status' => 'required|in:available,under_contract,sold,rented',
             'form.is_featured' => 'boolean',
+            'form.social_links' => 'nullable|array',
+            'form.social_links.*.platform' => 'required_with:form.social_links|string|in:instagram,tiktok,facebook,twitter,youtube,linkedin,pinterest',
+            'form.social_links.*.url' => 'required_with:form.social_links|url',
+            'form.social_links.*.title' => 'nullable|string|max:255',
         ];
 
         // Add conditional rules based on listing type
@@ -381,6 +386,21 @@ new class extends Component {
         $this->notifySuccess('Image set as featured successfully.');
     }
 
+    public function addSocialLink()
+    {
+        $this->form['social_links'][] = [
+            'platform' => '',
+            'url' => '',
+            'title' => ''
+        ];
+    }
+
+    public function removeSocialLink($index)
+    {
+        unset($this->form['social_links'][$index]);
+        $this->form['social_links'] = array_values($this->form['social_links']);
+    }
+
     public function create()
     {
         $this->resetForm();
@@ -390,7 +410,7 @@ new class extends Component {
 
     public function edit($id)
     {
-        $property = Property::with('images')->findOrFail($id);
+        $property = Property::with(['images', 'socialLinks'])->findOrFail($id);
         $this->selectedProperty = $property;
         
         // Extract property data before resetting the form
@@ -412,6 +432,16 @@ new class extends Component {
         $this->resetForm();
         $this->selectedProperty = $property; // Restore selected property after form reset
         $this->form = array_merge($this->form, $propertyData);
+        
+        // Load existing social links
+        $this->form['social_links'] = $property->socialLinks->map(function ($link) {
+            return [
+                'platform' => $link->platform,
+                'url' => $link->url,
+                'title' => $link->title
+            ];
+        })->toArray();
+        
         $this->modalMode = 'edit';
         $this->showFormModal = true;
     }
@@ -530,6 +560,16 @@ new class extends Component {
                             }
                         }
                     }
+                    
+                    // Handle social links
+                    if (!empty($formData['social_links'])) {
+                        foreach ($formData['social_links'] as $socialLinkData) {
+                            if (!empty($socialLinkData['platform']) && !empty($socialLinkData['url'])) {
+                                $property->socialLinks()->create($socialLinkData);
+                            }
+                        }
+                    }
+                    
                     $this->notifySuccess('Property created successfully.');
                     logger()->info('Property created successfully', ['property_id' => $property->id]);
                 } else {
@@ -555,6 +595,20 @@ new class extends Component {
                             }
                         }
                     }
+                    
+                    // Handle social links for existing property
+                    if (!empty($formData['social_links'])) {
+                        // Delete existing social links
+                        $this->selectedProperty->socialLinks()->delete();
+                        
+                        // Create new social links
+                        foreach ($formData['social_links'] as $socialLinkData) {
+                            if (!empty($socialLinkData['platform']) && !empty($socialLinkData['url'])) {
+                                $this->selectedProperty->socialLinks()->create($socialLinkData);
+                            }
+                        }
+                    }
+                    
                     $this->notifySuccess('Property updated successfully.');
                     logger()->info('Property updated successfully', ['property_id' => $this->selectedProperty->id]);
                 }
@@ -641,6 +695,7 @@ new class extends Component {
             
             'is_featured' => false,
             'additional_features' => [],
+            'social_links' => [],
         ];
         $this->selectedProperty = null;
         $this->temporaryImages = [];
@@ -1319,6 +1374,100 @@ new class extends Component {
                                     </div>
                                 </div>
                                 @error('form.is_featured') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Social Media Links Section -->
+                    <div>
+                        <div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                            <h4 class="text-md font-medium text-gray-700 dark:text-gray-300">
+                                Social Media Links
+                            </h4>
+                            <button
+                                type="button"
+                                wire:click="addSocialLink"
+                                class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-[#02c9c2] hover:text-[#02c9c2]/80 bg-[#02c9c2]/10 hover:bg-[#02c9c2]/20 rounded-lg transition-colors duration-200"
+                            >
+                                <flux:icon name="plus" class="w-4 h-4 mr-1" />
+                                Add Link
+                            </button>
+                        </div>
+                        
+                        <div class="space-y-4" x-data="{ socialLinks: @entangle('form.social_links') }">
+                            <template x-for="(link, index) in socialLinks" :key="index">
+                                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                                    <!-- Platform -->
+                                    <div class="md:col-span-3">
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Platform</label>
+                                        <select
+                                            x-model="socialLinks[index].platform"
+                                            @change="$wire.set('form.social_links.' + index + '.platform', $event.target.value)"
+                                            class="w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-2.5 px-3 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                        >
+                                            <option value="">Select Platform</option>
+                                            <option value="instagram">Instagram</option>
+                                            <option value="tiktok">TikTok</option>
+                                            <option value="facebook">Facebook</option>
+                                            <option value="twitter">Twitter</option>
+                                            <option value="youtube">YouTube</option>
+                                            <option value="linkedin">LinkedIn</option>
+                                            <option value="pinterest">Pinterest</option>
+                                        </select>
+                                        @error('form.social_links.' . $index . '.platform') 
+                                            <span class="text-red-500 text-sm">{{ $message }}</span> 
+                                        @enderror
+                                    </div>
+                                    
+                                    <!-- URL -->
+                                    <div class="md:col-span-6">
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">URL</label>
+                                        <input
+                                            type="url"
+                                            x-model="socialLinks[index].url"
+                                            @input="$wire.set('form.social_links.' + index + '.url', $event.target.value)"
+                                            class="w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-2.5 px-3 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                            placeholder="https://..."
+                                        >
+                                        @error('form.social_links.' . $index . '.url') 
+                                            <span class="text-red-500 text-sm">{{ $message }}</span> 
+                                        @enderror
+                                    </div>
+                                    
+                                    <!-- Title (Optional) -->
+                                    <div class="md:col-span-2">
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title (Optional)</label>
+                                        <input
+                                            type="text"
+                                            x-model="socialLinks[index].title"
+                                            @input="$wire.set('form.social_links.' + index + '.title', $event.target.value)"
+                                            class="w-full rounded-lg border-0 bg-white/50 dark:bg-gray-700/50 py-2.5 px-3 text-gray-900 dark:text-white ring-1 ring-gray-300 dark:ring-gray-600 transition-all duration-200 focus:bg-white dark:focus:bg-gray-700 focus:ring-2 focus:ring-[#02c9c2] sm:text-sm"
+                                            placeholder="Post title"
+                                        >
+                                        @error('form.social_links.' . $index . '.title') 
+                                            <span class="text-red-500 text-sm">{{ $message }}</span> 
+                                        @enderror
+                                    </div>
+                                    
+                                    <!-- Remove Button -->
+                                    <div class="md:col-span-1 flex items-end">
+                                        <button
+                                            type="button"
+                                            wire:click="removeSocialLink({{ $index }})"
+                                            class="w-full md:w-auto p-2.5 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors duration-200"
+                                            title="Remove link"
+                                        >
+                                            <flux:icon name="trash" class="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </template>
+                            
+                            <!-- Empty state -->
+                            <div x-show="socialLinks.length === 0" class="text-center py-8 text-gray-500 dark:text-gray-400">
+                                <flux:icon name="link" class="w-12 h-12 mx-auto mb-3 opacity-50" />
+                                <p>No social media links added yet</p>
+                                <p class="text-sm">Click "Add Link" to add social media links for this property</p>
                             </div>
                         </div>
                     </div>

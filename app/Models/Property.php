@@ -139,6 +139,14 @@ class Property extends Model
     {
         return $this->hasOne(PropertyImage::class)->where('is_featured', true);
     }
+
+    /**
+     * Get all social media links for this property.
+     */
+    public function socialLinks(): HasMany
+    {
+        return $this->hasMany(PropertySocialLink::class);
+    }
     
     /**
      * Get all Airbnb-specific images for this property.

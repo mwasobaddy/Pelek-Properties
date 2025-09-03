@@ -105,7 +105,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
                 </div>
 
                 <form wire:submit="login" class="space-y-6">
-                    <!-- Email Input -->
+                    {{-- <!-- Email Input -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" for="email">
                             Email address
@@ -136,6 +136,39 @@ new #[Layout('components.layouts.auth')] class extends Component {
                             class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#02c9c2] focus:border-transparent transition-all"
                             required
                         >
+                        @error('password')
+                            <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                        @enderror
+                    </div> --}}
+
+                    <!-- Email Input -->
+                    <div>
+                        <flux:input
+                            wire:model="email"
+                            :label="__('Email address')"
+                            type="email"
+                            required
+                            autocomplete="email"
+                            :placeholder="__('hello@hytypo.studio')"
+                            {{-- class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:!ring-[#02c9c2] focus:border-transparent transition-all" --}}
+                        />
+                        @error('email')
+                            <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Password Input -->
+                    <div>
+                        <flux:input
+                            wire:model="password"
+                            :label="__('Password')"
+                            type="password"
+                            required
+                            autocomplete="current-password"
+                            :placeholder="__('••••••••')"
+                            viewable
+                            {{-- class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#02c9c2] focus:border-transparent transition-all" --}}
+                        />
                         @error('password')
                             <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                         @enderror
