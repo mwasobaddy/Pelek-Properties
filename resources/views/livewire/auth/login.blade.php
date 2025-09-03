@@ -152,9 +152,6 @@ new #[Layout('components.layouts.auth')] class extends Component {
                             :placeholder="__('hello@hytypo.studio')"
                             {{-- class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:!ring-[#02c9c2] focus:border-transparent transition-all" --}}
                         />
-                        @error('email')
-                            <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
-                        @enderror
                     </div>
 
                     <!-- Password Input -->

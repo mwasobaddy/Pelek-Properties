@@ -49,6 +49,7 @@ class DatabaseSeeder extends Seeder
             PropertyTypeSeeder::class,
             AmenitySeeder::class,
             PropertySeeder::class,
+            PropertySocialLinkSeeder::class,
             AvailabilityCalendarSeeder::class,
             PropertyManagementSeeder::class,
             MaintenanceRecordSeeder::class, // Added MaintenanceRecordSeeder
