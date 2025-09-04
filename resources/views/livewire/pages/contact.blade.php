@@ -2,6 +2,8 @@
 
 use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
+use App\Mail\ContactFormMail;
+use Illuminate\Support\Facades\Mail;
 
 new #[Layout('components.layouts.guest')] class extends Component {
     public $name = '';
@@ -30,9 +32,37 @@ new #[Layout('components.layouts.guest')] class extends Component {
             'selectedService' => 'required'
         ]);
 
-        // Here you would typically send an email or save to database
-        // For now, we'll just reset the form
-        session()->flash('success', 'Thank you for your message. We will get back to you soon!');
+        // Prepare form data for email
+        $formData = [
+            'name' => $this->name,
+            'email' => $this->email,
+            'phone' => $this->phone,
+            'subject' => $this->subject,
+            'message' => $this->message,
+            'selectedService' => $this->selectedService,
+            'services' => $this->services,
+            'submitted_at' => now()->format('Y-m-d H:i:s')
+        ];
+
+        try {
+            // Send email to sales team
+            Mail::to('sales@pelekproperties.co.ke')->send(new ContactFormMail($formData));
+
+            // Also send to admin if different from sales
+            if (config('mail.from.address') !== 'sales@pelekproperties.co.ke') {
+                Mail::to(config('mail.from.address'))->send(new ContactFormMail($formData));
+            }
+
+            // Send to personal email if configured
+            if (env('ADMIN_EMAIL')) {
+                Mail::to(env('ADMIN_EMAIL'))->send(new ContactFormMail($formData));
+            }
+
+            session()->flash('success', 'Thank you for your message! We have received your inquiry and will get back to you within 24 hours.');
+
+        } catch (\Exception $e) {
+            session()->flash('error', 'Sorry, there was an error sending your message. Please try again or contact us directly.');
+        }
 
         $this->reset(['name', 'email', 'phone', 'subject', 'message', 'selectedService']);
     }
@@ -99,6 +129,38 @@ new #[Layout('components.layouts.guest')] class extends Component {
                         <div class="ml-auto pl-3">
                             <div class="-mx-1.5 -my-1.5">
                                 <button @click="show = false" class="inline-flex rounded-md p-1.5 text-green-500 hover:bg-green-100 dark:hover:bg-green-800 transition-colors">
+                                    <span class="sr-only">Dismiss</span>
+                                    <flux:icon name="x-mark" class="h-5 w-5" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Error Message -->
+            @if (session()->has('error'))
+                <div x-data="{ show: true }"
+                     x-show="show"
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 transform -translate-y-2"
+                     x-transition:enter-end="opacity-100 transform translate-y-0"
+                     x-transition:leave="transition ease-in duration-300"
+                     x-transition:leave-start="opacity-100 transform translate-y-0"
+                     x-transition:leave-end="opacity-0 transform -translate-y-2"
+                     class="mb-8 rounded-lg bg-red-50 dark:bg-red-900/50 p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <flux:icon name="exclamation-circle" class="h-5 w-5 text-red-400" />
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-red-800 dark:text-red-200">
+                                {{ session('error') }}
+                            </p>
+                        </div>
+                        <div class="ml-auto pl-3">
+                            <div class="-mx-1.5 -my-1.5">
+                                <button @click="show = false" class="inline-flex rounded-md p-1.5 text-red-500 hover:bg-red-100 dark:hover:bg-red-800 transition-colors">
                                     <span class="sr-only">Dismiss</span>
                                     <flux:icon name="x-mark" class="h-5 w-5" />
                                 </button>
