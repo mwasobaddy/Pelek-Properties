@@ -138,7 +138,7 @@ new #[Layout('components.layouts.guest')] class extends Component {
                                 </div>
                                 <div class="flex items-center">
                                     <flux:icon name="envelope" class="h-6 w-6 text-[#02c9c2]" />
-                                    <span class="ml-3">info@pelekproperties.co.ke</span>
+                                    <span class="ml-3">sales@pelekproperties.co.ke</span>
                                 </div>
                             </div>
                         </div>

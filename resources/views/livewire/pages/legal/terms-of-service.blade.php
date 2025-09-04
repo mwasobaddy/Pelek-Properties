@@ -224,9 +224,9 @@ new #[Layout('components.layouts.guest')] class extends Component {
                                         </h2>
                                     </div>
                                     <div class="grid sm:grid-cols-2 gap-4">
-                                        <a href="mailto:info@pelekproperties.co.ke" class="flex items-center gap-3 p-4 rounded-lg bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-700/50 transition-all duration-300 group">
+                                        <a href="mailto:sales@pelekproperties.co.ke" class="flex items-center gap-3 p-4 rounded-lg bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-700/50 transition-all duration-300 group">
                                             <flux:icon name="envelope" class="w-5 h-5 text-[#02c9c2] group-hover:scale-110 transition-transform duration-300" />
-                                            <span class="text-gray-600 dark:text-gray-300">info@pelekproperties.co.ke</span>
+                                            <span class="text-gray-600 dark:text-gray-300">sales@pelekproperties.co.ke</span>
                                         </a>
                                         <a href="tel:+254711614099" class="flex items-center gap-3 p-4 rounded-lg bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-700/50 transition-all duration-300 group">
                                             <flux:icon name="phone" class="w-5 h-5 text-[#02c9c2] group-hover:scale-110 transition-transform duration-300" />

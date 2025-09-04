@@ -320,7 +320,7 @@ class SEOService
             '@type' => 'ContactPoint',
             'telephone' => '+254711614099',
             'contactType' => 'customer service',
-            'email' => 'info@pelekproperties.co.ke',
+            'email' => 'admin@pelekproperties.co.ke',
             'areaServed' => 'KE'
         ]);
     }
